@@ -128,6 +128,7 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
 
     }
 
+
     suspend fun sendTicketStatusReq(req: TicketStatusReq): retrofit2.Response<TicketStatusResp> {
         return apiInterface.getticketstatusreq(req.adminCode,req.userCode)
     }

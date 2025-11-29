@@ -315,8 +315,6 @@ interface ApiInterface {
     @POST("api/AOP/App/RechargeOperatorsList")
     suspend fun getAllOperatorList(@Body req: RechargeOperatorsListReq): Response<RechargeOperatorsListRes>?
 
-    //    @POST("api/BOS/BillPaymentOperatorsList")
-    //    fun getOperatorList(@Body model: Operation?): Call<OperationListModel?>?
 
   /*  @POST("api/BOS/App/hlrcheck")
       suspend fun getOperatorName(@Body req: MobileCheckReq?): Response<MobileCheckRes>? */ // Annu
@@ -324,8 +322,8 @@ interface ApiInterface {
     @POST("api/AOP/App/hlrcheck")
     suspend fun getOperatorName(@Body req: MobileCheckReq?): Response<MobileCheckRes>?
 
-    // Like master API //
-    @POST("api/BOS/App/BillPaymentOperatorsList")
+    // BBPS bill, electicity etc.....................
+    @POST("api/AOP/App/BillPaymentOperatorsList")
     suspend fun getOperatorList(@Body model: BillOperationPaymentReq?): Response<BillOperationPaymentRes>?
 
    /* @POST("api/BOS/App/BrowsPlan")
@@ -345,10 +343,8 @@ interface ApiInterface {
     @POST("api/BOS/App/OperatorsList")
     suspend fun getFastTagList(@Query("RegistrationID") registrationID: String): Response<FastTagOperatorsListRes?>?
 
-//    @POST("api/BOS/FetchBilPaymentDetails")
-//    fun viewBill(@Body model: BillModel?): Call<BillModelGet?>?
 
-    @POST("api/BOS/App/FetchBilPaymentDetails")
+    @POST("api/AOP/APP/FetchBilPaymentDetails")
     suspend fun viewBill(@Body req: FetchBilPaymentDetailsReq?): Response<FetchBilPaymentDetailsRes>?
 
     //    fun getOperatorName(@Body receiptModel: OperationSendModel?): Call<OperationModel?>?
@@ -430,6 +426,7 @@ interface ApiInterface {
      // for recharge check slab
     @POST("api/Commercial/GeTCommercial")
     suspend fun getAllRechargeAndBillServiceCharge(@Body req: GetCommercialReq): Response<GetCommercialRes>?
+
 
    // for toself check slab
     @POST("api/Payout/GetPayoutCommercial")
@@ -554,7 +551,7 @@ interface ApiInterface {
     fun getRechargePlanReq(@Body body: RequestBody): Call<ResponseBody>
 
 
-    @POST("api/AOP/V2/MobileRecharge")
+    @POST("api/AOP/V2/Mobile/MobileRecharge")
     suspend fun getMobileRechargeReq(@Body req: com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileRechargeReq): Response<MobileRechargeRespo>? // Annu
 
 
@@ -570,7 +567,7 @@ interface ApiInterface {
     suspend fun putRechargeapiresponseReq(@Body req: RechargeapiresponseReq): Response<UploadRechargeMobileRespResp>? // Annu
 
 
-    // when having commission use this api
+    // when having commission use this apiFetchBilPaymentDetails
     @POST("api/BosTransfer/TransfertoAgent")
     suspend fun getTransferAmountToAgentsForCommission(@Body req: TransferToAgentReq): Response<UploadRechargeMobileRespResp>?
 
@@ -609,8 +606,8 @@ interface ApiInterface {
         @Part("TransactionSummary") receiptNo: RequestBody,
         @Part imageFile1: MultipartBody.Part,
         @Part imageFile2: MultipartBody.Part,
-        @Part imageFile3: MultipartBody.Part
-    ): Response<RaiseTicketResp>
+        @Part imageFile3: MultipartBody.Part): Response<RaiseTicketResp>
+
 
 
     @GET("api/Complaint/TicketList")

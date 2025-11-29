@@ -122,7 +122,7 @@ dependencies {
     // Retrofit Scalars Converter
     implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
 
-//     Compose UI test dependencies
+//   Compose UI test dependencies
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.3'
     debugImplementation 'androidx.compose.ui:ui-tooling:1.4.3'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.3'
@@ -132,14 +132,12 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
 
     // ML Kit Barcode Scanning
-   // implementation 'com.google.zxing:core:3.4.1'
 
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // OTP PinView
     implementation 'io.github.chaosleung:pinview:1.4.4'
-//    implementation 'androidx.biometric:biometric:1.1.0'
     implementation "androidx.biometric:biometric:1.2.0-alpha05"
 
     implementation 'org.apache.poi:poi:4.0.0'
@@ -149,14 +147,10 @@ dependencies {
 
     implementation "org.bouncycastle:bcprov-jdk15to18:1.76"
 
-//    // Required for USB communication
-//    implementation 'androidx.core:core-ktx:1.10.1'
-//    implementation 'android.hardware.usb:usb-host:1.1.0'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     // Bitmap support for fingerprint image
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-
-//    implementation files('libs/MFS100_SDK.aar')
 
     // firebase services......................................................
     implementation 'com.google.firebase:firebase-messaging:25.0.1'
@@ -167,6 +161,8 @@ dependencies {
     // Declare the dependency for the Cloud Firestore library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
+
+    implementation 'com.airbnb.android:lottie:3.4.0'
 
 
 }

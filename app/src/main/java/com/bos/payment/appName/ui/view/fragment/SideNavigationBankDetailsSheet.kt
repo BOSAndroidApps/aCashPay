@@ -1,10 +1,14 @@
 package com.bos.payment.appName.ui.view.fragment
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
@@ -15,6 +19,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.R
 import com.bos.payment.appName.constant.ConstantClass
@@ -65,6 +70,8 @@ import com.bos.payment.appName.utils.Utils
 import com.bos.payment.appName.utils.Utils.PD
 import com.bos.payment.appName.utils.Utils.generateQrBitmap
 import com.bos.payment.appName.utils.Utils.generateRandomNumber
+import com.bos.payment.appName.utils.Utils.getStateCode
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -90,7 +97,7 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
     private lateinit var MobileRechargeViewModel: GetAllMobileRechargeViewModel
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
 
-
+    private var customFuseLocation: CustomFuseLocationActivity? = null
 
 
     companion object {
@@ -102,9 +109,6 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
         var pincode : String = ""
         var Address : String = ""
         var statecode : String = ""
-
-
-
     }
 
 
@@ -114,16 +118,15 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
         mStash = MStash.getInstance(requireContext())
         pd = PD(requireContext())
 
-        MobileRechargeViewModel = ViewModelProvider(this, MobileRechargeViewModelFactory (
-            MobileRechargeRepository(RetrofitClient.apiRechargeInterface)
-        )
-        )[GetAllMobileRechargeViewModel::class.java]
+        MobileRechargeViewModel = ViewModelProvider(this, MobileRechargeViewModelFactory (MobileRechargeRepository(RetrofitClient.apiRechargeInterface)))[GetAllMobileRechargeViewModel::class.java]
 
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
-
+        getFuseLocation()
         setinitData()
         setonclicklistner()
+
+
         return binding.root
     }
 
@@ -138,8 +141,6 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
         accounttype =   mStash!!.getStringValue(Constants.BankAccountType,"")
         merchantcode =   mStash!!.getStringValue(Constants.MerchantId,"")
         registrationID =   mStash!!.getStringValue(Constants.RegistrationId,"")
-
-
 
         binding.holdername.text= holdername
         binding.accountnumber.text= AccountNumber
@@ -159,7 +160,6 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
     }
 
 
-
     private fun setonclicklistner(){
         binding.cross.setOnClickListener {
             dialog!!.dismiss()
@@ -169,7 +169,6 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
             createVirtual()
         }
 
-
     }
 
 
@@ -178,8 +177,9 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
         dialog?.setOnShowListener { it ->
             val d = it as BottomSheetDialog
             val bottomSheet = d.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+
             bottomSheet?.let {
-                    sheet ->
+                sheet ->
                 val behavior = BottomSheetBehavior.from(sheet)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
@@ -188,10 +188,11 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
                 layoutParams.height = windowHeight
                 sheet.layoutParams = layoutParams
             }
+
         }
+
         return super.onCreateDialog(savedInstanceState)
     }
-
 
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -201,73 +202,80 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
 
 
     fun createVirtual(){
-        val requestId = generateRandomNumber()
-        val requestForCreateVirtualAccount = GenerateVirtualAccountModel(
-            apiId = "20261",
-            bankid = "2",
-            partnerReferenceNo = requestId,
-            p1businessName = holdername,
-            p2settlementAccountName = holdername,
-            p3sellerIdentifier = selleridentifier,
-            p4mobileNumber = mobilenumber,
-            p5emailId = emailid,
-            p6mcc = "6012",
-            p7turnoverType = "SMALL",
-            p8acceptanceType = "OFFLINE",
-            p9ownershipType = "PROPRIETARY",
-            p10city = cityName,
-            p11district = district,
-            p12stateCode = statecode,
-            p13pincode = pincode,
-            p14pan = "",
-            p15gstNumber = "",
-            p16settlementAccountNumber = AccountNumber,
-            p17settlementAccountIfsc = IFSC,
-            p18Latitude =  "$latt",
-            p19Longitude = "$long" ,
-            p20addressLine1 = Address,
-            p21addressLine2 = Address,
-            p22LLPINCIN = "",
-            p26DOB = "28/05/1987",
-            p27dOI = "01/02/2024",
-            p28websiteURLAppPackageName = "www.boscenter.in",
-            RegistrationID = merchantcode
-        )
-        Log.d("virtualaccountreq", Gson().toJson(requestForCreateVirtualAccount))
-        MobileRechargeViewModel.createVirtualAccount(requestForCreateVirtualAccount).observe(this) { resource ->
-            resource?.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        pd.dismiss()
-                        it.data?.let { users ->
-                            users.body()?.let { response ->
-                                pd.dismiss()
-                                Log.d("virtualaccountresp", Gson().toJson(requestForCreateVirtualAccount))
-                                if(response.status!!){
-                                    createQRCode()
-                                }
-                                else{
-                                  Toast.makeText(requireContext(),response.message,Toast.LENGTH_SHORT).show()
+        if(latt>0.0 && long> 0.0 ) {
+           var address = getAddressFromLatLng(requireActivity(),latt,long)
+            if(!address.isNullOrBlank()) {
+                val requestId = generateRandomNumber()
+                 val requestForCreateVirtualAccount = GenerateVirtualAccountModel(
+                    apiId = "20261",
+                    bankid = "2",
+                    partnerReferenceNo = requestId,
+                    p1businessName = holdername,
+                    p2settlementAccountName = holdername,
+                    p3sellerIdentifier = selleridentifier,
+                    p4mobileNumber = mobilenumber,
+                    p5emailId = emailid,
+                    p6mcc = "6012",
+                    p7turnoverType = "SMALL",
+                    p8acceptanceType = "OFFLINE",
+                    p9ownershipType = "PROPRIETARY",
+                    p10city = cityName,
+                    p11district = district,
+                    p12stateCode = statecode,
+                    p13pincode = pincode,
+                    p14pan = "",
+                    p15gstNumber = "",
+                    p16settlementAccountNumber = AccountNumber,
+                    p17settlementAccountIfsc = IFSC,
+                    p18Latitude = "$latt",
+                    p19Longitude = "$long",
+                    p20addressLine1 = Address,
+                    p21addressLine2 = Address,
+                    p22LLPINCIN = "",
+                    p26DOB = "28/05/1987",
+                    p27dOI = "01/02/2024",
+                    p28websiteURLAppPackageName = "www.boscenter.in",
+                    RegistrationID = merchantcode
+                )
+                Log.d("virtualaccountreq", Gson().toJson(requestForCreateVirtualAccount))
+
+                MobileRechargeViewModel.createVirtualAccount(requestForCreateVirtualAccount)
+                    .observe(this) { resource ->
+                        resource?.let {
+                            when (it.apiStatus) {
+                                ApiStatus.SUCCESS -> {
+                                    pd.dismiss()
+                                    it.data?.let { users ->
+                                        users.body()?.let { response ->
+                                            pd.dismiss()
+                                            Log.d("virtualaccountresp", Gson().toJson(response))
+                                            binding.responsemasg.text = Gson().toJson(response)
+
+                                            if (response.status!!) {
+                                                createQRCode()
+                                            }
+                                            else {
+                                                Toast.makeText(requireContext(), response.message, Toast.LENGTH_SHORT).show()
+                                            }
+
+                                        }
+                                    }
                                 }
 
+                                ApiStatus.ERROR -> {
+                                    pd.dismiss()
+                                }
+
+                                ApiStatus.LOADING -> {
+                                    pd.show()
+                                }
                             }
                         }
                     }
-
-                    ApiStatus.ERROR -> {
-                        pd.dismiss()
-                    }
-
-                    ApiStatus.LOADING -> {
-                        pd.show()
-                    }
-                }
             }
         }
 
     }
-
-
 
     fun createQRCode(){
 
@@ -282,11 +290,13 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 pd.dismiss()
                                 Log.d("qrcoderesponse", Gson().toJson(response))
+
+                                Toast.makeText(requireContext(),response.message,Toast.LENGTH_LONG).show()
+
                                 if(response.status!!){
                                     var url = response.details!!.qrCode
                                     QRBimap = generateQrBitmap(url!!, 800)
@@ -317,7 +327,6 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
 
     }
 
-
     fun hitapiForUpdateBankDetails(intent:String, vpa:String,isQRCodeActivate:String,isQRCodeGenerated:String){
         val updateBankDetails = UpdateBankDetailsReq(
             vpaid = vpa,
@@ -339,6 +348,7 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
                                 if(response.isSuccess!!){
                                     (activity as JustPeDashboard)?.setQRCodeWithBankDetailsCodition()
                                      dialog!!.dismiss()
+
                                 }
                                 else{
 
@@ -357,6 +367,62 @@ class SideNavigationBankDetailsSheet:BottomSheetDialogFragment() {
                     }
                 }
             }
+        }
+    }
+
+
+    private fun getFuseLocation() {
+        val fused = LocationServices.getFusedLocationProviderClient(requireContext())
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fused.lastLocation.addOnSuccessListener {
+            latt = it.latitude
+            long = it.longitude
+
+            Log.d("LatLongg" , "$latt $long")
+
+        }
+    }
+
+    fun getAddressFromLatLng(context: Context, latitude: Double, longitude: Double): String {
+        return try {
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+
+            if (!addresses.isNullOrEmpty()) {
+                val address = addresses[0]
+
+                Address = address.getAddressLine(0) ?: ""
+                cityName = address.locality ?: ""
+                district = address.subAdminArea ?: ""
+                val state = address.adminArea ?: ""
+                statecode = getStateCode(state ?: "")
+                pincode = address.postalCode ?: ""
+
+                // You can return full formatted string
+                Log.d("Address", "Address: $Address\nCity: $cityName\nDistrict: $district\nState: $state\nPincode: $pincode")
+                "Address: $Address\nCity: $cityName\nDistrict: $district\nState: $state\nPincode: $pincode"
+            } else {
+                "Address not found"
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "Error: ${e.message}"
         }
     }
 

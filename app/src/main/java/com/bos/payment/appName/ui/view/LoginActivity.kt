@@ -322,6 +322,8 @@ class LoginActivity : AppCompatActivity() {
                 mStash!!.setStringValue(Constants.RegistrationId, res.data[0].userID.toString().uppercase())
                 mStash!!.setStringValue(Constants.MobileNumber, res.data[0].mobileNo.toString())
                 mStash!!.setStringValue(Constants.AdminCode, res.data[0].adminCode.toString())
+                mStash!!.setStringValue(Constants.mailid, res.data[0].emailId.toString())
+                mStash!!.setStringValue(Constants.applicationtype, res.data[0].applicationType.toString())
                 mStash!!.setBooleanValue(Constants.IS_LOGIN, true)
                 mStash!!.setStringValue(Constants.AgentName, res.data[0].agencyname.toString())
                 mStash!!.setStringValue(Constants.AgentType, res.data[0].agentType.toString())

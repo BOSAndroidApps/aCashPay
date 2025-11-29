@@ -5,10 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class GetToselfPayoutCommercialReq(
 
 	@field:SerializedName("txtslabamtfrom")
-	val txtslabamtfrom: Int? = null,
+	val txtslabamtfrom: Double? = null,
 
 	@field:SerializedName("txtslabamtto")
-	val txtslabamtto: Int? = null,
+	val txtslabamtto: Double? = null,
 
 	@field:SerializedName("merchant")
 	val merchant: String? = null,

@@ -263,13 +263,14 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
     }
 
+
     // checking slab for services charge
 
     private fun hitApiForToSelfPayoutCommercialRetailer(transferamt:String){
         var merchantCode = mStash!!.getStringValue(Constants.RegistrationId,"")
         var request = GetToselfPayoutCommercialReq(
-            txtslabamtfrom  = transferamt.toIntOrNull(),
-            txtslabamtto =  transferamt.toIntOrNull(),
+            txtslabamtfrom  = transferamt.toDoubleOrNull(),
+            txtslabamtto =  transferamt.toDoubleOrNull(),
             merchant= merchantCode,
             modeofPayment = "NEFT",
             productId = "F0112")
@@ -323,6 +324,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                 Log.d("rechargeAmount", String.format("%.2f", totalRechargeAmount))
 
                 // Save commission types in shared preferences
+
                 with(mStash!!) {
                     setStringValue(Constants.serviceType, response.data!![0]!!.serviceType.toString())
                 }
@@ -336,7 +338,8 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                     Toast.makeText(this,"",Toast.LENGTH_SHORT).show()
                  }
 
-            } else {
+            }
+            else {
                 hitApiForToSelfPayoutCommercialAdmin(rechargeAmount)
 
             }
@@ -347,8 +350,8 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
     private fun hitApiForToSelfPayoutCommercialAdmin(transferamt:String){
         var merchantCode = mStash!!.getStringValue(Constants.AdminCode,"")
         var request = GetToselfPayoutCommercialReq(
-            txtslabamtfrom  = transferamt.toIntOrNull(),
-            txtslabamtto =  transferamt.toIntOrNull(),
+            txtslabamtfrom  = transferamt.toDoubleOrNull(),
+            txtslabamtto =  transferamt.toDoubleOrNull(),
             merchant= merchantCode,
             modeofPayment = "NEFT",
             productId = "F0112"
@@ -385,6 +388,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
 
     }
+
 
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
     private fun getAllServiceChargeApiResAdmin(response: GetToSelfPayoutCommercialResp, rechargeAmount: String) {
@@ -487,6 +491,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
         // Return the total service charge (with GST) to include in the final transaction
         return totalAmountWithGst
     }
+
 
 
 
@@ -841,7 +846,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
             Log.d("balanceCheck", "MainBal = $mainBalance, merchantBal = $merchantBalance,totalAmount = $totalAmount, Status = ${totalAmount <= mainBalance && totalAmount <= merchantBalance}")
 
             if (totalAmount <= merchantBalance) {
-                getTransferAmountToAgentWithCal(binding.etAmount.text.toString())  // payout api
+                sendAllPayoutAmount()
             }
             else {
                 pd.dismiss()
@@ -857,7 +862,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
     }
 
 
-    private fun getTransferAmountToAgentWithCal(rechargeAmount: String) {
+    private fun getTransferAmountToAgentWithCal(rechargeAmount: String,payoutresponse: AOPPayOutRes) {
         try {
             val currentDateTime = Utils.getCurrentDateTime()
             val bankAccountNo = binding.accountnumber.text.toString().trim()
@@ -873,12 +878,12 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
             val transferAmountToAgentsReq = TransferAmountToAgentsReq(
                 transferFrom = mStash!!.getStringValue(Constants.RegistrationId, "") ?: "0",
                 transferTo = "Admin",
-                transferAmt = rechargeAmount ?: "0", //dr
+                transferAmt = "${rechargeAmt ?: "0"}", //dr
                 remark = "To Self Transfer" /*binding.remarks.text.toString().trim()*/,
-                transferFromMsg = "Your account is debited by ₹${rechargeAmt ?: "0"} from your wallet and credited with ₹${creditAmount ?: "0"} to your bank account due to ToSelf on number ${bankAccountNo ?: ""}.",
+                transferFromMsg = "Your account is debited by ₹${rechargeAmt ?: "0"} from your wallet and credited with ₹${creditAmount ?: "0"} to your bank account due to ToSelf on number ${bankAccountNo ?: ""} with UPI Reference Number: ${payoutresponse.initiateAuthGenericFundTransferAPIResp!!.resourceData!!.transactionReferenceNo}",
                 transferToMsg = "", // for toself commission remarks
                 amountType = "Payout",
-                actualTransactionAmount = rechargeAmount ?: "0",
+                actualTransactionAmount = "${rechargeAmt ?: "0"}",  //Trans.Amt.
                 transIpAddress = mStash!!.getStringValue(Constants.deviceIPAddress, "") ?: "0.0.0.0",
                 parmUserName = mStash!!.getStringValue(Constants.RegistrationId, "") ?: "0",
                 merchantCode = mStash!!.getStringValue(Constants.MerchantId, "") ?: "0",
@@ -912,7 +917,8 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                                             if(dialog!=null && dialog.isShowing){
                                                 dialog.dismiss()
                                             }
-                                            sendAllPayoutAmount()
+                                            openDialogForPayout(payoutresponse)
+                                            // there are no need commission
                                         }
                                     }
                                 }
@@ -982,16 +988,8 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
 
     private fun sendAllPayoutAmountRes(response: AOPPayOutRes) {
-        if (response.statuss == "SUCCESS"){
-            openDialogForPayout(response)
-           /* if(dialog!=null && dialog.isShowing){
-                dialog.dismiss()
-            }
-            pd.dismiss()*/
-            Toast.makeText(this, response.message.toString(), Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, response.message.toString(), Toast.LENGTH_SHORT).show()
-        }
+        getTransferAmountToAgentWithCal(binding.etAmount.text.toString(), response)  // payout api
+
     }
 
 
@@ -1021,7 +1019,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
         val detailsgstserviceslayout = dialog.findViewById<LinearLayout>(R.id.chargesdetailslayout)
 
 
-        transferamttxt.text = "$transferAmount"
+        transferamttxt.text =  String.format("%.2f", transferAmount)
         serviceChargeincludinggsttxt.text = String.format("%.2f", servicechargeincludingGst)
 
        var servicechargeamount = mStash!!.getStringValue(Constants.serviceCharge, "") ?: "0.00"
@@ -1034,6 +1032,13 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
         val toBeCreditedAmt = transferAmount - servicechargeincludingGst
 
         creditedamt.text = String.format("%.2f", toBeCreditedAmt)
+
+        if(toBeCreditedAmt<0){
+            creditedamt.setTextColor(resources.getColor(R.color.red))
+        }
+        else{
+            creditedamt.setTextColor(resources.getColor(R.color.green))
+        }
 
         var checkView : Boolean = false
 
@@ -1050,12 +1055,12 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
 
         done.setOnClickListener {
-            if(toBeCreditedAmt>0){
+            if(toBeCreditedAmt>=1){
                 mStash?.setStringValue(Constants.toBeCreditedAmt, String.format("%.2f", toBeCreditedAmt))
                 getMerchantBalance(walletAmount)
             }
             else{
-                Toast.makeText(this, "Transfer amount must be greater than the service charge.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Transfer amount must be greater than ₹ 1 ", Toast.LENGTH_LONG).show()
             }
 
         }
@@ -1089,13 +1094,16 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
         val tvamount = dialog.findViewById<TextView>(R.id.tvAmount)
         val tvToBeneficiary = dialog.findViewById<TextView>(R.id.tvToBeneficiary)
+        val transactionidlayout = dialog.findViewById<LinearLayout>(R.id.bankdata)
+        transactionidlayout.visibility=View.VISIBLE
+
         val tvUpiRefNumber = dialog.findViewById<TextView>(R.id.tvUpiRefNumber)
         val transactionReferenceNo = dialog.findViewById<TextView>(R.id.transactionReferenceNo)
         val done = dialog.findViewById<Button>(R.id.btnDone)
         var ToBeCreditedAmt = mStash!!.getStringValue(Constants.toBeCreditedAmt, "")
 
         tvamount.text = "₹${ToBeCreditedAmt}"
-        tvToBeneficiary.text = response.initiateAuthGenericFundTransferAPIResp!!.resourceData!!.beneficiaryName
+        tvToBeneficiary.text = binding.holdername.text.toString().trim()
         transactionReferenceNo .text = response.initiateAuthGenericFundTransferAPIResp!!.resourceData!!.transactionID
         tvUpiRefNumber .text = response.initiateAuthGenericFundTransferAPIResp!!.resourceData!!.transactionReferenceNo
 

@@ -109,11 +109,11 @@ class AllServicesSelectionActivity : AppCompatActivity() {
 
         addIfActive(R.drawable.rechargenew,getString(R.string.recharge),"F0140")
         addIfActive(R.drawable.dthnew,getString(R.string.dth),"F0140")
-        addIfActive(R.drawable.postpaidnew,getString(R.string.postpaid),"F0116")
         addIfActive(R.drawable.electricitynew,getString(R.string.electricity),"F0116")
         addIfActive(R.drawable.gasnew,getString(R.string.gas),"F0116")
         addIfActive(R.drawable.waterbill,getString(R.string.waterbill),"F0116")
         addIfActive(R.drawable.internet,getString(R.string.broadband),"F0116")
+        addIfActive(R.drawable.postpaidnew,getString(R.string.postpaid),"F0116")
 
 
        /*serviceslist.add(MoneyTransferServicesModel(R.drawable.rechargenew,getString(R.string.recharge),"F0140",""))

@@ -120,7 +120,7 @@ class JustPeDashboard : AppCompatActivity() {
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private  var getMenuListData: ArrayList<Data> = arrayListOf()
     private lateinit var menuListAdapter: MenuListAdapter
-    private lateinit var pd: AlertDialog
+   // private lateinit var pd: AlertDialog
     private var doubleBackToExitPressedOnce: Boolean = false
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
     private var coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -146,11 +146,11 @@ class JustPeDashboard : AppCompatActivity() {
     val items = listOf(NavParentItem("Support Management", listOf("Ticket Status")))
     private lateinit var navAdapter: NavAdapter
 
+
     companion object{
          var QRBimap : Bitmap? = null
          var vpa : String? = null
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,11 +169,10 @@ class JustPeDashboard : AppCompatActivity() {
         }
 
         init()
-        getFuseLocation()
+
         getfirebasetoken()
         hitApiForBannerRetailer("retailer")
         startMerchantListPolling(mStash!!.getStringValue(Constants.MerchantId, "").toString())
-        getBankDetails(mStash!!.getStringValue(Constants.RegistrationId, "").toString())
         setMoneyTransferServices()
         setclickListner()
 
@@ -203,7 +202,6 @@ class JustPeDashboard : AppCompatActivity() {
                     resource?.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
-                                pd.dismiss()
                                 it.data?.let { users ->
                                     users.body()?.let { it1 ->
                                         getAllMerchantListRes(it1, merchantId)
@@ -212,11 +210,9 @@ class JustPeDashboard : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.dismiss()
                             }
                         }
                     }
@@ -225,6 +221,9 @@ class JustPeDashboard : AppCompatActivity() {
     }
 
     private fun getAllMerchantListRes(response: GetApiListMarchentWiseRes, merchantId: String) {
+        if(binding.appBarDashBoard.deskdesign.swipeRefreshLayout.isRefreshing){
+            binding.appBarDashBoard.deskdesign.swipeRefreshLayout.isRefreshing = false
+        }
         if (response.isSuccess == true) {
             if (response.data.isEmpty()) {
                 Log.e("MerchantListError", "response.data is null or empty")
@@ -258,7 +257,8 @@ class JustPeDashboard : AppCompatActivity() {
 
     fun init(){
         mStash = MStash.getInstance(this@JustPeDashboard)
-        pd = PD(this)
+
+        getFuseLocation()
 
         viewModel = ViewModelProvider(this, MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllInterface)))[MoneyTransferViewModel::class.java]
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
@@ -364,6 +364,10 @@ class JustPeDashboard : AppCompatActivity() {
 
     fun setclickListner(){
 
+        binding.appBarDashBoard.deskdesign.swipeRefreshLayout.setOnRefreshListener {
+            refreshData()
+        }
+
         binding.nav.shareqrcode.setOnClickListener {
             if(QRBimap!=null)
             shareBitmap(QRBimap!!,this)
@@ -405,6 +409,12 @@ class JustPeDashboard : AppCompatActivity() {
             mStash!!.setBooleanValue(Constants.fingerPrintAction.toString(), fingerPrint)
         }
 
+        //ProfileUpdated
+
+        binding.nav.ownerPhoto.setOnClickListener {
+           startActivity(Intent(this@JustPeDashboard,ProfileUpdated::class.java))
+        }
+
         binding.appBarDashBoard.deskdesign.menuicon.setOnClickListener {
             getAllMenuList()
             binding.drawer.openDrawer(GravityCompat.START)
@@ -429,6 +439,12 @@ class JustPeDashboard : AppCompatActivity() {
             startActivity(Intent(this, ScannerFragment::class.java))
         }
 
+    }
+
+    fun refreshData(){
+        hitApiForBannerRetailer("retailer")
+        hitApiForServicesRequest()
+        startMerchantListPolling(mStash!!.getStringValue(Constants.MerchantId, "").toString())
     }
 
     fun setViewPagerData(response:DashboardBannerListModel){
@@ -487,7 +503,8 @@ class JustPeDashboard : AppCompatActivity() {
     private fun getAllMenuList() {
         val getAllMenuListReq = GetAllMenuListReq(
             loginId = mStash!!.getStringValue(Constants.RegistrationId, ""),
-            applicationCode = "Bos")
+            applicationCode = "Bos"
+        )
 
            Log.d("getAllMenuListReq", Gson().toJson(getAllMenuListReq))
 
@@ -495,7 +512,7 @@ class JustPeDashboard : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        Constants.dialog.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("MenuList",Gson().toJson(response))
@@ -505,11 +522,11 @@ class JustPeDashboard : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        Constants.dialog.dismiss()
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
@@ -567,24 +584,26 @@ class JustPeDashboard : AppCompatActivity() {
                 parmUser = mStash!!.getStringValue(Constants.RegistrationId, ""),
                 flag = "CreditBalance"
             )
+            Log.d("checkWallet",Gson().toJson(walletBalanceReq))
             getAllApiServiceViewModel.getWalletBalance(walletBalanceReq).observe(this) { resource ->
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                             it.data?.let { users ->
                                 users.body()?.let { response ->
+                                    Log.d("checkwalletresp", Gson().toJson(response))
                                     getAllWalletBalanceRes(response)
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
                     }
                 }
@@ -630,7 +649,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-       handler.removeCallbacksAndMessages(null)
+        handler.removeCallbacksAndMessages(null)
     }
 
 
@@ -639,6 +658,7 @@ class JustPeDashboard : AppCompatActivity() {
         startAutoSlide()
         getWalletBalance()
         hitApiForServicesRequest()
+        getBankDetails(mStash!!.getStringValue(Constants.RegistrationId, "").toString())
     }
 
 
@@ -723,7 +743,7 @@ class JustPeDashboard : AppCompatActivity() {
             when (resource.apiStatus) {
 
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
+
 
                     val response = resource.data
                     if (response?.isSuccess == true) {
@@ -736,14 +756,15 @@ class JustPeDashboard : AppCompatActivity() {
                     }
                 }
 
+
                 ApiStatus.ERROR -> {
                     hitApiForBannerAdmin("admin")
-                    pd.dismiss()
+
                     //Toast.makeText(this, resource.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
-                    pd.show()
+
                 }
             }
         }
@@ -763,8 +784,6 @@ class JustPeDashboard : AppCompatActivity() {
             when (resource.apiStatus) {
 
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
-
                     val response = resource.data
 
                     if (response?.isSuccess == true) {
@@ -779,13 +798,11 @@ class JustPeDashboard : AppCompatActivity() {
                 }
 
                 ApiStatus.ERROR -> {
-                    pd.dismiss()
                     binding.appBarDashBoard.deskdesign.viewpager.visibility= View.GONE
                     Toast.makeText(this, resource.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
-                    pd.show()
                 }
             }
         }
@@ -807,7 +824,7 @@ class JustPeDashboard : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("RetailerWiseServicesresp",Gson().toJson(response))
@@ -868,11 +885,11 @@ class JustPeDashboard : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.dismiss()
+
                     }
                 }
             }
@@ -893,7 +910,7 @@ class JustPeDashboard : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("BankdetailsResponse",Gson().toJson(response))
@@ -926,11 +943,11 @@ class JustPeDashboard : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.dismiss()
+
                     }
                 }
             }
@@ -938,14 +955,18 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     private fun getFuseLocation() {
 
         customFuseLocation = CustomFuseLocationActivity(this, this) { mCurrentLocation ->
             latt = mCurrentLocation.latitude
             long = mCurrentLocation.longitude
-            Log.d("Lat Long", "Lat: ${latt} : Long: ${long}")
-            getAddressFromLatLng(this,latt,long)
+
+            Log.d("Lat Long", "Lat: $latt : Long: $long")
+            getAddressFromLatLng(this, latt, long)
         }
+
+
     }
 
     fun getAddressFromLatLng(context: Context, latitude: Double, longitude: Double): String {

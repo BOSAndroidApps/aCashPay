@@ -70,14 +70,6 @@ class MoneyTransferViewModel (private val repository: MoneyTransferRepository) :
         }
     }
 
-    fun getOperatorList(req: BillOperationPaymentReq) = liveData(Dispatchers.IO) {
-        emit(ApiResponse.loading(data = null))
-        try {
-            emit(ApiResponse.success(data = repository.getOperatorList(req)))
-        } catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
-        }
-    }
 
     fun getAllOperatorList(req: RechargeOperatorsListReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -339,14 +331,7 @@ class MoneyTransferViewModel (private val repository: MoneyTransferRepository) :
         }
     }
 
-    fun viewBill(req: FetchBilPaymentDetailsReq) = liveData(Dispatchers.IO) {
-        emit(ApiResponse.loading(data = null))
-        try {
-            emit(ApiResponse.success(data = repository.viewBill(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
-        }
-    }
+
 
 
 

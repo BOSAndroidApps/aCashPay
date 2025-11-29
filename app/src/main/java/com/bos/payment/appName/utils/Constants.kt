@@ -1,21 +1,29 @@
 package com.bos.payment.appName.utils
 
+import android.app.Dialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesDataItem
 import com.bos.payment.appName.data.model.recharge.operator.Data
 import com.google.firebase.Firebase
@@ -48,6 +56,8 @@ object Constants {
     var RegistrationId = "RegistrationId"
     var AdminCode = "AdminCode"
     var MerchantId = "MerchantId"
+    var mailid = "mailid"
+    var applicationtype = "applicationtype"
     var retailerName = "fullname"
     var MerchantList = "MerchantList"
     var Merchant = "Merchant"
@@ -237,7 +247,7 @@ object Constants {
    var BranchNamee =  "branchname"
    var CashDeposit =  "Cash Deposit"
    var DateSelectionHint =  "Select Date"
-
+    lateinit var  dialog : Dialog
 
     val KEY_192 = "your-24-byte-key-here!".toByteArray(Charsets.UTF_8) // 24 bytes
     val IV_192 = "8-byte-iv".toByteArray(Charsets.UTF_8) // 8 bytes
@@ -497,6 +507,27 @@ object Constants {
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentIsoDate(): String {
         return Instant.now().toString()
+    }
+
+
+    fun OpenPopUpForVeryfyOTP(context: Context){
+        dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.loader)
+
+        dialog.window?.apply {
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.TRANSPARENT
+            decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+        }
+
+        dialog.setCanceledOnTouchOutside(false)
+
+        dialog.show()
+
     }
 
 

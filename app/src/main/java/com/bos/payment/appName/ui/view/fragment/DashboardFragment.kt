@@ -940,6 +940,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun pressedAllBillBtn() {
+
         binding.llPostPaid.setOnClickListener {
             callFragment(RechargeFragment(), "postpaid")
         }

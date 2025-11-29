@@ -8,6 +8,15 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_dash_board">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/menulayout"
         android:layout_width="match_parent"
@@ -38,7 +47,6 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -423,6 +431,9 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

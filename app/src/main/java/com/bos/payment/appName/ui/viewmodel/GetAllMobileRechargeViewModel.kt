@@ -2,8 +2,10 @@ package com.bos.payment.appName.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import com.bos.payment.appName.data.model.fastTag.viewBillPayment.FetchBilPaymentDetailsReq
 import com.bos.payment.appName.data.model.justpaymodel.CheckBankDetailsModel
 import com.bos.payment.appName.data.model.justpaymodel.GenerateVirtualAccountModel
+import com.bos.payment.appName.data.model.recharge.BillOperationPaymentReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileWiseRechargeReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.RechargeCategoryReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.RechargeOperatorsReq
@@ -145,6 +147,17 @@ class GetAllMobileRechargeViewModel(private val repository: MobileRechargeReposi
     }
 
 
+    // for bbps api.................................................................................................
+
+    fun getOperatorList(req: BillOperationPaymentReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.getOperatorList(req)))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
 
     fun getMobileRechargeRequest(req: com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileRechargeReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -175,6 +188,14 @@ class GetAllMobileRechargeViewModel(private val repository: MobileRechargeReposi
         }
     }
 
+    fun viewBill(req: FetchBilPaymentDetailsReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.viewBill(req)))
+        }catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
 
 
     fun createVirtualAccount(req: GenerateVirtualAccountModel) = liveData(Dispatchers.IO) {
@@ -235,8 +256,6 @@ class GetAllMobileRechargeViewModel(private val repository: MobileRechargeReposi
             )
         }
     }
-
-
 
 
 }

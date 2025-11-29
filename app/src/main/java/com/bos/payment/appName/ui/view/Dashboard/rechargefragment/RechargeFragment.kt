@@ -140,11 +140,10 @@ class RechargeFragment : Fragment() {
     private lateinit var spinnerType: String
     private lateinit var adapter: ViewPlanListAdapter
     private var oeratorList = ArrayList<Data>()
-    private var getAllOperatorList =
-        ArrayList<com.bos.payment.appName.data.model.recharge.operator.Data>()
+    private var getAllOperatorList = ArrayList<com.bos.payment.appName.data.model.recharge.operator.Data>()
     private var rechargeType: String = ""
     private var featureCode: String = ""
-    private lateinit var pd: AlertDialog
+   // private lateinit var pd: AlertDialog
     private var customFuseLocation: CustomFuseLocationActivity? = null
     private var bill_model = FetchConsumerDetailsRes()
     private var mStash: MStash? = null
@@ -165,6 +164,7 @@ class RechargeFragment : Fragment() {
     }
 
     var mobileRechargePlanList: MutableList<MobileRechargePlanModel> = mutableListOf()
+    var filterMobileRechargePlanList: MutableList<MobileRechargePlanModel> = mutableListOf()
     var mobilePlan: MutableList<Plan> = mutableListOf()
 
     var operatorNameDTHList: MutableList<Pair<String, Int>> = mutableListOf()
@@ -172,8 +172,8 @@ class RechargeFragment : Fragment() {
 
     var apiCalled: Boolean = false
 
-    var DthInfoList: MutableList<com.bos.payment.appName.data.model.recharge.recharge.DataItem> =
-        mutableListOf()
+    var DthInfoList: MutableList<com.bos.payment.appName.data.model.recharge.recharge.DataItem> = mutableListOf()
+
     private var lastTriggeredBy: String? = null
 
     lateinit var dialog: Dialog
@@ -185,18 +185,32 @@ class RechargeFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.M)
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         binding = FragmentRechargeBinding.inflate(inflater, container, false)
         context = requireContext()
         rechargeType = arguments?.getString("RechargeType").toString()
         featureCode = arguments?.getString("FeatureCode").toString()
-        setOperatorNameForDTH()
+
         getFuseLocation()
+
+        /*if (rechargeType == "FastTag") {
+            getFastTagList()
+        }
+        else {*/
         initView()
+        if (rechargeType == "mobile" || rechargeType == "dth") {
+            // new changes.............................................
+            val apiName = "Recharge Api"
+            getAllOperatorList(apiName)
+            setOperatorNameForDTH()
+            hitApiForRechargeCategory()
+        }
+        else {
+            val apiName = "Bill Payment Api"
+            getOperatorList(apiName)
+        }
+        /* }*/
 
         if (!isUserLoggedIn()) {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
@@ -204,22 +218,6 @@ class RechargeFragment : Fragment() {
 
         btnListener()
 
-        /*  if (rechargeType == "FastTag") {
-              getFastTagList()
-          }
-          else {
-              if (rechargeType == "mobile" || rechargeType == "dth") {
-                  val apiName = "Recharge Api"
-                  getAllOperatorList(apiName)
-              } else {
-                  val apiName = "Bill Payment Api"
-                  getOperatorList(apiName)
-              }
-          }*/
-
-        // new changes.............................................
-
-        hitApiForRechargeCategory()
 
         return binding.root
 
@@ -258,18 +256,89 @@ class RechargeFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun btnListener() {
 
+        // Set up the SearchView
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Filter the adapter when query is submitted
+                query?.let {
+                    if(mobileRechargePlanList.size>0&&!it.isNullOrBlank()){
+                        filterMobileRechargePlanList= filterPlansByRs(mobileRechargePlanList,
+                            it.toIntOrNull()!!
+                        )
+                        if(filterMobileRechargePlanList.size>0){
+                            setSearchPlanMobile(filterMobileRechargePlanList)
+                        }else{
+                            Toast.makeText(context,"No Plan Found",Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+                    else {
+                        setSearchPlanMobile(mobileRechargePlanList)
+                    }
+
+
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Filter the adapter as the user types
+                newText?.let {
+                    if(mobileRechargePlanList.size>0&&!it.isNullOrBlank()){
+                        filterMobileRechargePlanList= filterPlansByRs(mobileRechargePlanList,
+                            it.toIntOrNull()!!
+                        )
+                        if(filterMobileRechargePlanList.size>0){
+                            setSearchPlanMobile(filterMobileRechargePlanList)
+                        }else{
+                            Toast.makeText(context,"No Plan Found",Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    else {
+                        setSearchPlanMobile(mobileRechargePlanList)
+                    }
+                }
+                return false
+            }
+
+
+        })
+
+
+        binding.etAmount.addTextChangedListener(object :TextWatcher{
+           override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+           }
+
+           override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+               binding.llViewBill.visibility = View.GONE
+               binding.tvAmount2.visibility = View.GONE
+               binding.etAmount2.visibility = View.GONE
+               binding.userNameText.visibility = View.GONE
+               binding.layoutDetails.visibility = View.GONE
+               binding.userNameEditText.visibility = View.GONE
+               binding.arrowImg.animate().rotation(0f).setDuration(200).start()
+           }
+
+           override fun afterTextChanged(s: Editable?) {
+
+           }
+
+       })
+
         binding.etMobileNumber.addTextChangedListener(object : TextWatcher {
 
             @SuppressLint("SetTextI18n")
             override fun afterTextChanged(s: Editable) {
-                if (s.length == 10) {
-                    binding.llViewPlan.visibility = View.VISIBLE
-                } else {
-                    binding.llViewPlan.visibility = View.GONE
-                    binding.etAmount.setText("")
-                    binding.spOperator.setSelection(0)
-                    //binding.etCircle.setText("")
-                }
+                    if (s.length == 10) {
+                        binding.llViewPlan.visibility = View.VISIBLE
+                    } else {
+                        binding.llViewPlan.visibility = View.GONE
+                        binding.etAmount.setText("")
+                        binding.spOperator.setSelection(0)
+                        //binding.etCircle.setText("")
+                    }
 
             }
 
@@ -278,10 +347,10 @@ class RechargeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.length == 10) {
                     mob = binding.etMobileNumber.text.toString().trim()
-                    //getOperatorName(binding.etMobileNumber.text.toString().trim(), "mobile")
                     hitApiForMobileWiseOperatorName(mob)
                     hideKeyboard(binding.etMobileNumber)
-                } else {
+                }
+                else {
                     if (s.length == 0) {
                         hitApiForRechargeOperatorNameList(DisplayName!!)
                     }
@@ -291,19 +360,14 @@ class RechargeFragment : Fragment() {
 
         })
 
-
         binding.tvBtnViewPlan.setOnClickListener {
             viewPlanList()
         }
-
 
         binding.etDTHBillNumber.addTextChangedListener(object : TextWatcher {
             @SuppressLint("SetTextI18n")
             override fun afterTextChanged(s: Editable) {
                 if (binding.etDTHBillNumber.length() > 0) {
-                    /*getOperatorName(binding.etDTHBillNumber.text.toString().trim(), "dth")
-                    hideKeyboard(binding.etDTHBillNumber)*/
-
                     if (binding.etDTHBillNumber.text.length >= 10) {
                         lastTriggeredBy = "circle"
                         CheckAndHitApi()
@@ -314,7 +378,6 @@ class RechargeFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         })
-
 
         binding.etMobileNumber.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
@@ -339,7 +402,6 @@ class RechargeFragment : Fragment() {
             false
         }
 
-
         binding.cancelBtn.setOnClickListener {
             binding.llViewBill.visibility = View.GONE
         }
@@ -349,19 +411,35 @@ class RechargeFragment : Fragment() {
             validation()
         }
 
-
         binding.tvBtnProceedBill.setOnClickListener {
-            showUpdateKycDetails(context)
-
+            //showUpdateKycDetails(context)
+            var bbpsrechargeamt =   binding.etAmount2.text.toString().trim()
+            if (bbpsrechargeamt > "0.00") {
+                //getAllBillServiceCharge(response.amount.toString())
+               // getAllServiceChargeRetailer(bbpsrechargeamt)
+                Toast.makeText(requireContext(),"Failed to process the payment",Toast.LENGTH_LONG).show()
+            }
+            else{
+                Toast.makeText(requireContext(),"All dues are paid!!",Toast.LENGTH_LONG).show()
+            }
         }
 
+    }
 
+    fun filterPlansByRs(list: List<MobileRechargePlanModel>, amount: Int): MutableList<MobileRechargePlanModel> {
+        return list.mapNotNull { item ->
+            val filteredPlans = item.plans.filter { it.rs == amount }
+            if (filteredPlans.isNotEmpty()) {
+                item.copy(plans = filteredPlans)    // return arrayName + matched plans
+            } else {
+                null
+            }
+        }.toMutableList()
     }
 
 
     private fun pickContact() {
-        val contactPickerIntent =
-            Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+        val contactPickerIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
         startActivityForResult(contactPickerIntent, PICK_CONTACT_REQUEST)
     }
 
@@ -394,9 +472,7 @@ class RechargeFragment : Fragment() {
                             binding.etMobileNumber.addTextChangedListener(object : TextWatcher {
                                 override fun afterTextChanged(s: Editable) {
                                     if (binding.etMobileNumber.length() == 10) {
-                                        getOperatorName(
-                                            binding.etMobileNumber.text.toString().trim(), "mobile"
-                                        )
+                                        getOperatorName(binding.etMobileNumber.text.toString().trim(), "mobile")
                                         hideKeyboard(binding.etMobileNumber)
                                     }
                                 }
@@ -435,39 +511,32 @@ class RechargeFragment : Fragment() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 pickContact()
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Permission denied to read contacts",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(requireContext(), "Permission denied to read contacts", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.M)
     private fun initView() {
-        pd = PD(requireContext())
+       // pd = PD(requireContext())
         mStash = MStash.getInstance(requireActivity())
+
         bill_model = FetchConsumerDetailsRes()
         selectedFastTagModel = com.bos.payment.appName.data.model.fastTag.fastTagOperator.Data()
 
-        getAllApiServiceViewModel = ViewModelProvider(
-            this,
-            GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface))
-        )[GetAllApiServiceViewModel::class.java]
+        getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
-        MobileRechargeViewModel = ViewModelProvider(
-            this,
-            MobileRechargeViewModelFactory(MobileRechargeRepository(RetrofitClient.apiRechargeInterface))
-        )[GetAllMobileRechargeViewModel::class.java]
+        MobileRechargeViewModel = ViewModelProvider(this, MobileRechargeViewModelFactory(MobileRechargeRepository(RetrofitClient.apiRechargeInterface)))[GetAllMobileRechargeViewModel::class.java]
 
-        viewModel = ViewModelProvider(
-            this,
-            MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllAPIService))
-        )[MoneyTransferViewModel::class.java]
+        viewModel = ViewModelProvider(this, MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllAPIService)))[MoneyTransferViewModel::class.java]
 
+        ShowHideUtils()
+    }
+
+
+    private fun ShowHideUtils(){
         binding.etDTHBillNumber.visibility = View.GONE
-
 
         Constants.operatorName = ArrayList()
         Constants.dthName = ArrayList()
@@ -521,10 +590,13 @@ class RechargeFragment : Fragment() {
         Constants.municipalityNameMapForGettingMunicipalityName = HashMap()
         Constants.fastTagNameMapForGettingFastTagName = HashMap()
 
+
         if (rechargeType == "mobile") {
             binding.etAmount.visibility = View.GONE
             binding.rechargeAmount.visibility = View.VISIBLE
-        } else if (rechargeType == "dth") {
+
+        }
+        else if (rechargeType == "dth") {
             binding.tvRechargeType.text = "Enter CA No"
             binding.etAmount.visibility = View.VISIBLE
             binding.rechargeAmount.visibility = View.GONE
@@ -534,7 +606,9 @@ class RechargeFragment : Fragment() {
             binding.etMobileNumber.visibility = View.GONE
             binding.etCircle.visibility = View.VISIBLE
             binding.tvBtnViewPlan.visibility = View.GONE
-        } else if (rechargeType == "FastTag") {
+
+        }
+        else if (rechargeType == "FastTag") {
             binding.tvRechargeType.text = "Enter Vehicle No"
             binding.etMobileNumber.visibility = View.GONE
             binding.etMobileNumber2.visibility = View.VISIBLE
@@ -542,54 +616,61 @@ class RechargeFragment : Fragment() {
             binding.etCircle.visibility = View.GONE
             binding.tvBtnViewPlan.visibility = View.GONE
             capitalizeEditText(binding.etMobileNumber2)
-        } else
+        }
+        else
             if (rechargeType == "postpaid" || rechargeType == "Broadband" || rechargeType == "Electricity" || rechargeType == "Landline" || rechargeType == "Water" || rechargeType == "Gas" || rechargeType == "EMI" || rechargeType == "Cable" || rechargeType == "Insurance" || rechargeType == "Municipality") {
-                binding.llMode.visibility = View.VISIBLE
-                binding.tvRechargeType.visibility = View.GONE
-                binding.etMobileNumber.visibility = View.GONE
-                binding.tvCircle.visibility = View.GONE
-                binding.etCircle.visibility = View.GONE
-                binding.tvBtnViewPlan.visibility = View.GONE
+            binding.llMode.visibility = View.VISIBLE
+            binding.etAmount.visibility = View.VISIBLE
+            binding.tvRechargeType.visibility = View.GONE
+            binding.etMobileNumber.visibility = View.GONE
+            binding.rechargeAmount.visibility = View.GONE
+            binding.tvCircle.visibility = View.GONE
+            binding.etCircle.visibility = View.GONE
+            binding.tvBtnViewPlan.visibility = View.GONE
 
-                if (rechargeType == "Broadband" || rechargeType == "Landline") {
-                    binding.tvAmount.text = "No. + STD Code"
-                } else if (rechargeType == "Electricity" || rechargeType == "Gas" || rechargeType == "Municipality") {
-                    binding.tvAmount.text = "Enter CA Number"
-                } else if (rechargeType == "Water") {
-                    binding.tvOperator.text = "Water Board"
-                    binding.tvAmount.text = "CA / RR No."
-                } else if (rechargeType == "EMI") {
-                    binding.tvOperator.text = "Lender"
-                    binding.tvAmount.text = "Loan Account No."
-                } else if (rechargeType == "Cable") {
-                    binding.tvAmount.text = "Mobile / Acc No."
-                } else if (rechargeType == "Insurance") {
-                    binding.tvOperator.text = "Insurance"
-                    binding.tvAmount.text = "Policy Number."
-                } else {
-                    binding.tvAmount.text = "Enter Mobile No"
-                }
-                binding.tvBtnProceed.text = "Get Bill"
-                val arrayList = ArrayList<String>()
-                arrayList.add("online")
-                arrayList.add("offline")
-                binding.spMode.adapter =
-                    ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, arrayList)
-                binding.spMode.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            adapterView: AdapterView<*>, view: View?, i: Int, l: Long
-                        ) {
-                            try {
-                                spinnerType = arrayList[i]
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                        }
-
-                        override fun onNothingSelected(adapterView: AdapterView<*>) {}
-                    }
+            if(rechargeType == "postpaid"){
+                binding.etMobileNumber.visibility = View.VISIBLE
+                binding.tvRechargeType.visibility = View.VISIBLE
             }
+            else if (rechargeType == "Broadband" || rechargeType == "Landline") {
+                binding.tvAmount.text = "No. + STD Code"
+            } else if (rechargeType == "Electricity" || rechargeType == "Gas" || rechargeType == "Municipality") {
+                binding.tvAmount.text = "Enter CA Number"
+            } else if (rechargeType == "Water") {
+                binding.tvOperator.text = "Water Board"
+                binding.tvAmount.text = "CA / RR No."
+            } else if (rechargeType == "EMI") {
+                binding.tvOperator.text = "Lender"
+                binding.tvAmount.text = "Loan Account No."
+            } else if (rechargeType == "Cable") {
+                binding.tvAmount.text = "Mobile / Acc No."
+            } else if (rechargeType == "Insurance") {
+                binding.tvOperator.text = "Insurance"
+                binding.tvAmount.text = "Policy Number."
+            } else {
+                binding.tvAmount.text = "Enter Mobile No"
+            }
+
+            binding.tvBtnProceed.text = "Get Bill"
+
+            val arrayList = ArrayList<String>()
+            arrayList.add("online")
+            arrayList.add("offline")
+            binding.spMode.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, arrayList)
+            binding.spMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(adapterView: AdapterView<*>, view: View?, i: Int, l: Long) {
+                    try {
+                        spinnerType = arrayList[i]
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onNothingSelected(adapterView: AdapterView<*>) {}
+            }
+        }
+
+
     }
 
 
@@ -598,6 +679,7 @@ class RechargeFragment : Fragment() {
         imm.hideSoftInputFromWindow(editText.windowToken, 0)
     }
 
+
     private fun viewPlanList() {
         if (rechargeType == "mobile") {
             if (TextUtils.isEmpty(binding.etMobileNumber.text.toString()) || binding.etMobileNumber.length() != 10) {
@@ -605,31 +687,26 @@ class RechargeFragment : Fragment() {
                 binding.llTransactionHistory.visibility = View.GONE
                 Toast.makeText(context, "Enter Valid Mobile Number", Toast.LENGTH_SHORT).show()
             } else {
-                pd.show()
-                if (binding.spOperator.selectedItem != null && binding.spOperator.selectedItem.toString()
-                        .isNotEmpty() && binding.etCircle.selectedItem.toString().isNotEmpty()
-                ) {
+                Constants.OpenPopUpForVeryfyOTP(requireContext())
+                if (binding.spOperator.selectedItem != null && binding.spOperator.selectedItem.toString().isNotEmpty() && binding.etCircle.selectedItem.toString().isNotEmpty()) {
                     Constants.mobileOperatorName = binding.spOperator.selectedItem.toString()
                     Constants.mobileCircleName = binding.etCircle.selectedItem.toString()
-                    mStash!!.setStringValue(
-                        Constants.mobileOperatorName,
-                        Constants.mobileOperatorName
-                    )
+                    mStash!!.setStringValue(Constants.mobileOperatorName, Constants.mobileOperatorName)
                     mStash!!.setStringValue(Constants.mobileCircleName, Constants.mobileCircleName)
                     mobileRechargePlanList.clear()
-                    getAllPlanList(
-                        mStash!!.getStringValue(Constants.mobileOperatorName, "").toString(),
-                        mStash!!.getStringValue(Constants.mobileCircleName, "").toString()
-                    )
-                } else {
-                    Toast.makeText(requireContext(), "Operator not found", Toast.LENGTH_SHORT)
-                        .show()
+
+                    getAllPlanList(mStash!!.getStringValue(Constants.mobileOperatorName, "").toString(),
+                        mStash!!.getStringValue(Constants.mobileCircleName, "").toString())
+                }
+                else {
+                    Toast.makeText(requireContext(), "Operator not found", Toast.LENGTH_SHORT).show()
                 }
 
 
             }
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun validation() {
@@ -642,9 +719,9 @@ class RechargeFragment : Fragment() {
             } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
                 Toast.makeText(context, "Enter Valid Amount", Toast.LENGTH_SHORT).show()
             } else {
-               /* getAllWalletBalance()
-                //recharge()
-                hideKeyboard(binding.etAmount)*/
+                /* getAllWalletBalance()
+                 //recharge()
+                 hideKeyboard(binding.etAmount)*/
 
                 // mobile recharge
                 val amount = binding.etAmount.text.toString().trim()
@@ -654,8 +731,7 @@ class RechargeFragment : Fragment() {
                 getAllServiceChargeRetailer(amount)
             }
 
-        }
-        else if (rechargeType == "postpaid") {
+        } else if (rechargeType == "postpaid") {
             if (selectedModel == "0") {
                 Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT).show()
             } else if (TextUtils.isEmpty(binding.etAmount.text.toString()) || binding.etAmount.length() != 10) {
@@ -664,8 +740,7 @@ class RechargeFragment : Fragment() {
                 getBill()
                 hideKeyboard(binding.etAmount)
             }
-        }
-        else if (rechargeType == "Broadband" || rechargeType == "Landline") {
+        } else if (rechargeType == "Broadband" || rechargeType == "Landline") {
             if (selectedModel == "0") {
                 Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT).show()
             } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
@@ -684,95 +759,85 @@ class RechargeFragment : Fragment() {
                     getBill()
                     hideKeyboard(binding.etAmount)
                 }
-            }
-            else if (rechargeType == "Municipality") {
-                    if (selectedModel == "0") {
-                        Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT).show()
-                    } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                        Toast.makeText(context, "Enter CA Number", Toast.LENGTH_SHORT).show()
+            } else if (rechargeType == "Municipality") {
+                if (selectedModel == "0") {
+                    Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT).show()
+                } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                    Toast.makeText(context, "Enter CA Number", Toast.LENGTH_SHORT).show()
+                } else {
+                    getBill()
+                    hideKeyboard(binding.etAmount)
+                }
+            } else if (rechargeType == "Water") {
+                if (selectedModel == "0") {
+                    Toast.makeText(context, "Please Select Water Board", Toast.LENGTH_SHORT).show()
+                } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                    Toast.makeText(context, "Enter CA / RR No.", Toast.LENGTH_SHORT).show()
+                } else {
+                    getBill()
+                    hideKeyboard(binding.etAmount)
+                }
+            } else if (rechargeType == "EMI") {
+                if (selectedModel == "0") {
+                    Toast.makeText(context, "Please Select Lender", Toast.LENGTH_SHORT)
+                        .show()
+                } else
+                    if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                        Toast.makeText(
+                            context,
+                            "Enter Loan Account No.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         getBill()
                         hideKeyboard(binding.etAmount)
                     }
-                }
-            else if (rechargeType == "Water") {
-                    if (selectedModel == "0") {
-                        Toast.makeText(context, "Please Select Water Board", Toast.LENGTH_SHORT).show()
-                    } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                            Toast.makeText(context, "Enter CA / RR No.", Toast.LENGTH_SHORT).show()
-                        }
-                    else {
-                            getBill()
-                            hideKeyboard(binding.etAmount)
-                        }
-                }
-            else if (rechargeType == "EMI") {
-                        if (selectedModel == "0") {
-                            Toast.makeText(context, "Please Select Lender", Toast.LENGTH_SHORT)
-                                .show()
-                        } else
-                            if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                                Toast.makeText(
-                                    context,
-                                    "Enter Loan Account No.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                getBill()
-                                hideKeyboard(binding.etAmount)
-                            }
-                    }
-            else if (rechargeType == "Cable") {
+            } else if (rechargeType == "Cable") {
                 if (selectedModel == "0") {
-                            Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                            Toast.makeText(context, "Enter Mobile / Acc No.", Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            getBill()
-                            hideKeyboard(binding.etAmount)
-                        }
-            }
-            else if (rechargeType == "Insurance") {
-                            if (selectedModel == "0") {
-                                Toast.makeText(
-                                    context,
-                                    "Please Select Insurance",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                                Toast.makeText(context, "Enter Policy No.", Toast.LENGTH_SHORT)
-                                    .show()
-                            } else {
-                                getBill()
-                                hideKeyboard(binding.etAmount)
-                            }
-                        }
-            else if (rechargeType == "FastTag") {
-                            if (TextUtils.isEmpty(binding.etMobileNumber2.text.toString())) {
-                                Toast.makeText(
-                                    context,
-                                    "Please Select Vehicle Number",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else if (selectedFastTagModel.id == "0") {
-                                Toast.makeText(
-                                    context,
-                                    "Please Select Operator",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
-                                Toast.makeText(context, "Enter Amount.", Toast.LENGTH_SHORT).show()
-                            } else {
-                                var data = BillFetchDetails()
-                                billFastTagRecharge(data)
-                                hideKeyboard(binding.etAmount)
-                            }
-                        }
-            else
-            {
+                    Toast.makeText(context, "Please Select Operator", Toast.LENGTH_SHORT)
+                        .show()
+                } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                    Toast.makeText(context, "Enter Mobile / Acc No.", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    getBill()
+                    hideKeyboard(binding.etAmount)
+                }
+            } else if (rechargeType == "Insurance") {
+                if (selectedModel == "0") {
+                    Toast.makeText(
+                        context,
+                        "Please Select Insurance",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                    Toast.makeText(context, "Enter Policy No.", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    getBill()
+                    hideKeyboard(binding.etAmount)
+                }
+            } else if (rechargeType == "FastTag") {
+                if (TextUtils.isEmpty(binding.etMobileNumber2.text.toString())) {
+                    Toast.makeText(
+                        context,
+                        "Please Select Vehicle Number",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (selectedFastTagModel.id == "0") {
+                    Toast.makeText(
+                        context,
+                        "Please Select Operator",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else if (TextUtils.isEmpty(binding.etAmount.text.toString())) {
+                    Toast.makeText(context, "Enter Amount.", Toast.LENGTH_SHORT).show()
+                } else {
+                    var data = BillFetchDetails()
+                    billFastTagRecharge(data)
+                    hideKeyboard(binding.etAmount)
+                }
+            } else {
 
                 // mobile recharge
                 val amount = binding.rechargeAmount.text.toString().trim()
@@ -802,6 +867,7 @@ class RechargeFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllWalletBalance() {
         requireContext().runIfConnected {
             val walletBalanceReq = GetBalanceReq(
@@ -821,11 +887,11 @@ class RechargeFragment : Fragment() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
@@ -843,8 +909,7 @@ class RechargeFragment : Fragment() {
 
             Log.d("actualBalance", "main = $mainBalance")
 
-            val totalAmount =
-                mStash!!.getStringValue(Constants.totalTransaction, "")?.toDoubleOrNull() ?: 0.0
+            val totalAmount = mStash!!.getStringValue(Constants.totalTransaction, "")?.toDoubleOrNull() ?: 0.0
 
         } else {
             toast(response.returnMessage.toString())
@@ -871,11 +936,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -914,16 +979,26 @@ class RechargeFragment : Fragment() {
 
                 if (rechargeType == "dth") {
                     var CANumber = binding.etDTHBillNumber.text.toString()
-                    hitApiForMobileRecharge(binding.etAmount.text.toString(), CANumber, binding.spOperator.selectedItem.toString().trim(), "DTH Api", "DTH Recharge")
+                    hitApiForMobileRecharge(
+                        binding.etAmount.text.toString(),
+                        CANumber,
+                        binding.spOperator.selectedItem.toString().trim(),
+                        "DTH Api",
+                        "DTH Recharge"
+                    )
                 }
 
 
             } else {
-                pd.dismiss()
-                Toast.makeText(requireContext(), "Your merchant balance is low. Please contact the administrator", Toast.LENGTH_LONG).show()
+                Constants.dialog.dismiss()
+                Toast.makeText(
+                    requireContext(),
+                    "Your merchant balance is low. Please contact the administrator",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } else {
-            pd.dismiss()
+            Constants.dialog.dismiss()
             Toast.makeText(requireContext(), response.returnMessage.toString(), Toast.LENGTH_SHORT)
                 .show()
         }
@@ -976,34 +1051,27 @@ class RechargeFragment : Fragment() {
             mode = "online",
             RegistrationID = mStash!!.getStringValue(Constants.MerchantId, ""),
             billFetch = com.bos.payment.appName.data.model.fastTag.billPayment.BillFetch(
-//                billAmount = mStash!!.getStringValue(Constants.posPaidBillAmount, ""),
                 billAmount = "10",
                 billnetamount = mStash!!.getStringValue(Constants.posPaidBillNetAmount, ""),
                 billdate = mStash!!.getStringValue(Constants.posPaidBillDate, ""),
                 dueDate = mStash!!.getStringValue(Constants.posPaidDueDate, ""),
-                acceptPayment = mStash!!.getBoolanValue(
-                    Constants.posPaidAcceptPayment.toString(),
-                    false
-                ),
-                acceptPartPay = mStash!!.getBoolanValue(
-                    Constants.posPaidAcceptPartPay.toString(),
-                    false
-                ),
+                acceptPayment = mStash!!.getBoolanValue(Constants.posPaidAcceptPayment.toString(), false),
+                acceptPartPay = mStash!!.getBoolanValue(Constants.posPaidAcceptPartPay.toString(), false),
                 cellNumber = mStash!!.getStringValue(Constants.posPaidCellNumber, ""),
                 userName = mStash!!.getStringValue(Constants.posPaidUserName, "")
             )
         )
-        pd.show()
+
         Log.d("billPaymentPaybillReq", Gson().toJson(billPaymentPaybillReq))
         ViewModelProvider(this).get(AttendanceViewModel::class.java)
             .billRecharge(billPaymentPaybillReq)
             .observe(viewLifecycleOwner) {
                 if (it!!.status == true) {
-                    pd.dismiss()
+                    Constants.dialog.dismiss()
                     //rechargeStatusCheck(referenceID)
                     toast(it.message.toString())
                 } else {
-                    pd.dismiss()
+                    Constants.dialog.dismiss()
                     toast(it.message.toString())
                 }
             }
@@ -1018,22 +1086,25 @@ class RechargeFragment : Fragment() {
                 mode = spinnerType,
                 RegistrationID = mStash!!.getStringValue(Constants.MerchantId, "")
             )
-            viewModel.viewBill(fetchBilPaymentDetailsReq).observe(requireActivity()) { resource ->
+            Log.d("billreq",Gson().toJson(fetchBilPaymentDetailsReq))
+            MobileRechargeViewModel.viewBill(fetchBilPaymentDetailsReq).observe(requireActivity()) { resource ->
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                             it.data?.let { users ->
-                                users.body()?.let { response -> getViewBillRes(response) }
+                                users.body()?.let { response ->
+                                    Log.d("Bill Response",Gson().toJson(response))
+                                    getViewBBPSBillRes(response) }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -1041,9 +1112,10 @@ class RechargeFragment : Fragment() {
         }
     }
 
-    private fun getViewBillRes(response: FetchBilPaymentDetailsRes) {
-        if (response.status == true) {
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getViewBBPSBillRes(response: FetchBilPaymentDetailsRes) {
+        if (response.status == true) {
             binding.userNameEditText.visibility = View.VISIBLE
             binding.userNameText.visibility = View.VISIBLE
             binding.llViewBill.visibility = View.VISIBLE
@@ -1051,78 +1123,73 @@ class RechargeFragment : Fragment() {
             binding.tvBtnProceedBill.visibility = View.VISIBLE
             binding.tvAmount2.visibility = View.VISIBLE
             binding.etAmount2.visibility = View.VISIBLE
-            binding.tvBillCaNumber.text = binding.tvBillCaNumber.text.toString()
-            binding.tvBillName.text = response.name.toString()
-            binding.tvBillAmount.text = response.billFetch!!.billAmount
-            binding.tvBillNetAmount.text = response.billFetch!!.billnetamount
-            binding.tvBillBillDate.text = response.billFetch!!.billdate
-            binding.tvBillDueDate.text = response.billFetch!!.dueDate
-            binding.tvBillCaMessage.text = response.message
-            binding.etAmount2.setText(response.amount.toString())
 
-            if (response.amount.toString() > "0.00") {
-                getAllBillServiceCharge(response.amount.toString())
+            binding.llViewDetails.setOnClickListener {
+                if (binding.layoutDetails.visibility == View.VISIBLE) {
+                    binding.layoutDetails.visibility = View.GONE
+                    binding.arrowImg.animate().rotation(0f).setDuration(200).start()
+                } else {
+                    binding.layoutDetails.visibility = View.VISIBLE
+                    binding.arrowImg.animate().rotation(180f).setDuration(200).start()
+                }
             }
 
+            binding.tvBillCaNumber.text = binding.etAmount.text.toString()
+            binding.tvBillName.text = response.name.toString()
+            binding.tvBillAmount.text = response.billFetch!!.billAmount
+            binding.tvBillBillDate.text = response.billFetch!!.billdate
+            binding.tvBillDueDate.text = response.billFetch!!.dueDate
+            binding.operatorName.text =   binding.spOperator.selectedItem.toString().trim()
+            binding.etAmount2.setText(response.amount.toString())
+
             mStash!!.setStringValue(Constants.posPaidBillAmount, response.billFetch!!.billAmount)
-            mStash!!.setStringValue(
-                Constants.posPaidBillNetAmount,
-                response.billFetch!!.billnetamount
-            )
+            mStash!!.setStringValue(Constants.posPaidBillNetAmount, response.billFetch!!.billnetamount)
             mStash!!.setStringValue(Constants.posPaidBillDate, response.billFetch!!.billdate)
             mStash!!.setStringValue(Constants.posPaidDueDate, response.billFetch!!.dueDate)
             mStash!!.setStringValue(Constants.posPaidUserName, response.billFetch!!.userName)
             mStash!!.setStringValue(Constants.posPaidCellNumber, response.billFetch!!.cellNumber)
-            response.billFetch!!.acceptPayment?.let {
-                mStash!!.setBooleanValue(
-                    Constants.posPaidAcceptPayment.toString(),
-                    it
-                )
-            }
-            response.billFetch!!.acceptPartPay?.let {
-                mStash!!.setBooleanValue(
-                    Constants.posPaidAcceptPartPay.toString(),
-                    it
-                )
-            }
-            Log.d(
-                TAG,
-                "viewBill: ${
-                    mStash!!.setStringValue(
-                        Constants.posPaidBillNetAmount,
-                        response.billFetch!!.billnetamount.toString()
-                    )
-                }"
-            )
+
+            response.billFetch!!.acceptPayment?.let { mStash!!.setBooleanValue(Constants.posPaidAcceptPayment.toString(), it) }
+
+            response.billFetch!!.acceptPartPay?.let { mStash!!.setBooleanValue(Constants.posPaidAcceptPartPay.toString(), it) }
+
+            Log.d(TAG, "viewBill: ${mStash!!.setStringValue(Constants.posPaidBillNetAmount, response.billFetch!!.billnetamount.toString())}")
+
             var referenceID: String = ConstantClass.generateRandomNumber()
-            bill_rec_model = BillPaymentPaybillReq(
+
+            /*   bill_rec_model = BillPaymentPaybillReq(
                 operator = selectedModel,
                 canumber = binding.etMobileNumber2.text.toString().trim(),
                 amount = binding.etAmount.text.toString().trim(),
                 referenceid = referenceID,
                 latitude = ConstantClass.latdouble.toString(),
                 longitude = ConstantClass.longdouble.toString(),
-                mode = "Online",
+                mode = spinnerType,
                 billFetch = bill_rec_model.billFetch,
                 RegistrationID = mStash!!.getStringValue(Constants.MerchantId, "")
+            )*/
 
-            )
-            Toast.makeText(requireActivity(), response.message.toString(), Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            pd.dismiss()
+            Toast.makeText(requireActivity(), response.message.toString(), Toast.LENGTH_SHORT).show()
+
+        }
+        else {
+            Constants.dialog.dismiss()
             binding.llViewBill.visibility = View.GONE
             binding.tvAmount2.visibility = View.GONE
             binding.etAmount2.visibility = View.GONE
+            binding.userNameText.visibility = View.GONE
+            binding.layoutDetails.visibility = View.GONE
+            binding.userNameEditText.visibility = View.GONE
+            binding.arrowImg.animate().rotation(0f).setDuration(200).start()
             Toast.makeText(context, response.message.toString(), Toast.LENGTH_SHORT).show()
         }
+
     }
 
     private fun getAllBillServiceCharge(rechargeAmount: String) {
         requireContext().runIfConnected {
             val getAPIServiceChargeReq = GetAPIServiceChargeReq(
                 APIName = mStash!!.getStringValue(Constants.AllAPIName, ""),
-//            APIName = "Bill Payment Api",
                 Category = mStash!!.getStringValue(Constants.opCategory, ""),
                 Code = mStash!!.getStringValue(Constants.OperatorId.toString(), ""),
                 CompanyCode = mStash!!.getStringValue(Constants.CompanyCode, "")
@@ -1135,23 +1202,23 @@ class RechargeFragment : Fragment() {
                     resource?.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
-//                                    getAllServiceChargeApiRes(response, rechargeAmount)
+                                        Log.d("billservice",Gson().toJson(response))
                                     }
                                 }
                             }
 
-                            ApiStatus.ERROR -> pd.dismiss()
-                            ApiStatus.LOADING -> pd.show()
+                            ApiStatus.ERROR -> Constants.dialog.dismiss()
+                            ApiStatus.LOADING -> Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
         }
     }
 
-    private fun getFastTagDetails() {
+    /*private fun getFastTagDetails() {
         var model = FetchConsumerDetailsReq(
             operator = selectedFastTagModel.id,
             canumber = binding.etMobileNumber2.text.toString(),
@@ -1160,20 +1227,20 @@ class RechargeFragment : Fragment() {
         ViewModelProvider(this)[AttendanceViewModel::class.java].getFastTagDetails(model)
             .observe(viewLifecycleOwner) {
                 if (it!!.status == true) {
-                    pd.dismiss()
+                    Constants.dialog.dismiss()
                     bill_model = it
                     binding.llViewBill.visibility = View.VISIBLE
                     hideKeyboard(binding.etAmount)
                     it.billFetchDetails?.let { it1 -> viewFastTagBill(it1) }
                 } else {
-                    pd.dismiss()
+                    Constants.dialog.dismiss()
                     binding.llViewBill.visibility = View.GONE
                     Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
                 }
             }
-    }
+    }*/
 
-    @SuppressLint("SetTextI18n")
+    /*    @SuppressLint("SetTextI18n")
     private fun viewFastTagBill(model: BillFetchDetails) {
         binding.tvVehicleNumber.text = "Vehicle No.:"
         binding.tvCustomerName.text = "Customer Name:"
@@ -1212,161 +1279,8 @@ class RechargeFragment : Fragment() {
             )
         }
 
-    }
+    }*/
 
-
-    /*
-
-      // TODO for the recharge API
-   private fun recharge() {
-       requireContext().runIfConnected {
-           val referenceID: String = ConstantClass.generateRandomNumber()
-           val mobileRechargeReq = MobileRechargeReq(
-               operator = if (rechargeType == "mobile") selectedAllOperator else selectedModel,
-               canumber = binding.etMobileNumber.text.toString(),
-               amount = binding.etAmount.text.toString().trim(),
-               referenceid = referenceID,
-               RegisterID = mStash!!.getStringValue(Constants.MerchantId, "")
-           )
-           Log.d("mobileRechargeReq", Gson().toJson(mobileRechargeReq))
-           pd.show()
-           viewModel.doRecharge(mobileRechargeReq).observe(viewLifecycleOwner) { resource ->
-               resource?.let {
-                   when (it.apiStatus) {
-                       ApiStatus.SUCCESS -> {
-//                        pd.dismiss()
-                           it.data?.let { response ->
-                               rechargeApi(response)
-                           }
-                       }
-
-                       ApiStatus.ERROR -> {
-                           pd.dismiss()
-                           toast(it.message.toString())
-                       }
-
-                       ApiStatus.LOADING -> {
-                           pd.show()
-                       }
-                   }
-               }
-           }
-       }
-   }
-
-   private fun rechargeApi(response: Response<MobileRechargeRes>) {
-       if (response.body()!!.status == true) {
-           val refId = response.body()!!.refid.toString()
-           rechargeStatusCheck(refId)
-       } else {
-           pd.dismiss()
-           toast(response.message().toString())
-       }
-   }
-
-
-     private fun rechargeStatusCheck(referenceID: String) {
-         val rechargeStatusReq = RechargeStatusReq(
-             registrationID = mStash!!.getStringValue(Constants.MerchantId, ""),
-             referenceid = referenceID
-         )
-         Log.d("rechargeStatusReq", Gson().toJson(rechargeStatusReq))
-
-         viewModel.rechargeStatus(rechargeStatusReq).observe(viewLifecycleOwner) { resource ->
-             resource?.let {
-                 when (it.apiStatus) {
-                     ApiStatus.SUCCESS -> {
-                         pd.dismiss()
-                         it.data?.let { response ->
-                             rechargeStatusRes(response)
-                         }
-                     }
-
-                     ApiStatus.ERROR -> {
-                         pd.dismiss()
-                         toast(it.message.toString())
-                     }
-
-                     ApiStatus.LOADING -> {
-                         pd.show()
-                     }
-                 }
-             }
-         }
-
-     }
-
-    @SuppressLint("SetTextI18n")
-     private fun rechargeStatusRes(response: Response<RechargeStatusRes>) {
-         try {
-             response.body()?.let { body ->
-                 if (body.status == true) {
-                     pd.dismiss()
-                     toast(response.message().toString())
-                     // Clear input fields
-                     binding.etMobileNumber.setText("")
-                    // binding.etCircle.setText("")
-                     binding.etAmount.setText("")
-                     binding.spOperator.setSelection(0)
-                     binding.llViewPlan.visibility = View.GONE
-                     binding.llTransactionHistory.visibility = View.GONE
-
-                     // Determine operator image based on selected operator ID
-                     val operatorImage = when (selectedAllOperator) {
-                         "11" -> R.drawable.airtel to Constants.airtel
-                         "13" -> R.drawable.bsnl to Constants.bsnl
-                         "4" -> R.drawable.idea to Constants.idea
-                         "18" -> R.drawable.jio to Constants.jio
-                         "22" -> R.drawable.vodafone to Constants.vodafone
-                         else -> R.drawable.no_image to Constants.noImage
-                     }
-
-                     // Store the image resource name in shared preferences
-                     mStash?.setStringValue(
-                         operatorImage.second,
-                         resources.getResourceName(operatorImage.first)
-                     )
-
-                     // Create and start the intent for RechargeActivity
-                     val intent =
-                         Intent(requireContext(), RechargeSuccessfulPageActivity::class.java).apply {
-                             putExtra("transactionId", body.data?.txnid.toString())
-                             putExtra("operatorName", body.data?.operatorname.toString())
-                             putExtra("mobileNumber", body.data?.canumber.toString())
-                             putExtra("amount", body.data?.amount.toString())
-                             putExtra("referenceId", body.data?.refid.toString())
-                             putExtra("operationId", body.data?.operatorid.toString())
-                             putExtra("dateAndTime", body.data?.dateadded.toString())
-                             putExtra("message", response.message().toString())
-                             putExtra(
-                                 "serviceCharge",
-                                 mStash!!.getStringValue(Constants.serviceCharge, "")
-                             )
-                             putExtra(
-                                 "serviceChargeWithGST",
-                                 mStash!!.getStringValue(Constants.serviceChargeWithGST, "")
-                             )
-                             putExtra(
-                                 "totalTransaction",
-                                 mStash!!.getStringValue(Constants.totalTransaction, "")
-                             )
-                             putExtra("Status", body.status.toString())
-                             putExtra(
-                                 operatorImage.second,
-                                 resources.getResourceName(operatorImage.first)
-                             )
-                             putExtra("image", operatorImage.second)
-                         }
-                     startActivity(intent)
-                 }
-             } ?: run {
-                 Toast.makeText(requireContext(), "Response body is null", Toast.LENGTH_SHORT).show()
-             }
-         } catch (e: JSONException) {
-             Toast.makeText(requireContext(), "JSONException: ${e.message}", Toast.LENGTH_SHORT)
-                 .show()
-         }
-     }*/
 
     private fun getOperatorName(number: String, type: String) {
         requireContext().runIfConnected {
@@ -1375,13 +1289,13 @@ class RechargeFragment : Fragment() {
                 number = number,
                 type = type
             )
-//        pd.show()
+
             Log.d("getOperatorName", Gson().toJson(mobileCheckReq))
             viewModel.getOperatorName(mobileCheckReq).observe(requireActivity()) { resource ->
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-//                        pd.dismiss()
+//                        Constants.dialog.dismiss()
                             it.data?.let { users ->
                                 users.body()?.let { it1 ->// getAllOperatorRes(it1)
                                 }
@@ -1389,7 +1303,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                             Toast.makeText(
                                 requireContext(),
                                 "Something went wrong",
@@ -1399,7 +1313,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -1408,63 +1322,9 @@ class RechargeFragment : Fragment() {
     }
 
 
-    /* private fun getAllOperatorRes(response: MobileCheckRes?) {
-         if (response!!.status == true) {
-             pd.show()
-             binding.etCircle.setText(response.info!!.circle)
-
-             binding.spOperator.post(Runnable {
-                 if (response.info!!.operator != null) {
-                     try {
-                         binding.spOperator.setSelection((binding.spOperator.getAdapter() as ArrayAdapter<String?>).getPosition(response.info!!.operator))
-                         viewPlanList()
-                     }
-                     catch (e: java.lang.Exception) {
-                         Log.d("Excep_at", "owners_gender_status_spinner")
-                         e.printStackTrace()
-                         toast(R.string.dropdown_excep_atres.toString())
-                     }
-                 }
-             })
-
-             val operator = response.info!!.operator.toString()
-
-             mStash!!.setStringValue(Constants.mobileOperatorName, response.info!!.operator.toString())
-             mStash!!.setStringValue(Constants.mobileCircleName, response.info!!.circle.toString())
-
-             val circle = response.info!!.circle.toString()
-
-         }
-         else {
-             pd.dismiss()
-         }
-     }*/
-
-
-    private fun setAllOperator(op: String) {
-        if (getAllOperatorList.size > 0 && op != "") {
-            for (i in 0 until getAllOperatorList.size) {
-                if (op.equals(getAllOperatorList[i].name, true)) {
-                    binding.spOperator.setSelection(i)
-                }
-            }
-        }
-    }
-
-    private fun setOperator(op: String) {
-        if (oeratorList.size > 0 && op != "") {
-            for (i in 0 until oeratorList.size) {
-                if (op.equals(oeratorList[i].name, ignoreCase = true)) {
-                    Toast.makeText(requireContext(), oeratorList[i].name, Toast.LENGTH_SHORT)
-                        .show()
-                    Log.d("setOperator", oeratorList.get(i).name.toString())
-                    binding.spOperator.setSelection(i)
-                }
-            }
-        }
-    }
 
     /************************************* getOperatorList ***********************************/
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getOperatorList(apiName: String) {
@@ -1474,35 +1334,25 @@ class RechargeFragment : Fragment() {
                 RegistrationID = mStash!!.getStringValue(Constants.MerchantId, "")
             )
             Log.d("getOperatorList: ", Gson().toJson(billOperationPaymentReq))
-            viewModel.getOperatorList(billOperationPaymentReq)
-                .observe(viewLifecycleOwner) { resource ->
+            MobileRechargeViewModel.getOperatorList(billOperationPaymentReq).observe(viewLifecycleOwner) { resource ->
                     try {
                         resource?.let {
                             when (it.apiStatus) {
                                 ApiStatus.SUCCESS -> {
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     it.data?.let { response ->
-                                        getAllOperatorDropDown(
-                                            response.body()!!.data,
-                                            response,
-                                            apiName
-                                        )
-//                            getAllOperator(response)
+                                        getAllOperatorDropDown(response.body()!!.data, response, apiName)
+
                                     }
                                 }
 
                                 ApiStatus.ERROR -> {
-                                    pd.dismiss()
-                                    Toast.makeText(
-                                        context,
-                                        "Something went wrong",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                        .show()
+                                    Constants.dialog.dismiss()
+                                    Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                                 }
 
                                 ApiStatus.LOADING -> {
-                                    pd.dismiss()
+                                    Constants.OpenPopUpForVeryfyOTP(requireContext())
 
                                 }
                             }
@@ -1514,105 +1364,73 @@ class RechargeFragment : Fragment() {
         }
     }
 
-    private fun getAllOperatorDropDown(
-        list: java.util.ArrayList<Data>,
-        response: Response<BillOperationPaymentRes>,
-        apiName: String
-    ) {
+
+    private fun getAllOperatorDropDown(list: java.util.ArrayList<Data>, response: Response<BillOperationPaymentRes>, apiName: String) {
         mStash!!.setStringValue(Constants.AllAPIName, apiName.toString())
         if (response.body()!!.status == true) {
             for (singleObject in list) {
                 when (singleObject.category) {
                     "EMI" -> {
                         Constants.emiNo!!.add(singleObject.name.toString())
-                        Constants.emiNoMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.emiNoMapForGettingEmiNo!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.emiNoMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.emiNoMapForGettingEmiNo!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Gas" -> {
                         Constants.gasName!!.add(singleObject.name.toString())
-                        Constants.gasNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.gasNameMapForGettingGasName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.gasNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.gasNameMapForGettingGasName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Insurance" -> {
                         Constants.insuranceName!!.add(singleObject.name.toString())
-                        Constants.insuranceNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.insuranceNameMapForGettingInsuranceName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.insuranceNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.insuranceNameMapForGettingInsuranceName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Broadband" -> {
                         Constants.broadBandName!!.add(singleObject.name.toString())
-                        Constants.broadBandNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.broadBandNameMapForGettingBroadBandName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.broadBandNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.broadBandNameMapForGettingBroadBandName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Electricity" -> {
                         Constants.electricityName!!.add(singleObject.name.toString())
-                        Constants.electricityNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.electricityNameMapForGettingElectricityName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.electricityNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.electricityNameMapForGettingElectricityName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Water" -> {
                         Constants.waterName!!.add(singleObject.name.toString())
-                        Constants.waterNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.waterNameMapForGettingWaterName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.waterNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.waterNameMapForGettingWaterName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Postpaid" -> {
                         Constants.prepaidName!!.add(singleObject.name.toString())
-                        Constants.prepaidNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.prepaidNameMapForGettingPrepaidName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.prepaidNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.prepaidNameMapForGettingPrepaidName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
-                    /*
-                                        "DTH" -> {
-                                            Constants.dthName!!.add(singleObject.name.toString())
-                                            Constants.dthNameMap!![singleObject.name.toString()] =
-                                                Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                                            Constants.dthNameMapForGettingDthName!![singleObject.id?.toInt()
-                                                ?: 0] = singleObject.name.toString()
-                                        }*/
 
                     "Landline" -> {
                         Constants.landLineName!!.add(singleObject.name.toString())
-                        Constants.landLineNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.landLineNameMapForGettingLandLineName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.landLineNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.landLineNameMapForGettingLandLineName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
 
                     "Municipality" -> {
                         Constants.municipalityName!!.add(singleObject.name.toString())
-                        Constants.municipalityNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.municipalityNameMapForGettingMunicipalityName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.municipalityNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.municipalityNameMapForGettingMunicipalityName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
                 }
                 setAllDropDown()
             }
         } else {
-            Toast.makeText(
-                requireContext(),
-                response.body()!!.message.toString(),
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(requireContext(), response.body()!!.message.toString(), Toast.LENGTH_SHORT).show()
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getAllOperatorList(apiName: String) {
@@ -1627,19 +1445,17 @@ class RechargeFragment : Fragment() {
                     resource?.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
-                                pd.dismiss()
                                 it.data?.let { response ->
                                     populateDropDowns(response.body()!!.data, response, apiName)
                                 }
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
                                 toast("Due to technical problem")
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.dismiss()
+
                             }
                         }
                     }
@@ -1647,11 +1463,8 @@ class RechargeFragment : Fragment() {
         }
     }
 
-    private fun populateDropDowns(
-        list: ArrayList<com.bos.payment.appName.data.model.recharge.operator.Data>,
-        response: Response<RechargeOperatorsListRes>,
-        apiName: String
-    ) {
+
+    private fun populateDropDowns(list: ArrayList<com.bos.payment.appName.data.model.recharge.operator.Data>, response: Response<RechargeOperatorsListRes>, apiName: String) {
         mStash!!.setStringValue(Constants.APIName, apiName.toString())
         if (response.body()!!.status == true) {
             for (singleObject in list) {
@@ -1684,6 +1497,7 @@ class RechargeFragment : Fragment() {
         }
     }
 
+
     private fun setAllDropDownMobile(singleObject: com.bos.payment.appName.data.model.recharge.operator.Data) {
         if (rechargeType == "mobile") {
             Constants.getAllOperatorAdapter = ArrayAdapter<String>(
@@ -1703,25 +1517,13 @@ class RechargeFragment : Fragment() {
                     ) {
                         if (pos > 0) {
                             try {
-                                selectedAllOperator = java.lang.String.valueOf(
-                                    Constants.operatorNameMap!![parent.getItemAtPosition(pos)]
-                                )
+                                selectedAllOperator = java.lang.String.valueOf(Constants.operatorNameMap!![parent.getItemAtPosition(pos)])
 
-                                mStash!!.setStringValue(
-                                    Constants.OperatorCategory,
-                                    singleObject.category.toString()
-                                )
+                                mStash!!.setStringValue(Constants.OperatorCategory, singleObject.category.toString())
 
-                                mStash!!.setStringValue(
-                                    Constants.OperatorId.toString(),
-                                    selectedAllOperator
-                                )
+                                mStash!!.setStringValue(Constants.OperatorId.toString(), selectedAllOperator)
 
-                                Log.d(
-                                    "contenttype",
-                                    mStash!!.getStringValue(Constants.OperatorCategory, "")
-                                        .toString()
-                                )
+                                Log.d("contenttype", mStash!!.getStringValue(Constants.OperatorCategory, "").toString())
 
                                 // If you need to perform further actions with selectedAllOperator, do it here.
                             } catch (e: Exception) {
@@ -1760,27 +1562,12 @@ class RechargeFragment : Fragment() {
                         ) {
                             if (pos > 0) {
                                 try {
-                                    selectedAllOperator = java.lang.String.valueOf(
-                                        Constants.dthNameMap!!.get(
-                                            parent.getItemAtPosition(pos)
-                                        )
-                                    )
+                                    selectedAllOperator = java.lang.String.valueOf(Constants.dthNameMap!!.get(parent.getItemAtPosition(pos)))
                                     mStash!!.setStringValue(Constants.OperatorCategory, "DTH")
-                                    mStash!!.setStringValue(
-                                        Constants.OperatorId.toString(),
-                                        selectedAllOperator
-                                    )
+                                    mStash!!.setStringValue(Constants.OperatorId.toString(), selectedAllOperator)
 
-                                    Log.d(
-                                        "dthName",
-                                        mStash!!.getStringValue(Constants.OperatorCategory, "")
-                                            .toString()
-                                    )
-                                    Log.d(
-                                        "dthName",
-                                        mStash!!.getStringValue(Constants.OperatorId.toString(), "")
-                                            .toString()
-                                    )
+                                    Log.d("dthName", mStash!!.getStringValue(Constants.OperatorCategory, "").toString())
+                                    Log.d("dthName", mStash!!.getStringValue(Constants.OperatorId.toString(), "").toString())
 
                                     // If you need to perform further actions with selectedAllOperator, do it here.
                                 } catch (e: Exception) {
@@ -1801,15 +1588,12 @@ class RechargeFragment : Fragment() {
             }
     }
 
+
     private fun setAllDropDown() {
         if (rechargeType == "EMI") {
             //********************************* EMI Spinner ******************************//
 
-            Constants.getAllOperatorAdapterValue = ArrayAdapter<String>(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                Constants.emiNo!!
-            )
+            Constants.getAllOperatorAdapterValue = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, Constants.emiNo!!)
             Constants.getAllOperatorAdapterValue!!.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             binding.spOperator.adapter = Constants.getAllOperatorAdapterValue
             binding.spOperator.onItemSelectedListener =
@@ -1822,40 +1606,12 @@ class RechargeFragment : Fragment() {
                     ) {
                         if (pos > 0) {
                             try {
-                                selectedModel = java.lang.String.valueOf(
-                                    Constants.emiNoMap!!.get(
-                                        parent.getItemAtPosition(pos)
-                                    )
-                                )
-                                mStash!!.setStringValue(
-                                    Constants.opCategory,
-                                    rechargeType.toString()
-                                )
-                                mStash!!.setStringValue(
-                                    Constants.OperatorId.toString(),
-                                    selectedModel
-                                )
-                                Log.d(
-                                    "dthName",
-                                    mStash!!.getStringValue(Constants.opCategory, rechargeType)
-                                        .toString()
-                                )
-                                Log.d(
-                                    "dthName",
-                                    mStash!!.getStringValue(Constants.OperatorId.toString(), "")
-                                        .toString()
-                                )
+                                selectedModel = java.lang.String.valueOf(Constants.emiNoMap!!.get(parent.getItemAtPosition(pos)))
+                                mStash!!.setStringValue(Constants.opCategory, rechargeType.toString())
+                                mStash!!.setStringValue(Constants.OperatorId.toString(), selectedModel)
+                                Log.d("dthName", mStash!!.getStringValue(Constants.opCategory, rechargeType).toString())
+                                Log.d("dthName", mStash!!.getStringValue(Constants.OperatorId.toString(), "").toString())
 
-//                                mStash!!.setStringValue(
-//                                    Constants.OperatorCategory,
-//                                    singleObject.category.toString()
-//                                )
-//                        Log.d("dthName",mStash!!.getStringValue(Constants.OperatorCategory, "").toString())
-//
-//                                mStash!!.setStringValue(
-//                                    Constants.OperatorId.toString(),
-//                                    selectedAllOperator
-//                                )
                                 // If you need to perform further actions with selectedAllOperator, do it here.
                             } catch (e: Exception) {
                                 e.printStackTrace()
@@ -1870,10 +1626,11 @@ class RechargeFragment : Fragment() {
                     }
                 }
 
-// Notify the adapter that the data set has changed (if data is dynamically added/removed)
+            // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllOperatorAdapterValue!!.notifyDataSetChanged()
 
-        } else if (rechargeType == "Gas") {
+        }
+        else if (rechargeType == "Gas") {
             //********************************* Gas Spinner ******************************//
 
             Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
@@ -1942,7 +1699,8 @@ class RechargeFragment : Fragment() {
 
             // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllGasOperatorAdapter!!.notifyDataSetChanged()
-        } else if (rechargeType == "Insurance") {
+        }
+        else if (rechargeType == "Insurance") {
             //********************************* Gas Spinner ******************************//
 
             Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
@@ -2011,7 +1769,8 @@ class RechargeFragment : Fragment() {
 
             // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllGasOperatorAdapter!!.notifyDataSetChanged()
-        } else if (rechargeType == "Broadband") {
+        }
+        else if (rechargeType == "Broadband") {
             //********************************* Gas Spinner ******************************//
 
             Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
@@ -2081,18 +1840,13 @@ class RechargeFragment : Fragment() {
 
             // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllGasOperatorAdapter!!.notifyDataSetChanged()
-        } else if (rechargeType == "Electricity") {
+        }
+        else if (rechargeType == "Electricity") {
             //********************************* Electricity Spinner ******************************//
-
-            Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                Constants.electricityName!!
-            )
+            Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, Constants.electricityName!!)
             Constants.getAllGasOperatorAdapter!!.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             binding.spOperator.adapter = Constants.getAllGasOperatorAdapter
-            binding.spOperator.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
+            binding.spOperator.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>,
                         view: View?,
@@ -2139,10 +1893,10 @@ class RechargeFragment : Fragment() {
                         // Handle the case where nothing is selected, if needed
                     }
                 }
-
             // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllGasOperatorAdapter!!.notifyDataSetChanged()
-        } else if (rechargeType == "Water") {
+        }
+        else if (rechargeType == "Water") {
             //********************************* Water Spinner ******************************//
 
             Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
@@ -2201,24 +1955,16 @@ class RechargeFragment : Fragment() {
 
             // Notify the adapter that the data set has changed (if data is dynamically added/removed)
             Constants.getAllGasOperatorAdapter!!.notifyDataSetChanged()
-        } else if (rechargeType == "postpaid") {
+        }
+        else if (rechargeType == "postpaid") {
             //********************************* Prepaid Spinner ******************************//
 
-            Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(
-                requireContext(),
-                R.layout.support_simple_spinner_dropdown_item,
-                Constants.prepaidName!!
-            )
+            Constants.getAllGasOperatorAdapter = ArrayAdapter<String>(requireContext(), R.layout.support_simple_spinner_dropdown_item, Constants.prepaidName!!)
             Constants.getAllGasOperatorAdapter!!.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
             binding.spOperator.adapter = Constants.getAllGasOperatorAdapter
             binding.spOperator.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>,
-                        view: View?,
-                        pos: Int,
-                        id: Long
-                    ) {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
                         if (pos > 0) {
                             try {
                                 selectedModel = java.lang.String.valueOf(
@@ -2272,12 +2018,7 @@ class RechargeFragment : Fragment() {
             binding.spOperator.adapter = Constants.getAllGasOperatorAdapter
             binding.spOperator.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>,
-                        view: View?,
-                        pos: Int,
-                        id: Long
-                    ) {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
                         if (pos > 0) {
                             try {
                                 selectedModel = java.lang.String.valueOf(
@@ -2403,7 +2144,7 @@ class RechargeFragment : Fragment() {
                                 )
                                 if (!TextUtils.isEmpty(binding.etMobileNumber2.text)) {
                                     binding.llViewBill.visibility = View.GONE
-                                    getFastTagDetails()
+                                    //getFastTagDetails()
                                 }
                                 mStash!!.setStringValue(
                                     Constants.opCategory,
@@ -2442,6 +2183,7 @@ class RechargeFragment : Fragment() {
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getFastTagList() {
         requireContext().runIfConnected {
@@ -2451,7 +2193,7 @@ class RechargeFragment : Fragment() {
                         resource?.let {
                             when (it.apiStatus) {
                                 ApiStatus.SUCCESS -> {
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     it.data?.let { users ->
                                         populateDropDown(users.body()!!.data, users)
 //                                getFastTagListRes(users)
@@ -2459,7 +2201,7 @@ class RechargeFragment : Fragment() {
                                 }
 
                                 ApiStatus.ERROR -> {
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     Toast.makeText(
                                         context,
                                         "Something went wrong",
@@ -2469,7 +2211,7 @@ class RechargeFragment : Fragment() {
                                 }
 
                                 ApiStatus.LOADING -> {
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                 }
                             }
                         }
@@ -2478,35 +2220,23 @@ class RechargeFragment : Fragment() {
         }
     }
 
-    private fun populateDropDown(
-        list: java.util.ArrayList<com.bos.payment.appName.data.model.fastTag.fastTagOperator.Data>,
-        response: Response<FastTagOperatorsListRes?>
-    ) {
+
+    private fun populateDropDown(list: java.util.ArrayList<com.bos.payment.appName.data.model.fastTag.fastTagOperator.Data>, response: Response<FastTagOperatorsListRes?>) {
         if (response.body()!!.status == true) {
             for (singleObject in list) {
                 when (singleObject.category) {
                     "Fastag" -> {
                         Constants.fastTagName!!.add(singleObject.name.toString())
-                        Constants.fastTagNameMap!![singleObject.name.toString()] =
-                            Integer.valueOf(singleObject.id?.toInt() ?: 0)
-                        Constants.fastTagNameMapForGettingFastTagName!![singleObject.id?.toInt()
-                            ?: 0] = singleObject.name.toString()
+                        Constants.fastTagNameMap!![singleObject.name.toString()] = Integer.valueOf(singleObject.id?.toInt() ?: 0)
+                        Constants.fastTagNameMapForGettingFastTagName!![singleObject.id?.toInt() ?: 0] = singleObject.name.toString()
                     }
                 }
                 setAllDropDown()
             }
-        } else {
-            Toast.makeText(
-                requireContext(),
-                response.body()!!.message.toString(),
-                Toast.LENGTH_SHORT
-            ).show()
         }
-    }
-
-
-    private fun setAllDropDownFastag(singleObject: com.bos.payment.appName.data.model.fastTag.fastTagOperator.Data) {
-
+        else {
+            Toast.makeText(requireContext(), response.body()!!.message.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -2521,39 +2251,28 @@ class RechargeFragment : Fragment() {
         }
 
         val requestBody = jsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
-        pd.show()
-        val call = apiService.getRechargePlanReq(requestBody)
+        Constants.OpenPopUpForVeryfyOTP(requireContext())
 
+        val call = apiService.getRechargePlanReq(requestBody)
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
                     if (response.isSuccessful) {
 
-                        pd.dismiss()
+                        Constants.dialog.dismiss()
                         val responseString = response.body()?.string()
                         val rootObject = JSONObject(responseString)
 
                         try {
                             if (rootObject.has("statusCode")) {
                                 val errorCode = rootObject.getInt("statusCode")
-                                uploadDataOnFirebaseConsole(
-                                    "Error code $errorCode  $responseString",
-                                    "RechargeFragmentRechargePlanReq",
-                                    requireContext()
-                                )
+                                uploadDataOnFirebaseConsole("Error code $errorCode  $responseString", "RechargeFragmentRechargePlanReq", requireContext())
                             } else {
-                                uploadDataOnFirebaseConsole(
-                                    "No statusCode found: $responseString",
-                                    "RechargeFragmentRechargePlanReq",
-                                    requireContext()
-                                )
+                                uploadDataOnFirebaseConsole("No statusCode found: $responseString", "RechargeFragmentRechargePlanReq", requireContext())
                             }
-                        } catch (e: Exception) {
-                            uploadDataOnFirebaseConsole(
-                                "Parsing Exception: ${e.message}",
-                                "RechargeFragmentRechargePlanReq",
-                                requireContext()
-                            )
+                        }
+                        catch (e: Exception) {
+                            uploadDataOnFirebaseConsole("Parsing Exception: ${e.message}", "RechargeFragmentRechargePlanReq", requireContext())
                         }
 
 
@@ -2569,8 +2288,7 @@ class RechargeFragment : Fragment() {
                                 if (value is JSONArray) {
                                     Log.d("APIArrayName", "Array Name: $key")
 
-                                    val mobilePlan =
-                                        mutableListOf<Plan>()  // 👈 create new list for each array
+                                    val mobilePlan = mutableListOf<Plan>()  // 👈 create new list for each array
                                     val array = value
 
                                     for (i in 0 until array.length()) {
@@ -2580,33 +2298,23 @@ class RechargeFragment : Fragment() {
                                         val desc = item.optString("desc", "")
 
                                         mobilePlan.add(Plan(rs, validity, desc))
-                                        Log.d(
-                                            "API",
-                                            " → Plan: Rs.$rs | Validity: $validity | Desc: $desc"
-                                        )
+
+                                        Log.d("API", " → Plan: Rs.$rs | Validity: $validity | Desc: $desc")
                                     }
 
-                                    mobileRechargePlanList.add(
-                                        MobileRechargePlanModel(
-                                            key,
-                                            mobilePlan
-                                        )
-                                    )
+                                    mobileRechargePlanList.add(MobileRechargePlanModel(key, mobilePlan))
                                 }
 
                             }
 
+
                             if (mobileRechargePlanList.isNotEmpty()) {
                                 Log.d("PlanList", Gson().toJson(mobileRechargePlanList))
                                 binding.llViewPlan.visibility = View.VISIBLE
-                                RechargePlanNameAdapter = RechargePlanNameAdapter(
-                                    requireContext(),
-                                    mobileRechargePlanList,
+                                RechargePlanNameAdapter = RechargePlanNameAdapter(requireContext(), mobileRechargePlanList,
                                     clickListener = object : RechargePlanNameAdapter.ClickListener {
                                         override fun itemClick(item: String) {
-                                            val mobilePlan =
-                                                mobileRechargePlanList.find { it.arrayName == item }?.plans
-                                                    ?: emptyList()
+                                            val mobilePlan = mobileRechargePlanList.find { it.arrayName == item }?.plans ?: emptyList()
                                             getAllPlanListRes(mobilePlan)
                                         }
                                     }
@@ -2619,34 +2327,24 @@ class RechargeFragment : Fragment() {
                         }
 
                         Log.d("SuccessApiRespo", "Success: $responseString")
+
                     } else {
-                        pd.dismiss()
-                        Log.e(
-                            "ErrorApiRespo",
-                            "Error: ${response.code()} - ${response.errorBody()?.string()}"
-                        )
+                        Constants.dialog.dismiss()
+                        Log.e("ErrorApiRespo", "Error: ${response.code()} - ${response.errorBody()?.string()}")
                         binding.llViewPlan.visibility = View.GONE
-                        uploadDataOnFirebaseConsole(
-                            "Error: ${response.code()} - ${
-                                response.errorBody()?.string()
-                            }", "RechargeFragmentRechargePlanReq", requireContext()
-                        )
+                        uploadDataOnFirebaseConsole("Error: ${response.code()} - ${response.errorBody()?.string()}", "RechargeFragmentRechargePlanReq", requireContext())
                     }
                 } catch (e: Exception) {
-                    pd.dismiss()
+                    Constants.dialog.dismiss()
                     val rechargeplanview = "TryException ".plus(e.printStackTrace().toString())
-                    uploadDataOnFirebaseConsole(
-                        rechargeplanview,
-                        "RechargeFragmentRechargePlanReq",
-                        requireContext()
-                    )
+                    uploadDataOnFirebaseConsole(rechargeplanview, "RechargeFragmentRechargePlanReq", requireContext())
                 }
 
 
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                pd.dismiss()
+                Constants.dialog.dismiss()
                 Log.e("API", "Failure: ${t.message}")
             }
 
@@ -2654,7 +2352,6 @@ class RechargeFragment : Fragment() {
 
 
     }
-
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -2665,8 +2362,7 @@ class RechargeFragment : Fragment() {
             // Set up RecyclerView
             val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             binding.rvViewPlan.layoutManager = layoutManager
-            val layoutAnimationController =
-                AnimationUtils.loadLayoutAnimation(context, R.anim.recyclerview_anim_layout)
+            val layoutAnimationController = AnimationUtils.loadLayoutAnimation(context, R.anim.recyclerview_anim_layout)
             binding.rvViewPlan.layoutAnimation = layoutAnimationController
             binding.rvViewPlan.setHasFixedSize(true)
 
@@ -2802,43 +2498,45 @@ class RechargeFragment : Fragment() {
                         //binding.etAmount.requestFocus()
                         binding.etMobileNumber.requestFocus()*/
                     }
-                }
-            )
+                })
             binding.rvViewPlan.layoutManager = LinearLayoutManager(requireContext())
             binding.rvViewPlan.adapter = adapter
             binding.rvViewPlan.setHasFixedSize(true)
             adapter.notifyDataSetChanged()
 
-            // Set up the SearchView
-            binding.searchView.setOnQueryTextListener(object :
-                SearchView.OnQueryTextListener,
-                androidx.appcompat.widget.SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    // Filter the adapter when query is submitted
-                    query?.let { adapter.filter(it) }
-                    return false
-                }
 
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    // Filter the adapter as the user types
-                    newText?.let { adapter.filter(it) }
-                    return false
-                }
-            })
-            binding.rvViewPlan.adapter = adapter
-            adapter.notifyDataSetChanged()
         } catch (e: Exception) {
-            pd.dismiss()
+            Constants.dialog.dismiss()
             e.printStackTrace()
         }
     }
 
 
+    private fun setSearchPlanMobile(filterMobileData: MutableList<MobileRechargePlanModel>){
+        if (filterMobileData.isNotEmpty()) {
+            Log.d("PlanList", Gson().toJson(filterMobileData))
+            RechargePlanNameAdapter = RechargePlanNameAdapter(requireContext(), filterMobileData,
+                clickListener = object : RechargePlanNameAdapter.ClickListener {
+                    override fun itemClick(item: String) {
+                        val mobilePlan = filterMobileData.find { it.arrayName == item }?.plans ?: emptyList()
+                        getAllPlanListRes(mobilePlan)
+                    }
+                }
+            )
+
+            binding.plannamerecyclerview.adapter = RechargePlanNameAdapter
+            RechargePlanNameAdapter.notifyDataSetChanged()
+        }
+
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllServiceChargeRetailer(rechargeAmount: String) {
         requireContext().runIfConnected {
             val getCommercialReq = GetCommercialReq(
-                txtslabamtfrom = Integer.valueOf(rechargeAmount),
-                txtslabamtto = Integer.valueOf(rechargeAmount),
+                txtslabamtfrom = rechargeAmount.toDoubleOrNull(),
+                txtslabamtto = rechargeAmount.toDoubleOrNull(),
                 merchant = mStash!!.getStringValue(Constants.RegistrationId, ""),
                 productId = featureCode,
                 cantentType = mStash!!.getStringValue(Constants.OperatorCategory, ""),
@@ -2852,7 +2550,7 @@ class RechargeFragment : Fragment() {
                     resource?.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
                                         Log.d("RetailerResp", Gson().toJson(response))
@@ -2860,8 +2558,9 @@ class RechargeFragment : Fragment() {
                                     }
                                 }
                             }
-                            ApiStatus.ERROR -> pd.dismiss()
-                            ApiStatus.LOADING -> pd.dismiss()
+
+                            ApiStatus.ERROR -> Constants.dialog.dismiss()
+                            ApiStatus.LOADING -> Constants.dialog.dismiss()
                         }
                     }
                 }
@@ -2869,11 +2568,12 @@ class RechargeFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllServiceChargeAdmin(rechargeAmount: String) {
         requireContext().runIfConnected {
             val getCommercialReq = GetCommercialReq(
-                txtslabamtfrom = Integer.valueOf(rechargeAmount),
-                txtslabamtto = Integer.valueOf(rechargeAmount),
+                txtslabamtfrom = rechargeAmount.toDoubleOrNull(),
+                txtslabamtto = rechargeAmount.toDoubleOrNull(),
                 merchant = mStash!!.getStringValue(Constants.AdminCode, ""),
                 productId = featureCode,
                 cantentType = mStash!!.getStringValue(Constants.OperatorCategory, ""),
@@ -2887,7 +2587,7 @@ class RechargeFragment : Fragment() {
                     resource?.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
                                         Log.d("AdminResp", Gson().toJson(response))
@@ -2896,8 +2596,8 @@ class RechargeFragment : Fragment() {
                                 }
                             }
 
-                            ApiStatus.ERROR -> pd.dismiss()
-                            ApiStatus.LOADING -> pd.dismiss()
+                            ApiStatus.ERROR -> Constants.dialog.dismiss()
+                            ApiStatus.LOADING -> Constants.dialog.dismiss()
                         }
                     }
                 }
@@ -2905,13 +2605,15 @@ class RechargeFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
     private fun getAllServiceChargeApiResRetailer(response: GetCommercialRes, rechargeAmount: String) {
         response.let {
             if (it.isSuccess == true) {
                 // Parse values safely
                 val rechargeAmountValue = rechargeAmount.toDoubleOrNull() ?: 0.0
-                val retailerCommission = response.data[0].retailerCommission?.toDoubleOrNull() ?: 0.0
+                val retailerCommission =
+                    response.data[0].retailerCommission?.toDoubleOrNull() ?: 0.0
 
                 val TDSTax = 5.0 // Fixed TDS rate
 
@@ -3006,8 +2708,7 @@ class RechargeFragment : Fragment() {
                     ""
                 )
 
-            }
-            else {
+            } else {
                 getAllServiceChargeAdmin(rechargeAmount)
 
             }
@@ -3015,6 +2716,7 @@ class RechargeFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
     private fun getAllServiceChargeApiResAdmin(response: GetCommercialRes, rechargeAmount: String) {
         response.let {
@@ -3033,20 +2735,14 @@ class RechargeFragment : Fragment() {
                         "Percentage" -> {
                             val commissionAmount = rechargeAmountValue * (amount / 100)
                             val tdsAmount = commissionAmount * (tdsRate / 100)
-                            mStash!!.setStringValue(
-                                Constants.retailerCommission,
-                                String.format("%.2f", commissionAmount)
-                            )
+                            mStash!!.setStringValue(Constants.retailerCommission, String.format("%.2f", commissionAmount))
                             mStash!!.setStringValue(Constants.tds, String.format("%.2f", tdsAmount))
                             commissionAmount - (commissionAmount * (tdsRate / 100))
                         }
 
                         "Amount" -> {
                             val tdsAmount = amount * (tdsRate / 100)
-                            mStash!!.setStringValue(
-                                Constants.retailerCommission,
-                                String.format("%.2f", amount)
-                            )
+                            mStash!!.setStringValue(Constants.retailerCommission, String.format("%.2f", amount))
                             mStash!!.setStringValue(Constants.tds, String.format("%.2f", tdsAmount))
                             amount - (amount * (tdsRate / 100))
                         }
@@ -3079,8 +2775,7 @@ class RechargeFragment : Fragment() {
                 Log.d("servicechargewithgst", String.format("%.2f", totalServiceChargeWithGst))
 
 //              Calculating the total recharge amount
-                val totalRechargeAmount =
-                    (rechargeAmount.toDoubleOrNull() ?: 0.0) + totalServiceChargeWithGst
+                val totalRechargeAmount = (rechargeAmount.toDoubleOrNull() ?: 0.0) + totalServiceChargeWithGst
                 Log.d("rechargeAmount", String.format("%.2f", totalRechargeAmount))
 
                 // Save commission types in shared preferences
@@ -3118,8 +2813,7 @@ class RechargeFragment : Fragment() {
                     ""
                 )
 
-            }
-            else {
+            } else {
 
                 // Save commission types in shared preferences
                 with(mStash!!) {
@@ -3143,6 +2837,7 @@ class RechargeFragment : Fragment() {
                 mStash!!.setStringValue(Constants.tds, String.format("%.2f", 0.0))
 
                 var msg = "Warning : Slab structure not found. This transaction will proceed without any commission being credited."
+
                 openDialogForPayout(rechargeAmount.toDoubleOrNull() ?: 0.0, 0.0, totalRechargeAmount, 0.0, msg)
 
             }
@@ -3150,6 +2845,7 @@ class RechargeFragment : Fragment() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun openDialogForPayout(transferAmount: Double, servicechargeGst: Double, totalRechargeAmount: Double, retailerCommission: Double, msg: String) {
         dialog = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -3176,36 +2872,35 @@ class RechargeFragment : Fragment() {
         val viewBreakLayout = dialog.findViewById<LinearLayout>(R.id.viewbreaklayout)
         val servicechargelayout = dialog.findViewById<LinearLayout>(R.id.servicechargelayout)
         val detailsgstserviceslayout = dialog.findViewById<LinearLayout>(R.id.chargesdetailslayout)
-        val retailercommissionlayout = dialog.findViewById<LinearLayout>(R.id.retailercommissionlayout)
+        val retailercommissionlayout =
+            dialog.findViewById<LinearLayout>(R.id.retailercommissionlayout)
 
         if (msg.isNotEmpty()) {
             warningmsg.visibility = View.VISIBLE
             warningmsg.text = msg
-        }
-        else {
+        } else {
             warningmsg.visibility = View.GONE
         }
 
         val gst = mStash!!.getStringValue(Constants.gst, "")
         mStash!!.setStringValue(Constants.serviceChargewithgst, String.format("%.2f", servicechargeGst)).toString()
 
-        transferamttxt.text = "$transferAmount"
+        transferamttxt.text = String.format("%.2f", transferAmount)
         servicechargewithgst.text = String.format("%.2f", servicechargeGst)
         retailercommission.text = String.format("%.2f", retailerCommission)
         serviceChargeamount.text = mStash!!.getStringValue(Constants.serviceCharge, "").toString()
         gstamount.text = "$gst"
         transferamt.text = String.format("%.2f", totalRechargeAmount)
 
-        if(servicechargeGst==0.0){
-            servicechargelayout.visibility=View.GONE
-        }else{
-            servicechargelayout.visibility=View.VISIBLE
+        if (servicechargeGst == 0.0) {
+            servicechargelayout.visibility = View.GONE
+        } else {
+            servicechargelayout.visibility = View.VISIBLE
         }
 
-        if(retailerCommission==0.0){
+        if (retailerCommission == 0.0) {
             retailercommissionlayout.visibility = View.GONE
-        }
-        else{
+        } else {
             retailercommissionlayout.visibility = View.VISIBLE
         }
 
@@ -3239,7 +2934,11 @@ class RechargeFragment : Fragment() {
 
                 getAllWalletBalance()
             } else {
-                Toast.makeText(requireContext(), "Transfer amount must be greater than the service charge.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Transfer amount must be greater than the service charge.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
         }
@@ -3257,7 +2956,6 @@ class RechargeFragment : Fragment() {
 
         dialog.show() // ✅ REQUIRED
     }
-
 
 
     @SuppressLint("DefaultLocale", "SetTextI18n")
@@ -3285,10 +2983,7 @@ class RechargeFragment : Fragment() {
                 val serviceWithGst = serviceInAmount * (gstRate / 100)
                 mStash!!.setStringValue(Constants.gst, String.format("%.2f", serviceWithGst))
                 // binding.serviceChargeWithGST.text = String.format("%.2f", serviceWithGst)
-                mStash!!.setStringValue(
-                    Constants.serviceCharge,
-                    String.format("%.2f", serviceInAmount)
-                )
+                mStash!!.setStringValue(Constants.serviceCharge, String.format("%.2f", serviceInAmount))
                 serviceInAmount + serviceWithGst
 
             }
@@ -3300,17 +2995,11 @@ class RechargeFragment : Fragment() {
             }
         }
 
-        mStash!!.setStringValue(
-            Constants.serviceChargeWithGST,
-            String.format("%.2f", totalAmountWithGst)
-        )
+        mStash!!.setStringValue(Constants.serviceChargeWithGST, String.format("%.2f", totalAmountWithGst))
 
         Log.d("gstamount", mStash!!.getStringValue(Constants.gst, "").toString())
         Log.d("servicecharge", mStash!!.getStringValue(Constants.serviceCharge, "").toString())
-        Log.d(
-            "totalAmountWithGst",
-            mStash!!.getStringValue(Constants.serviceChargeWithGST, "").toString()
-        )
+        Log.d("totalAmountWithGst", mStash!!.getStringValue(Constants.serviceChargeWithGST, "").toString())
 
         // Return the total service charge (with GST) to include in the final transaction
         return totalAmountWithGst
@@ -3398,6 +3087,7 @@ class RechargeFragment : Fragment() {
         builder.show()
     }
 
+
     // operators name.......................................................................
     fun hitApiForRechargeOperatorNameList(displayName: String) {
 
@@ -3412,10 +3102,10 @@ class RechargeFragment : Fragment() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     uploadDataOnFirebaseConsole(
                                         Gson().toJson(response),
                                         "RechargeFragmentOperatorsRequest",
@@ -3441,11 +3131,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3454,6 +3144,7 @@ class RechargeFragment : Fragment() {
 
 
     }
+
 
     private fun setDropDownMobileOperators() {
         if (rechargeType == "mobile") {
@@ -3478,6 +3169,7 @@ class RechargeFragment : Fragment() {
         binding.spOperator.adapter = Constants.getAllOperatorAdapter
 
         binding.spOperator.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -3533,6 +3225,7 @@ class RechargeFragment : Fragment() {
             ) {
                 if (circleArray!![position]!!.isNotEmpty()) {
                     Log.d("circlename", circleArray!![position].toString())
+
                     mStash!!.setStringValue(
                         Constants.circleName.toString(),
                         circleArray!![position].toString()
@@ -3556,6 +3249,7 @@ class RechargeFragment : Fragment() {
 
 
     }
+
 
     private fun getOperatorId(operatorName: String): Int? {
         val normalized = operatorName.lowercase()
@@ -3599,6 +3293,7 @@ class RechargeFragment : Fragment() {
         }
     }
 
+
     // operators name.......................................................................
     fun hitApiForMobileWiseOperatorName(mob: String) {
 
@@ -3613,10 +3308,10 @@ class RechargeFragment : Fragment() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     uploadDataOnFirebaseConsole(
                                         Gson().toJson(response),
                                         "RechargeFragmentMobileWiseRequest",
@@ -3635,11 +3330,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3647,6 +3342,7 @@ class RechargeFragment : Fragment() {
             }
 
     }
+
 
     fun setdefaultDropDownList(operatorName: String, circleName: String) {
         //..................................Operator Name.........................................................................................
@@ -3672,12 +3368,14 @@ class RechargeFragment : Fragment() {
         ).apply {
             setDropDownViewResource(R.layout.spinner_right_aligned)
         }
+
         // Set to spinner
         binding.spOperator.adapter = Constants.getAllOperatorAdapter
         // Always select default at 0th position
         binding.spOperator.setSelection(0)
 
         //....................................................................................................................................
+
         //........................................Circle Name.................................................................................
         val circleArray = resources.getStringArray(R.array.recharge_circle).toMutableList()
         val circleposition = circleArray.indexOf(circleName)
@@ -3692,7 +3390,11 @@ class RechargeFragment : Fragment() {
             }
         }
 
-        val circleAdapter = ArrayAdapter(requireContext(), R.layout.spinner_right_aligned, circleArray).apply { setDropDownViewResource(R.layout.spinner_right_aligned) }
+        val circleAdapter = ArrayAdapter(
+            requireContext(),
+            R.layout.spinner_right_aligned,
+            circleArray
+        ).apply { setDropDownViewResource(R.layout.spinner_right_aligned) }
 
         binding.etCircle.adapter = circleAdapter
         binding.etCircle.setSelection(0)  // default always selected
@@ -3701,15 +3403,20 @@ class RechargeFragment : Fragment() {
 
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun hitApiForMobileRecharge(rechargeAmt: String, mobileNo: String, operatorName: String, remarks: String, commissionremark: String) {
         var registrationId = mStash?.getStringValue(Constants.MerchantId, "")
         var productID = mStash!!.getStringValue(Constants.OperatorId.toString(), "")
 
         var latlong = ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble)
-        Log.d("Lat Long", ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble))
+        Log.d(
+            "Lat Long",
+            ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble)
+        )
 
-        var MobileRechargeReq = com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileRechargeReq(
+        var MobileRechargeReq =
+            com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileRechargeReq(
                 registrationId = registrationId,
                 productId = productID!!,
                 amount = rechargeAmt,
@@ -3731,10 +3438,10 @@ class RechargeFragment : Fragment() {
                                         requireContext()
                                     )
                                     getFuseLocation()
-                                    pd.dismiss()
+                                    Constants.dialog.dismiss()
                                     Log.d("rechargeResp", Gson().toJson(response))
 
-                                    if(commissionremark.contains("dth",ignoreCase = true)){
+                                    if (commissionremark.contains("dth", ignoreCase = true)) {
                                         when (productID) {
                                             "522" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.airteldigital)
@@ -3751,14 +3458,17 @@ class RechargeFragment : Fragment() {
                                             "523" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.dishtv)
                                         }
-                                        RechargeSuccessfulPageActivity.operatorName = binding.spOperator.selectedItem.toString().trim()
-                                        Log.d("operatorName", RechargeSuccessfulPageActivity.operatorName)
+                                        RechargeSuccessfulPageActivity.operatorName =
+                                            binding.spOperator.selectedItem.toString().trim()
+                                        Log.d(
+                                            "operatorName",
+                                            RechargeSuccessfulPageActivity.operatorName
+                                        )
                                         Log.d("productID", productID)
                                         operatorLogo = operatorlogo
                                         planPrice = binding.etAmount.text.toString().trim()
 
-                                    }
-                                    else{
+                                    } else {
                                         when (productID) {
                                             "518" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.airtel)
@@ -3772,8 +3482,12 @@ class RechargeFragment : Fragment() {
                                             "520" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.vodaphone)
                                         }
-                                        RechargeSuccessfulPageActivity.operatorName = binding.spOperator.selectedItem.toString().trim()
-                                        Log.d("operatorName", RechargeSuccessfulPageActivity.operatorName)
+                                        RechargeSuccessfulPageActivity.operatorName =
+                                            binding.spOperator.selectedItem.toString().trim()
+                                        Log.d(
+                                            "operatorName",
+                                            RechargeSuccessfulPageActivity.operatorName
+                                        )
                                         Log.d("productID", productID)
                                         operatorLogo = operatorlogo
                                         planPrice = binding.rechargeAmount.text.toString().trim()
@@ -3785,8 +3499,12 @@ class RechargeFragment : Fragment() {
                                     mobileNumber = mobileNo
                                     orderID = response.referanceID ?: ""
 
-                                    serviceChargeWithGST = mStash!!.getStringValue(Constants.serviceChargeWithGST, "")!!
-                                    totalTransaction = mStash!!.getStringValue(Constants.totalTransaction, "")!!
+                                    serviceChargeWithGST = mStash!!.getStringValue(
+                                        Constants.serviceChargeWithGST,
+                                        ""
+                                    )!!
+                                    totalTransaction =
+                                        mStash!!.getStringValue(Constants.totalTransaction, "")!!
 
                                     hitApiForMobileRechargeReqUpload(
                                         rechargeAmt,
@@ -3803,11 +3521,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3816,6 +3534,7 @@ class RechargeFragment : Fragment() {
 
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun hitApiForMobileRechargeReqUpload(rechargeAmt: String, mobileNo: String, rechargeResponse: MobileRechargeRespo, rechargeresuqst: String, operatorName: String, remarks: String, commissionremark: String) {
@@ -3844,17 +3563,22 @@ class RechargeFragment : Fragment() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("RechargeReqResp", Gson().toJson(response))
-                                    hitApiForMobileRechargeRespUpload(rechargeResponse, operatorName, remarks, commissionremark)
+                                    hitApiForMobileRechargeRespUpload(
+                                        rechargeResponse,
+                                        operatorName,
+                                        remarks,
+                                        commissionremark
+                                    )
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3863,6 +3587,7 @@ class RechargeFragment : Fragment() {
 
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun hitApiForMobileRechargeRespUpload(rechargeResponse: MobileRechargeRespo, operatorName: String, remarks: String, commissionremark: String) {
@@ -3903,11 +3628,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3917,23 +3642,23 @@ class RechargeFragment : Fragment() {
 
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun hitApiForRechargeApiResponse(rechargeResponse: MobileRechargeRespo, operatorName: String, remarks: String, commissionremark: String) {
         var registrationId = mStash?.getStringValue(Constants.RegistrationId, "")
         var productID = mStash!!.getStringValue(Constants.OperatorId.toString(), "")
         var totalamount = mStash!!.getStringValue(Constants.totalTransaction, "")
 
-        var rechargeamount =""
-        var rechargenumber =""
+        var rechargeamount = ""
+        var rechargenumber = ""
 
 
-        if(commissionremark.contains("dth",ignoreCase = true)){
+        if (commissionremark.contains("dth", ignoreCase = true)) {
             rechargeamount = binding.etAmount.text.toString().trim()
             rechargenumber = binding.etDTHBillNumber.text.toString()
-        }
-        else{
-            rechargeamount =  binding.rechargeAmount.text.toString().trim()
-            rechargenumber =  binding.etMobileNumber.text.toString().trim()
+        } else {
+            rechargeamount = binding.rechargeAmount.text.toString().trim()
+            rechargenumber = binding.etMobileNumber.text.toString().trim()
         }
 
         val req = RechargeapiresponseReq(
@@ -3992,11 +3717,11 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -4006,7 +3731,8 @@ class RechargeFragment : Fragment() {
 
     }
 
-    private fun getTransferAmountToAgentWithCal(rechargeAmount: String,rechargenumber:String, operatorName: String, remarks: String, commissionremark: String) {
+
+    private fun getTransferAmountToAgentWithCal(rechargeAmount: String, rechargenumber: String, operatorName: String, remarks: String, commissionremark: String) {
         var totalamount = mStash!!.getStringValue(Constants.totalTransaction, "")
         var status = ""
 
@@ -4018,7 +3744,7 @@ class RechargeFragment : Fragment() {
             status = "Pending"
         }
 
-        if(status.equals("Failed")){
+        if (status.equals("Failed")) {
             val transferAmountToAgentsReq = TransferAmountToAgentsReq(
                 transferFrom = mStash!!.getStringValue(Constants.RegistrationId, ""),
                 transferTo = "Admin",
@@ -4056,37 +3782,39 @@ class RechargeFragment : Fragment() {
                             ApiStatus.SUCCESS -> {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
-                                             Log.d("transafertoagent", Gson().toJson(response))
+                                        Log.d("transafertoagent", Gson().toJson(response))
 
-                                             Log.d("checkconditionforcommission", "CommissionMethodfailed")
+                                        Log.d(
+                                            "checkconditionforcommission",
+                                            "CommissionMethodfailed"
+                                        )
 
-                                             getTransferAmountToAgentWithCalRes(response)
+                                        getTransferAmountToAgentWithCalRes(response)
                                     }
                                 }
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT)
                                     .show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
                 }
 
-        }
-
-        else{
+        } else {
             val transferAmountToAgentsReq = TransferAmountToAgentsReq(
                 transferFrom = mStash!!.getStringValue(Constants.RegistrationId, ""),
                 transferTo = "Admin",
                 transferAmt = mStash!!.getStringValue(Constants.totalTransaction, "0.00") ?: "0.00",
                 remark = "Recharge $remarks",
-                transferFromMsg = "Your account has been debited by ₹$totalamount for a recharge on $operatorName number ${rechargenumber
+                transferFromMsg = "Your account has been debited by ₹$totalamount for a recharge on $operatorName number ${
+                    rechargenumber
                 }.",
                 transferToMsg = "Your Account has been credited by ₹$totalamount for a recharge on $operatorName  number  ${
                     rechargenumber
@@ -4102,7 +3830,10 @@ class RechargeFragment : Fragment() {
                 servicesChargeWithoutGST = mStash!!.getStringValue(Constants.serviceCharge, "0.00")
                     ?: "0.00",
                 customerVirtualAddress = "",
-                retailerCommissionAmt = mStash!!.getStringValue(Constants.retailerCommission, "0.00") ?: "0.00",
+                retailerCommissionAmt = mStash!!.getStringValue(
+                    Constants.retailerCommission,
+                    "0.00"
+                ) ?: "0.00",
                 retailerId = "",
                 paymentMode = "",
                 depositBankName = "",
@@ -4125,30 +3856,39 @@ class RechargeFragment : Fragment() {
                                     users.body()?.let { response ->
                                         Log.d("transafertoagent", Gson().toJson(response))
 
-                                        val commission = mStash!!.getStringValue(Constants.retailerCommission, "0.00")?.trim()?.toDoubleOrNull() ?: 0.0
+                                        val commission = mStash!!.getStringValue(
+                                            Constants.retailerCommission,
+                                            "0.00"
+                                        )?.trim()?.toDoubleOrNull() ?: 0.0
 
                                         Log.d("retailercommissionforpayout", commission.toString())
 
                                         if (commission > 0.0) {
-                                                Log.d("checkconditionforcommission", "Commissionmethod")
-                                                getTransferAmountToAgentInCommissionCal(response, commissionremark)
-                                            } else {
-                                                Log.d("checkconditionforcommission", "CommissionMethodfailed")
-                                                getTransferAmountToAgentWithCalRes(response)
-                                            }
+                                            Log.d("checkconditionforcommission", "Commissionmethod")
+                                            getTransferAmountToAgentInCommissionCal(
+                                                response,
+                                                commissionremark
+                                            )
+                                        } else {
+                                            Log.d(
+                                                "checkconditionforcommission",
+                                                "CommissionMethodfailed"
+                                            )
+                                            getTransferAmountToAgentWithCalRes(response)
+                                        }
 
                                     }
                                 }
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                Constants.dialog.dismiss()
                                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT)
                                     .show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
@@ -4157,9 +3897,11 @@ class RechargeFragment : Fragment() {
 
     }
 
+
     private fun getTransferAmountToAgentInCommissionCal(response: TransferAmountToAgentsRes, remarks: String) {
         var totalamount = mStash!!.getStringValue(Constants.totalTransaction, "")
-        var withouttdscommissionamount = mStash!!.getStringValue(Constants.retailerCommissionWithoutTDS, "")
+        var withouttdscommissionamount =
+            mStash!!.getStringValue(Constants.retailerCommissionWithoutTDS, "")
         var tdsamount = mStash!!.getStringValue(Constants.tds, "")
         var actualcommission = mStash!!.getStringValue(Constants.retailerCommission, "")
 
@@ -4210,25 +3952,32 @@ class RechargeFragment : Fragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { commissionresp ->
-                                    if(pd!=null && pd.isShowing){
-                                        pd.dismiss()
+                                    if (Constants.dialog != null && Constants.dialog.isShowing) {
+                                        Constants.dialog.dismiss()
                                     }
-                                    referenceId = response.data!!.refTransID!!  // payout referenceid
-                                    Log.d("transferAmountToAgentcommissionresp", Gson().toJson(response))
-                                    var intent = Intent(requireContext(), RechargeSuccessfulPageActivity::class.java)
+                                    referenceId =
+                                        response.data!!.refTransID!!  // payout referenceid
+                                    Log.d(
+                                        "transferAmountToAgentcommissionresp",
+                                        Gson().toJson(response)
+                                    )
+                                    var intent = Intent(
+                                        requireContext(),
+                                        RechargeSuccessfulPageActivity::class.java
+                                    )
                                     startActivity(intent)
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                             Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
 
                     }
@@ -4236,19 +3985,21 @@ class RechargeFragment : Fragment() {
             }
     }
 
+
     private fun getTransferAmountToAgentWithCalRes(response: TransferAmountToAgentsRes) {
         if (response.isSuccess == true) {
             referenceId = response.data!!.refTransID!!  // payout referenceid
             var intent = Intent(requireContext(), RechargeSuccessfulPageActivity::class.java)
             startActivity(intent)
         } else {
-            pd.dismiss()
+            Constants.dialog.dismiss()
             toast(response.returnMessage.toString())
         }
     }
 
+
     fun hitApiForRechargeCategory() {
-        //     // new changes done by Annu
+        // new changes done by Annu
 
         var categoryreq = RechargeCategoryReq(
             registerationID = mStash?.getStringValue(Constants.MerchantId, "") /*"AOP-554"*/
@@ -4261,75 +4012,56 @@ class RechargeFragment : Fragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    uploadDataOnFirebaseConsole(
-                                        Gson().toJson(response),
-                                        "RechargeFragmentCategoryRequest",
-                                        requireContext()
-                                    )
+                                    uploadDataOnFirebaseConsole(Gson().toJson(response), "RechargeFragmentCategoryRequest", requireContext())
                                     if (response.status!!) {
                                         Log.d("RechargeCategoryRespo", Gson().toJson(response))
                                         //Toast.makeText(context,response.message.toString(),Toast.LENGTH_SHORT).show()
                                         if (response.data!!.size > 0) {
                                             var getdata = response.data
                                             getdata.forEach { it ->
-
-                                                if (it!!.displayName!!.lowercase()
-                                                        .contains("prepaid") && rechargeType == "mobile"
-                                                ) {
+                                                if (it!!.displayName!!.lowercase().contains("prepaid") && rechargeType == "mobile") {
                                                     DisplayName = it!!.displayName
-                                                    mStash!!.setStringValue(
-                                                        Constants.OperatorCategory,
-                                                        DisplayName
-                                                    )
+                                                    mStash!!.setStringValue(Constants.OperatorCategory, DisplayName)
+
                                                     if (DisplayName!!.isNotEmpty()) {
                                                         Constants.operatorName = ArrayList()
                                                         Constants.productIdList = ArrayList()
-                                                        hitApiForRechargeOperatorNameList(
-                                                            DisplayName!!
-                                                        )
+                                                        hitApiForRechargeOperatorNameList(DisplayName!!)
                                                     }
-                                                } else {
 
-                                                    if (it!!.displayName!!.lowercase()
-                                                            .contains("dth") && rechargeType == "dth"
-                                                    ) {
+                                                }
+                                                else {
+
+                                                    if (it!!.displayName!!.lowercase().contains("dth") && rechargeType == "dth") {
                                                         DisplayName = it!!.displayName
                                                     }
 
-                                                    mStash!!.setStringValue(
-                                                        Constants.OperatorCategory,
-                                                        DisplayName
-                                                    )
+                                                    mStash!!.setStringValue(Constants.OperatorCategory, DisplayName)
 
                                                     if (DisplayName!!.isNotEmpty()) {
                                                         Constants.operatorName = ArrayList()
                                                         Constants.productIdList = ArrayList()
-                                                        hitApiForRechargeOperatorNameList(
-                                                            DisplayName!!
-                                                        )
+                                                        hitApiForRechargeOperatorNameList(DisplayName!!)
                                                     }
                                                 }
 
                                             }
                                         }
-                                    } else {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            response.message,
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                        pd.dismiss()
+                                    }
+                                    else {
+                                        Toast.makeText(requireContext(), response.message, Toast.LENGTH_LONG).show()
+                                        Constants.dialog.dismiss()
                                     }
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            Constants.dialog.dismiss()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -4337,6 +4069,7 @@ class RechargeFragment : Fragment() {
             }
 
     }
+
 
     fun CheckAndHitApi() {
         val caNumber = binding.etDTHBillNumber.text.toString().trim()
@@ -4360,6 +4093,7 @@ class RechargeFragment : Fragment() {
         }
     }
 
+
     fun hitApiForGetDTHInfo() {
 
         apiCalled = false
@@ -4370,7 +4104,6 @@ class RechargeFragment : Fragment() {
                 Log.d("CheckOperator", "Match found: $selectedOperatorDTHName")
             }
         }
-
 
         var dthreq = DthInfoReq(
             registrationId = mStash?.getStringValue(Constants.MerchantId, "") /*"AOP-554"*/,
@@ -4387,23 +4120,17 @@ class RechargeFragment : Fragment() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let { response ->
-                                uploadDataOnFirebaseConsole(
-                                    Gson().toJson(response),
-                                    "RechargeFragmentDthInfoRequest",
-                                    requireContext()
-                                )
+                                uploadDataOnFirebaseConsole(Gson().toJson(response), "RechargeFragmentDthInfoRequest", requireContext())
                                 if (response.status!!) {
                                     Log.d("dthRespo", Gson().toJson(response))
                                     if (response.data!!.size > 0) {
-                                        if (pd != null && pd.isShowing) {
-                                            pd.dismiss()
+                                        if (Constants.dialog != null && Constants.dialog.isShowing) {
+                                            Constants.dialog.dismiss()
                                         }
                                         var getdata = response.data
                                         DthInfoList = getdata!!.toMutableList()!!
                                         binding.dthinfo.visibility = View.VISIBLE
-                                        var adapter = DTHViewInfoAdapter(
-                                            requireContext(),
-                                            DthInfoList,
+                                        var adapter = DTHViewInfoAdapter(requireContext(), DthInfoList,
                                             clickListener = DTHViewInfoAdapter.ClickListener { it ->
                                                 binding.etAmount.setText(it.toString())
                                             })
@@ -4411,8 +4138,8 @@ class RechargeFragment : Fragment() {
                                         adapter.notifyDataSetChanged()
                                     }
                                 } else {
-                                    if (pd != null && pd.isShowing) {
-                                        pd.dismiss()
+                                    if (Constants.dialog != null && Constants.dialog.isShowing) {
+                                        Constants.dialog.dismiss()
                                     }
                                     binding.dthinfo.visibility = View.GONE
                                     Toast.makeText(requireContext(), "Must check operator or circle may be incorrect", Toast.LENGTH_SHORT).show()
@@ -4422,11 +4149,11 @@ class RechargeFragment : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        Constants.dialog.dismiss()
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
                 }
             }
@@ -4434,5 +4161,6 @@ class RechargeFragment : Fragment() {
         }
 
     }
+
 
 }

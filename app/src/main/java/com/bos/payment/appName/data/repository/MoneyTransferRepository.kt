@@ -38,7 +38,6 @@ class MoneyTransferRepository(private val apiInterface: ApiInterface) {
     suspend fun creditCardDetails(req: CreditCardBillPaymentReq) = apiInterface.creditCardDetails(req)
     suspend fun doRecharge(req: MobileRechargeReq) = apiInterface.doRecharge(req)
     suspend fun rechargeStatus(req: RechargeStatusReq) = apiInterface.rechargeStatus(req)
-    suspend fun getOperatorList(req: BillOperationPaymentReq) = apiInterface.getOperatorList(req)
     suspend fun getAllOperatorList(req: RechargeOperatorsListReq) = apiInterface.getAllOperatorList(req)
     suspend fun transactionHistoryList(req: RechargeHistoryReq) = apiInterface.transactionHistoryList(req)
     suspend fun generateQRCode(req: GenerateQRCodeReq) = apiInterface.generateQRCode(req)
@@ -69,7 +68,7 @@ class MoneyTransferRepository(private val apiInterface: ApiInterface) {
 //    suspend fun getTransferAmountToAgents(req: TransferAmountToAgentsReq) = apiInterface.getTransferAmountToAgents(req)
     suspend fun getTransferAmountToAgentWithCal(req: TransferAmountToAgentsWithCalculationReq) = apiInterface.getTransferAmountToAgentWithCal(req)
     suspend fun getAgentReferenceId(req: AgentRefrenceidReq) = apiInterface.getAgentReferenceId(req)
-    suspend fun viewBill(req: FetchBilPaymentDetailsReq) = apiInterface.viewBill(req)
+
 
 
 }

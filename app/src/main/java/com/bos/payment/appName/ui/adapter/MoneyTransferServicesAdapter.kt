@@ -22,10 +22,12 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
     class ViewHolder (var binding : MoneytransferServicesLayoutBinding) : RecyclerView.ViewHolder(binding.root)
 
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val bin = MoneytransferServicesLayoutBinding.inflate(LayoutInflater.from(context), parent,false)
         return ViewHolder(bin)
     }
+
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -73,11 +75,13 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
                }
            }
 
+
            if(servicesList[position].name.equals(context.getString(R.string.postpaid))){
                if (activity is AllServicesSelectionActivity) {
                    activity.callFragment(RechargeFragment(), "postpaid",servicesList[position].featurecode,"")
                }
            }
+
 
            if(servicesList[position].name.equals(context.getString(R.string.dth))){
                if (activity is AllServicesSelectionActivity) {
@@ -85,17 +89,20 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
                }
            }
 
+
            if(servicesList[position].name.equals(context.getString(R.string.electricity))){
                if (activity is AllServicesSelectionActivity) {
                    activity.callFragment(RechargeFragment(), "Electricity",servicesList[position].featurecode,"")
                }
            }
 
+
            if(servicesList[position].name.equals(context.getString(R.string.gas))){
                if (activity is AllServicesSelectionActivity) {
                    activity.callFragment(RechargeFragment(), "Gas",servicesList[position].featurecode,"")
                }
            }
+
 
            if(servicesList[position].name.equals(context.getString(R.string.waterbill))){
                if (activity is AllServicesSelectionActivity) {
