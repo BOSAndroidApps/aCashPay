@@ -42,7 +42,7 @@ class UpcomingAir : Fragment() {
     private lateinit var viewModel: TravelViewModel
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     lateinit var upcominadapter : AirTicketUpcomingAdapter
-    private lateinit var pd: AlertDialog
+
     var checkSelectedPassangerList : MutableList<Int> = mutableListOf()
     var selectedCardPosition:Int = 0
 
@@ -63,7 +63,7 @@ class UpcomingAir : Fragment() {
         getAllApiServiceViewModel = ViewModelProvider( this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(requireContext())
-        pd = PD(context)
+
 
         setDataInList()
 
@@ -131,7 +131,9 @@ class UpcomingAir : Fragment() {
 
                                     }
                                     else{
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         Toast.makeText(requireContext(),response.responseHeader.errorInnerException, Toast.LENGTH_SHORT).show()
                                     }
 
@@ -142,11 +144,13 @@ class UpcomingAir : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
 
                     }
@@ -186,7 +190,7 @@ class UpcomingAir : Fragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    pd.dismiss()
+
                                     Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"UpcomingAirRequeryRequest",requireContext())
 
                                     Log.d("ticketrequeryresp",Gson().toJson(response))
@@ -201,11 +205,13 @@ class UpcomingAir : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }
@@ -254,11 +260,13 @@ class UpcomingAir : Fragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }

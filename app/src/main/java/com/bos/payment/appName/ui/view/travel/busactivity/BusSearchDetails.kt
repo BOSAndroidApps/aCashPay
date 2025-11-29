@@ -28,7 +28,7 @@ import com.google.gson.Gson
 class BusSearchDetails : AppCompatActivity() {
 
     private var mStash: MStash? = null
-    private lateinit var pd: AlertDialog
+
     private lateinit var viewModel: TravelViewModel
     private lateinit var bin: ActivityBusSearchDetailsBinding
     private lateinit var busDataList: ArrayList<Buses>
@@ -63,9 +63,9 @@ class BusSearchDetails : AppCompatActivity() {
             resource?.let {
                 when(it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
+
                                 Log.d("BussearchList",response.buses[0]?.availableSeats.toString())
                                 Log.d("BusList",Gson().toJson(response.buses))
                                 getAllBusSearchListRes(response)
@@ -73,12 +73,14 @@ class BusSearchDetails : AppCompatActivity() {
                         }
                     }
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         Log.d("busListError",it.message.toString())
                         toast(it.message.toString())
                     }
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
@@ -87,6 +89,9 @@ class BusSearchDetails : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllBusSearchListRes(response: BusSearchRes) {
+        if(Constants.dialog!=null && Constants.dialog.isShowing){
+            Constants.dialog.dismiss()
+        }
         if (response.responseHeader?.errorCode == "0000"){
             mStash?.setStringValue(Constants.searchKey, response.searchKey.toString())
             Log.d("responseHeader", mStash?.getStringValue(Constants.searchKey, "").toString())
@@ -110,7 +115,7 @@ class BusSearchDetails : AppCompatActivity() {
     }
 
     private fun intiView() {
-        pd = PD(this)
+
         mStash = MStash.getInstance(this)
         busDataList = ArrayList()
 

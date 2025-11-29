@@ -186,7 +186,6 @@ class RechargeFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-
         binding = FragmentRechargeBinding.inflate(inflater, container, false)
         context = requireContext()
         rechargeType = arguments?.getString("RechargeType").toString()
@@ -686,8 +685,8 @@ class RechargeFragment : Fragment() {
                 binding.llViewPlan.visibility = View.GONE
                 binding.llTransactionHistory.visibility = View.GONE
                 Toast.makeText(context, "Enter Valid Mobile Number", Toast.LENGTH_SHORT).show()
-            } else {
-                Constants.OpenPopUpForVeryfyOTP(requireContext())
+            }
+            else {
                 if (binding.spOperator.selectedItem != null && binding.spOperator.selectedItem.toString().isNotEmpty() && binding.etCircle.selectedItem.toString().isNotEmpty()) {
                     Constants.mobileOperatorName = binding.spOperator.selectedItem.toString()
                     Constants.mobileCircleName = binding.etCircle.selectedItem.toString()
@@ -695,8 +694,7 @@ class RechargeFragment : Fragment() {
                     mStash!!.setStringValue(Constants.mobileCircleName, Constants.mobileCircleName)
                     mobileRechargePlanList.clear()
 
-                    getAllPlanList(mStash!!.getStringValue(Constants.mobileOperatorName, "").toString(),
-                        mStash!!.getStringValue(Constants.mobileCircleName, "").toString())
+                    getAllPlanList(mStash!!.getStringValue(Constants.mobileOperatorName, "").toString(), mStash!!.getStringValue(Constants.mobileCircleName, "").toString())
                 }
                 else {
                     Toast.makeText(requireContext(), "Operator not found", Toast.LENGTH_SHORT).show()
@@ -940,7 +938,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
+                           // Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -954,8 +952,7 @@ class RechargeFragment : Fragment() {
             Log.d(TAG, "getAllMerchantBalanceRes: ${response.data[0].debitBalance}")
             mStash!!.setStringValue(Constants.merchantBalance, response.data[0].debitBalance)
 
-            val totalAmount =
-                mStash!!.getStringValue(Constants.totalTransaction, "")?.toDoubleOrNull() ?: 0.0
+            val totalAmount = mStash!!.getStringValue(Constants.totalTransaction, "")?.toDoubleOrNull() ?: 0.0
             val merchantBalance = response.data[0].debitBalance?.toDoubleOrNull() ?: 0.0
 
             Log.d(
@@ -979,6 +976,7 @@ class RechargeFragment : Fragment() {
 
                 if (rechargeType == "dth") {
                     var CANumber = binding.etDTHBillNumber.text.toString()
+
                     hitApiForMobileRecharge(
                         binding.etAmount.text.toString(),
                         CANumber,
@@ -991,16 +989,12 @@ class RechargeFragment : Fragment() {
 
             } else {
                 Constants.dialog.dismiss()
-                Toast.makeText(
-                    requireContext(),
-                    "Your merchant balance is low. Please contact the administrator",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(requireContext(), "Your merchant balance is low. Please contact the administrator", Toast.LENGTH_LONG).show()
             }
-        } else {
+        }
+        else {
             Constants.dialog.dismiss()
-            Toast.makeText(requireContext(), response.returnMessage.toString(), Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), response.returnMessage.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -2258,8 +2252,10 @@ class RechargeFragment : Fragment() {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 try {
                     if (response.isSuccessful) {
+                         if(Constants.dialog!=null && Constants.dialog.isShowing){
+                             Constants.dialog.dismiss()
+                         }
 
-                        Constants.dialog.dismiss()
                         val responseString = response.body()?.string()
                         val rootObject = JSONObject(responseString)
 
@@ -2845,6 +2841,7 @@ class RechargeFragment : Fragment() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun openDialogForPayout(transferAmount: Double, servicechargeGst: Double, totalRechargeAmount: Double, retailerCommission: Double, msg: String) {
@@ -3135,7 +3132,6 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3217,19 +3213,11 @@ class RechargeFragment : Fragment() {
 
         binding.etCircle.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (circleArray!![position]!!.isNotEmpty()) {
                     Log.d("circlename", circleArray!![position].toString())
 
-                    mStash!!.setStringValue(
-                        Constants.circleName.toString(),
-                        circleArray!![position].toString()
-                    )
+                    mStash!!.setStringValue(Constants.circleName.toString(), circleArray!![position].toString())
                     binding.llViewPlan.visibility = View.GONE
 
                     if (binding.etDTHBillNumber.text.length >= 10) {
@@ -3390,11 +3378,7 @@ class RechargeFragment : Fragment() {
             }
         }
 
-        val circleAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.spinner_right_aligned,
-            circleArray
-        ).apply { setDropDownViewResource(R.layout.spinner_right_aligned) }
+        val circleAdapter = ArrayAdapter(requireContext(), R.layout.spinner_right_aligned, circleArray).apply { setDropDownViewResource(R.layout.spinner_right_aligned) }
 
         binding.etCircle.adapter = circleAdapter
         binding.etCircle.setSelection(0)  // default always selected
@@ -3410,10 +3394,7 @@ class RechargeFragment : Fragment() {
         var productID = mStash!!.getStringValue(Constants.OperatorId.toString(), "")
 
         var latlong = ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble)
-        Log.d(
-            "Lat Long",
-            ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble)
-        )
+        Log.d("Lat Long", ConstantClass.latdouble.toString().plus(",").plus(ConstantClass.longdouble))
 
         var MobileRechargeReq =
             com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileRechargeReq(
@@ -3432,11 +3413,7 @@ class RechargeFragment : Fragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    uploadDataOnFirebaseConsole(
-                                        Gson().toJson(response),
-                                        "RechargeFragmentRechargeRequest",
-                                        requireContext()
-                                    )
+                                    uploadDataOnFirebaseConsole(Gson().toJson(response), "RechargeFragmentRechargeRequest", requireContext())
                                     getFuseLocation()
                                     Constants.dialog.dismiss()
                                     Log.d("rechargeResp", Gson().toJson(response))
@@ -3458,12 +3435,8 @@ class RechargeFragment : Fragment() {
                                             "523" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.dishtv)
                                         }
-                                        RechargeSuccessfulPageActivity.operatorName =
-                                            binding.spOperator.selectedItem.toString().trim()
-                                        Log.d(
-                                            "operatorName",
-                                            RechargeSuccessfulPageActivity.operatorName
-                                        )
+                                        RechargeSuccessfulPageActivity.operatorName = binding.spOperator.selectedItem.toString().trim()
+                                        Log.d("operatorName", RechargeSuccessfulPageActivity.operatorName)
                                         Log.d("productID", productID)
                                         operatorLogo = operatorlogo
                                         planPrice = binding.etAmount.text.toString().trim()
@@ -3482,12 +3455,8 @@ class RechargeFragment : Fragment() {
                                             "520" -> operatorlogo =
                                                 context.resources.getDrawable(R.drawable.vodaphone)
                                         }
-                                        RechargeSuccessfulPageActivity.operatorName =
-                                            binding.spOperator.selectedItem.toString().trim()
-                                        Log.d(
-                                            "operatorName",
-                                            RechargeSuccessfulPageActivity.operatorName
-                                        )
+                                        RechargeSuccessfulPageActivity.operatorName = binding.spOperator.selectedItem.toString().trim()
+                                        Log.d("operatorName", RechargeSuccessfulPageActivity.operatorName)
                                         Log.d("productID", productID)
                                         operatorLogo = operatorlogo
                                         planPrice = binding.rechargeAmount.text.toString().trim()
@@ -3499,22 +3468,10 @@ class RechargeFragment : Fragment() {
                                     mobileNumber = mobileNo
                                     orderID = response.referanceID ?: ""
 
-                                    serviceChargeWithGST = mStash!!.getStringValue(
-                                        Constants.serviceChargeWithGST,
-                                        ""
-                                    )!!
-                                    totalTransaction =
-                                        mStash!!.getStringValue(Constants.totalTransaction, "")!!
+                                    serviceChargeWithGST = mStash!!.getStringValue(Constants.serviceChargeWithGST, "")!!
+                                    totalTransaction = mStash!!.getStringValue(Constants.totalTransaction, "")!!
 
-                                    hitApiForMobileRechargeReqUpload(
-                                        rechargeAmt,
-                                        mobileNo,
-                                        response,
-                                        Gson().toJson(MobileRechargeReq).toString(),
-                                        operatorName,
-                                        remarks,
-                                        commissionremark
-                                    )
+                                    hitApiForMobileRechargeReqUpload(rechargeAmt, mobileNo, response, Gson().toJson(MobileRechargeReq).toString(), operatorName, remarks, commissionremark)
 
                                 }
                             }
@@ -3525,7 +3482,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
+                           // Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3578,7 +3535,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
+                            //Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3617,12 +3574,7 @@ class RechargeFragment : Fragment() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("RechargeRespResp", Gson().toJson(response))
-                                    hitApiForRechargeApiResponse(
-                                        rechargeResponse,
-                                        operatorName,
-                                        remarks,
-                                        commissionremark
-                                    )
+                                    hitApiForRechargeApiResponse(rechargeResponse, operatorName, remarks, commissionremark)
                                 }
                             }
                         }
@@ -3632,7 +3584,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
+                           // Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3721,7 +3673,7 @@ class RechargeFragment : Fragment() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(requireContext())
+                           // Constants.OpenPopUpForVeryfyOTP(requireContext())
                         }
                     }
                 }
@@ -3738,9 +3690,11 @@ class RechargeFragment : Fragment() {
 
         if (rechargeStatus.equals("success", ignoreCase = true)) {
             status = "Approved"
-        } else if (rechargeStatus.equals("failed", ignoreCase = true)) {
+        }
+        else if (rechargeStatus.equals("failed", ignoreCase = true)) {
             status = "Failed"
-        } else {
+        }
+        else {
             status = "Pending"
         }
 
@@ -3784,10 +3738,7 @@ class RechargeFragment : Fragment() {
                                     users.body()?.let { response ->
                                         Log.d("transafertoagent", Gson().toJson(response))
 
-                                        Log.d(
-                                            "checkconditionforcommission",
-                                            "CommissionMethodfailed"
-                                        )
+                                        Log.d("checkconditionforcommission", "CommissionMethodfailed")
 
                                         getTransferAmountToAgentWithCalRes(response)
                                     }
@@ -3796,18 +3747,18 @@ class RechargeFragment : Fragment() {
 
                             ApiStatus.ERROR -> {
                                 Constants.dialog.dismiss()
-                                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
 
                             ApiStatus.LOADING -> {
-                                Constants.OpenPopUpForVeryfyOTP(requireContext())
+                               // Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
                 }
 
-        } else {
+        }
+        else {
             val transferAmountToAgentsReq = TransferAmountToAgentsReq(
                 transferFrom = mStash!!.getStringValue(Constants.RegistrationId, ""),
                 transferTo = "Admin",
@@ -3888,7 +3839,7 @@ class RechargeFragment : Fragment() {
                             }
 
                             ApiStatus.LOADING -> {
-                                Constants.OpenPopUpForVeryfyOTP(requireContext())
+                                //Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
@@ -3988,6 +3939,7 @@ class RechargeFragment : Fragment() {
 
     private fun getTransferAmountToAgentWithCalRes(response: TransferAmountToAgentsRes) {
         if (response.isSuccess == true) {
+            Constants.dialog.dismiss()
             referenceId = response.data!!.refTransID!!  // payout referenceid
             var intent = Intent(requireContext(), RechargeSuccessfulPageActivity::class.java)
             startActivity(intent)

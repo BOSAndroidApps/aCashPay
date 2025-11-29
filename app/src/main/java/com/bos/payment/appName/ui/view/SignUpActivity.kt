@@ -59,13 +59,12 @@ class SignUpActivity : AppCompatActivity() {
         binding.signUpLayout.spinnerReferralCode.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 @SuppressLint("SetTextI18n")
-                override fun onItemSelected(
-                    parent: AdapterView<*>?, view: View?, position: Int, id: Long
-                ) {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     if (position > 0) {
                         applicationModeTxt = parent!!.getItemAtPosition(position).toString()
                         toast(applicationModeTxt.toString())
-                    } else {
+                    }
+                    else {
                         applicationModeTxt = null
                     }
                 }

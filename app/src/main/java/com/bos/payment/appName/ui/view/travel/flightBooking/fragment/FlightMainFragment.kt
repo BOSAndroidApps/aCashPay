@@ -79,7 +79,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
 
     private var firstDateCalendar: Calendar? = null
     private lateinit var viewModel: TravelViewModel
-    private lateinit var pd: ProgressDialog
+
     private lateinit var mStash: MStash
     private var customFuseLocation: CustomFuseLocationActivity? = null
 
@@ -97,9 +97,6 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mStash = MStash(requireContext())
-
-        pd = ProgressDialog(requireContext())
-        pd.setCanceledOnTouchOutside(false)
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
 
@@ -602,7 +599,9 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         viewModel.getAirportListRequet(airportListReq).observe(viewLifecycleOwner) { resource ->
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                     val response = resource.data?.body()
                     Log.d("AirportListResponse", Gson().toJson(response))
                     uploadDataOnFirebaseConsole(Gson().toJson(response),
@@ -617,8 +616,10 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
                         setSpinnerData()
                     }
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING ->   Constants.OpenPopUpForVeryfyOTP(requireContext())
             }
         }
     }
@@ -705,22 +706,28 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
 
                         TripDetailsList[0]!!.flights?.let { AllFlightList.addAll(it) }
 
-
                         fromCityName = binding.fromcityname.text.toString()
                         toCityName = binding.tocityname.text.toString()
+
                         startActivity(Intent(requireContext(), FlightDetailListActivity::class.java))
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
                     else {
                         toast(response?.responseHeader?.errorInnerException ?: "Error")
                     }
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                 }
                 ApiStatus.ERROR -> {
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                     Toast.makeText(requireContext(), "Server busy", Toast.LENGTH_SHORT).show()
                 }
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.LOADING -> Constants.OpenPopUpForVeryfyOTP(requireContext())
             }
         }
     }

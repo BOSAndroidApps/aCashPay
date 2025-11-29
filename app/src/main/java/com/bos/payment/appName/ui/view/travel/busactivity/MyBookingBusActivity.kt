@@ -51,7 +51,7 @@ class MyBookingBusActivity : AppCompatActivity() {
     lateinit var binding: ActivityMyBookingBusBinding
     private lateinit var viewModel: TravelViewModel
     private var mStash: MStash? = null
-    private lateinit var pd: ProgressDialog
+
 
     //val statusArray = listOf("Upcoming", "Pending", "Cancelled", "Completed")
     val statusArray = listOf("Booked Tickets", "Cancelled")
@@ -245,17 +245,21 @@ class MyBookingBusActivity : AppCompatActivity() {
             startDate = startDate,
             endDate = endDate
         )
-        pd = showLoadingDialog(this)
+
 
         AppLog.d("BookingListReq", Gson().toJson(busRequery))
         viewModel.getBusBookListResponse(busRequery).observe(this) { resource ->
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("Response", response.toString())
+
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
+
                                 Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"MyBookingBusActivityBusBookListResponse",this@MyBookingBusActivity)
                                 AppLog.d("BookingListReqResponse", response.toString())
                                 BookingList.clear()
@@ -291,14 +295,16 @@ class MyBookingBusActivity : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         binding.tablelayout.visibility = View.GONE
                         binding.notfounddatalayout.visibility = View.VISIBLE
                         hitApiForBusTicketCancelList(startDate!!, endDate!!)
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }

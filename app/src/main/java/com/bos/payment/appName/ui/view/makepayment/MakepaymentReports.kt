@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -39,7 +40,6 @@ class MakepaymentReports : AppCompatActivity() {
 
     lateinit var binding : ActivityMakepaymentReportsBinding
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    lateinit var pd: ProgressDialog
     private var mStash: MStash? = null
     private var getMakePaymentReportsList: MutableList<DataItem?>? = arrayListOf()
     var reportModeList: MutableList<String?> = arrayListOf()
@@ -55,8 +55,6 @@ class MakepaymentReports : AppCompatActivity() {
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this)
-        pd = ProgressDialog(this)
-
 
         HitApiForTransferAmountToAdminAccount()
         setReportModeInSpinner()
@@ -215,7 +213,9 @@ class MakepaymentReports : AppCompatActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.body()?.let { response ->
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
 
                             Log.d("GetMakePaymentResp", Gson().toJson(response))
 
@@ -238,9 +238,11 @@ class MakepaymentReports : AppCompatActivity() {
                         }
                     }
 
-                    ApiStatus.ERROR -> pd.dismiss()
+                    ApiStatus.ERROR ->  if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
 
-                    ApiStatus.LOADING -> pd.show()
+                    ApiStatus.LOADING ->  Constants.OpenPopUpForVeryfyOTP(this)
                 }
             }
         }

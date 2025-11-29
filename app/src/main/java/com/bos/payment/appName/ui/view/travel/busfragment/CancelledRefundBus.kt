@@ -39,7 +39,6 @@ class CancelledRefundBus : Fragment() {
     var selectedCardPosition:Int = 0
     private var mStash: MStash? = null
     private var passangerList : MutableList<PaXDetailsItem> = mutableListOf()
-    private lateinit var pd: AlertDialog
     private lateinit var viewModel: TravelViewModel
 
 
@@ -49,7 +48,6 @@ class CancelledRefundBus : Fragment() {
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
         mStash = MStash.getInstance(requireContext())
-        pd = PD(context)
 
         if(BusTicketConsListClass.CancelTicketList!=null){
             CancelTicketList.clear()
@@ -91,7 +89,9 @@ class CancelledRefundBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 if(response.isSuccess){
@@ -151,6 +151,9 @@ class CancelledRefundBus : Fragment() {
                                 }
                                 else{
                                     Toast.makeText(context,response.returnMessage, Toast.LENGTH_SHORT).show()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     Constants.uploadDataOnFirebaseConsole(response.returnMessage,"CancelledRefundBusPassangerDetailsRequest",requireContext())
                                 }
                             }
@@ -158,11 +161,13 @@ class CancelledRefundBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
                 }
             }

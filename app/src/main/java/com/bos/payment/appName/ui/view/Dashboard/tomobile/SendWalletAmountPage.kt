@@ -52,15 +52,12 @@ import com.google.gson.Gson
 import org.apache.poi.sl.draw.geom.Context
 
 class SendWalletAmountPage : AppCompatActivity() {
-
     lateinit var binding: ActivitySendWalletAmountPageBinding
     private var mStash: MStash? = null
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    lateinit var pd : ProgressDialog
     var totalamoutForWithdraw: Double = 0.0
     var walletamount: Double = 0.0
     lateinit var dialog: Dialog
-
     companion object{
         var name : String ? = ""
         var agencyName : String ?= ""
@@ -70,6 +67,7 @@ class SendWalletAmountPage : AppCompatActivity() {
 
     var checkFirstTime: Boolean = false
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,7 +76,6 @@ class SendWalletAmountPage : AppCompatActivity() {
 
         mStash = MStash.getInstance(this)
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
-        pd = ProgressDialog(this)
 
 
         getAllWalletBalance(checkFirstTime)
@@ -237,17 +234,19 @@ class SendWalletAmountPage : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
                         }
                     }
                 }
-        }
-    }
+           }
+     }
 
 
     @SuppressLint("SetTextI18n", "DefaultLocale")
@@ -262,12 +261,16 @@ class SendWalletAmountPage : AppCompatActivity() {
                     getTransferAmountToAgentWithCal(totalamoutForWithdraw)
                 }
                 else{
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                 }
 
             }
             else{
-                pd.dismiss()
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 Toast.makeText(this, "Yor merchant balance is low, please contact with your admin.", Toast.LENGTH_LONG).show()
             }
 
@@ -275,8 +278,12 @@ class SendWalletAmountPage : AppCompatActivity() {
 
             Log.d("actualBalance", "main = $walletamount")
 
-        } else {
+        }
+        else {
             toast(response.returnMessage.toString())
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
         }
 
     }
@@ -334,12 +341,14 @@ class SendWalletAmountPage : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+
                             }
 
                         }
@@ -348,9 +357,12 @@ class SendWalletAmountPage : AppCompatActivity() {
 
         } catch (e: NumberFormatException) {
             e.printStackTrace()
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, e.message.toString() + " " + e.localizedMessage?.toString(), Toast.LENGTH_SHORT).show()
         }
+
     }
 
 
@@ -399,9 +411,8 @@ class SendWalletAmountPage : AppCompatActivity() {
 
                                     openDialogForPayout(rechargeAmount,refId)
 
-                                    if(pd!=null && pd.isShowing){
-                                        pd.dismiss()
-
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
                                     }
 
                                 }
@@ -409,12 +420,14 @@ class SendWalletAmountPage : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                             Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }

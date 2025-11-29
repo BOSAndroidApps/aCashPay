@@ -42,7 +42,6 @@ class MakePaymentActivity : AppCompatActivity() {
     lateinit var binding : ActivityMakePayment2Binding
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private var mStash: MStash? = null
-    lateinit var pd: ProgressDialog
     lateinit var referenceID : String
     private val CAMERA_REQUEST_CODE_FRONT = 1001
     var displayBankNameList : MutableList<String?> = arrayListOf()
@@ -85,7 +84,7 @@ class MakePaymentActivity : AppCompatActivity() {
         )[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this)
-        pd = ProgressDialog(this)
+
 
 
         setOnClickListner()
@@ -256,7 +255,9 @@ class MakePaymentActivity : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("RaiseMakePaymentResp", Gson().toJson(response))
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     if (response.isSuccess!!) {
                                         clearData()
                                         Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
@@ -269,11 +270,13 @@ class MakePaymentActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
 
                     }
@@ -322,7 +325,9 @@ class MakePaymentActivity : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("RaiseMakePaymentResp", Gson().toJson(response))
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     if (response.isSuccess!!) {
                                         clearData()
                                         hitApiForReferenceID()
@@ -336,11 +341,14 @@ class MakePaymentActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
+
                         }
 
                     }
@@ -410,11 +418,11 @@ class MakePaymentActivity : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
 
                 }
@@ -440,7 +448,9 @@ class MakePaymentActivity : AppCompatActivity() {
                                 users.body()?.let { response ->
                                     Log.d("BankResp", Gson().toJson(response))
                                     if(response.isSuccess!!){
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         displayBankNameList.clear()
                                         displaybankvalueList.clear()
 
@@ -459,11 +469,13 @@ class MakePaymentActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
                     }
                 }
@@ -488,7 +500,9 @@ class MakePaymentActivity : AppCompatActivity() {
                                 users.body()?.let { response ->
                                     Log.d("bankbranchnameresp", Gson().toJson(response))
                                     if(response.isSuccess!!){
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         if(response.data!!.isNotEmpty()){
                                             binding.branchcodetxt.text = response.data[0]!!.displayText
                                         }
@@ -498,11 +512,13 @@ class MakePaymentActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
                     }
                 }

@@ -110,7 +110,6 @@ import java.util.Locale
 
 class BusSeating : AppCompatActivity() {
     private lateinit var mStash: MStash
-    private lateinit var pd: ProgressDialog
     private lateinit var viewModel: TravelViewModel
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private lateinit var bin: ActivityBusSeatingBinding
@@ -265,7 +264,6 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 getAllBusRequaryTicketRes(response)
@@ -274,11 +272,13 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
@@ -337,7 +337,6 @@ class BusSeating : AppCompatActivity() {
         viewModel.getBusCommissionRequest(req).observe(this) { resource ->
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
                     val response = resource.data?.body()
                     Log.d("RetailerCommissionResp",Gson().toJson(response))
                         if (response != null && response.isSuccess!!) {
@@ -369,8 +368,10 @@ class BusSeating : AppCompatActivity() {
 
                         }
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING ->  Constants.OpenPopUpForVeryfyOTP(this)
             }
         }
 
@@ -395,12 +396,14 @@ class BusSeating : AppCompatActivity() {
         viewModel.getBusCommissionRequest(req).observe(this) { resource ->
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
                     val response = resource.data?.body()
                     if (response != null && response.isSuccess == true) {
                         callback.onSuccess(response)   // 🔥 return data
                     } else {
                         callback.onError("Slab not found") // 🔥 return error
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
                    /* val response = resource.data?.body()
                     Log.d("RetailerCommissionResp",Gson().toJson(response))
@@ -433,12 +436,15 @@ class BusSeating : AppCompatActivity() {
 
                     }*/
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.ERROR ->  if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING ->    Constants.OpenPopUpForVeryfyOTP(this)
             }
         }
 
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -464,7 +470,9 @@ class BusSeating : AppCompatActivity() {
             }
 
             override fun onError(message: String) {
-
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
             }
 
         })
@@ -478,11 +486,15 @@ class BusSeating : AppCompatActivity() {
             }
 
             override fun onError(message: String) {
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
             }
 
         })
 
     }
+
 
 
     interface ApiCallback<T> {
@@ -511,10 +523,14 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
     private fun getAllServiceChargeApiResRetailer(response: BusCommissionResp, rechargeAmount: String) {
         if (response.isSuccess!!) {
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
                 // Parse values safely
                 val rechargeAmountValue = rechargeAmount.toDoubleOrNull() ?: 0.0
                 val retailerCommission = response!!.data!![0]?.commissionValue ?: 0.0
@@ -584,6 +600,10 @@ class BusSeating : AppCompatActivity() {
 
             }
         else {
+
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
 
                 // Save commission types in shared preferences
                 with(mStash!!) {
@@ -732,8 +752,8 @@ class BusSeating : AppCompatActivity() {
                 detailsgstserviceslayout.visibility = View.VISIBLE
                 checkView = true
             }
-            if(pd!=null && pd.isShowing){
-                pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
             }
         }
 
@@ -784,11 +804,13 @@ class BusSeating : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
                         }
                     }
@@ -809,6 +831,9 @@ class BusSeating : AppCompatActivity() {
             val totalAmount = mStash!!.getStringValue(Constants.totalTransaction, "")?.toDoubleOrNull() ?: 0.0
 
         } else {
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             toast(response.returnMessage.toString())
         }
     }
@@ -833,16 +858,19 @@ class BusSeating : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
                     }
                 }
             }
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -859,11 +887,15 @@ class BusSeating : AppCompatActivity() {
             if (totalAmount <= mainBalance && totalAmount <= merchantBalance) {
                  getAllBusAddMoney(mStash.getStringValue(Constants.booking_RefNo, "").toString())
             } else {
-                pd.dismiss()
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 Toast.makeText(this, "Your merchant balance is low. Please contact the administrator", Toast.LENGTH_LONG).show()
             }
         } else {
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, response.returnMessage.toString(), Toast.LENGTH_SHORT).show()
         }
     }
@@ -970,6 +1002,9 @@ class BusSeating : AppCompatActivity() {
         }
 
         else {
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, response?.responseHeader?.errorInnerException.toString(), Toast.LENGTH_SHORT).show()
          }
     }
@@ -981,9 +1016,12 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"BusSeatingPassangerDetailsRequest",this@BusSeating)
                                 Log.d("RequeryResponse", Gson().toJson(response))
                             }
@@ -991,11 +1029,13 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }
@@ -1159,7 +1199,6 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 hitApiForGetTampBookingRequest( Gson().toJson(busTempBookingReq))
@@ -1170,16 +1209,19 @@ class BusSeating : AppCompatActivity() {
 
                     ApiStatus.ERROR -> {
                         hitApiForGetTampBookingRequest( Gson().toJson(busTempBookingReq))
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
         }
     }
+
 
     private fun hitApiForGetTampBookingRequest( request:String){
         val busTempBookingReq = BusTempBookingRequest(
@@ -1213,7 +1255,7 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"BusSeatingBusTampBookRequest",this@BusSeating)
@@ -1223,11 +1265,11 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
 
                 }
@@ -1235,6 +1277,7 @@ class BusSeating : AppCompatActivity() {
         }
 
     }
+
 
     private fun hitApiForGetTampBookingResponse( response:String, apiResponse:BusTempBookingRes){
         val busTempBookingReq = BusTampBookTicketResponseRequest(
@@ -1259,7 +1302,6 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"BusSeatingTampBusTicketResponse",this@BusSeating)
@@ -1269,22 +1311,24 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
 
                 }
             }
         }
 
-
     }
+
 
     @SuppressLint("SetTextI18n")
     private fun getAllDetailsBusBookingRes(response: BusTempBookingRes?) {
+        if(Constants.dialog!=null && Constants.dialog.isShowing){
+            Constants.dialog.dismiss()
+        }
         if (response?.responseHeader?.errorCode == "0000") {
             hitApiForGetTampBookingResponse(Gson().toJson(response),response)
             bin.fullLayout.visibility = View.GONE
@@ -1326,6 +1370,7 @@ class BusSeating : AppCompatActivity() {
         }
     }
 
+
     private fun getAllBusAddMoney(referenceId: String) {
         val busAddMoneyReq = BusAddMoneyReq(
             clientRefNo = referenceId,
@@ -1344,7 +1389,6 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 getAllBusAddMoneyRes(response)
@@ -1353,11 +1397,13 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }
@@ -1365,8 +1411,12 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     private fun getAllBusAddMoneyRes(response: BusAddMoneyRes?) {
         AppLog.d("BusAddMoneyResponse",Gson().toJson(response))
+        if(Constants.dialog!=null && Constants.dialog.isShowing){
+            Constants.dialog.dismiss()
+        }
         if (response?.responseHeader?.errorCode == "0000") {
             getAllBusTicketing(mStash.getStringValue(Constants.booking_RefNo, "").toString())
         }
@@ -1374,6 +1424,7 @@ class BusSeating : AppCompatActivity() {
             Toast.makeText(this, response?.responseHeader?.errorInnerException.plus("Amount: ").plus(response!!.amount), Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun getAllBusTicketing(referenceId: String) {
         val busTicketingReq = BusTicketingReq(
@@ -1390,10 +1441,12 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 AppLog.d("busTempBookingRes",Gson().toJson(response))
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 mStash.setStringValue(Constants.ForPayoutBookingRefId, response.bookingRefNo.toString())
                                 getAllBusTicketingRes(response)
                                 getAddBusTicketRequest(mStash.getStringValue(Constants.booking_RefNo, "").toString(),Gson().toJson(busTicketingReq))
@@ -1402,12 +1455,14 @@ class BusSeating : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         getAddBusTicketRequest(mStash.getStringValue(Constants.booking_RefNo, "").toString(),Gson().toJson(busTicketingReq))
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
@@ -1433,17 +1488,14 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketRequest",this@BusSeating)
                         Log.d("AddBusTicketRequest",resource.data.toString())
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
                     }
                 }
             }
@@ -1477,18 +1529,22 @@ class BusSeating : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         getTransferAmountToAgentWithCal()
                         Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketResponse",this@BusSeating)
                         Log.d("AddBusTicketResponse",resource.data.toString())
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                       // pd.show()
                     }
                 }
             }
@@ -1539,7 +1595,9 @@ class BusSeating : AppCompatActivity() {
                             ApiStatus.SUCCESS -> {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         Log.d("BosPayoutTransaction", response.toString())
 
                                         val commission = mStash!!.getStringValue(Constants.retailerCommission, "0.00")?.trim()?.toDoubleOrNull() ?: 0.0
@@ -1555,19 +1613,23 @@ class BusSeating : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+
                             }
                         }
                     }
                 }
-        } catch (e: NumberFormatException) {
+         }  catch (e: NumberFormatException) {
             e.printStackTrace()
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, e.message.toString() + " " + e.localizedMessage?.toString(), Toast.LENGTH_SHORT).show()
         }
     }
@@ -1818,7 +1880,6 @@ class BusSeating : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
-        pd = showLoadingDialog(this)
         mStash = MStash.getInstance(this)!!
         Constants.titleName = ArrayList()
         Constants.genderName = ArrayList()
@@ -1865,16 +1926,20 @@ class BusSeating : AppCompatActivity() {
         viewModel.getAllBusSeatMap(request).observe(this) { resource ->
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                     resource.data?.body()?.let { setupSeatGrid(it) }
                 }
 
                 ApiStatus.ERROR -> {
-                    pd.dismiss()
+                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                        Constants.dialog.dismiss()
+                    }
                     Toast.makeText(this, "Failed to load seats", Toast.LENGTH_SHORT).show()
                 }
 
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.LOADING -> Constants.OpenPopUpForVeryfyOTP(this)
             }
         }
     }
@@ -2142,21 +2207,22 @@ class BusSeating : AppCompatActivity() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { commissionresp ->
-                                    if(pd!=null && pd.isShowing){
-                                        pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
                                     }
-
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                             Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }

@@ -22,7 +22,6 @@ import kotlin.properties.Delegates
 
 class ChatToAdminActivity : AppCompatActivity() {
     lateinit var binding : ActivityChatLayoutBinding
-    lateinit var pd: ProgressDialog
     private var mStash: MStash? = null
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     lateinit var adapter : ChatCommentAdapter
@@ -43,7 +42,7 @@ class ChatToAdminActivity : AppCompatActivity() {
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this@ChatToAdminActivity)
-        pd = ProgressDialog(this)
+
 
         userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
         adminCode = mStash!!.getStringValue(Constants.AdminCode, "").toString()
@@ -89,8 +88,8 @@ class ChatToAdminActivity : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("commentrespo", Gson().toJson(response))
-                                    if(pd!=null && pd.isShowing){
-                                        pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
                                     }
                                     if (response.isSuccess!!) {
                                         var commentList = response.data!!.comments
@@ -118,11 +117,13 @@ class ChatToAdminActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
 
                     }
@@ -148,6 +149,9 @@ class ChatToAdminActivity : AppCompatActivity() {
                             users.body()?.let { response ->
                                 Log.d("commentrespo", Gson().toJson(response))
                                 if(response.isSuccess!!){
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     binding.subjecttxt.text.clear()
                                     hitApiForRaiseTicket(commentId)
                                 } else{
@@ -159,11 +163,13 @@ class ChatToAdminActivity : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
 
                 }

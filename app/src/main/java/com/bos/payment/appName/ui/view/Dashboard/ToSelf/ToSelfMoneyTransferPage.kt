@@ -73,7 +73,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
     private var mStash: MStash? = null
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private lateinit var viewModel1: PayoutViewModel
-    lateinit var pd : ProgressDialog
+
     var totalamoutForWithdraw: Double = 0.0
     var walletAmount: Double = 0.0
     var mainBalance: Double = 0.0
@@ -104,7 +104,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
             GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)
         )
         )[GetAllApiServiceViewModel::class.java]
-        pd = ProgressDialog(this)
+
 
         getBankDetails(mStash!!.getStringValue(Constants.RegistrationId, "").toString())
 
@@ -282,7 +282,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("retailercommissionresp",Gson().toJson(response))
@@ -293,11 +293,13 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
                     }
                 }
@@ -312,6 +314,9 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
     private fun getAllServiceChargeApiResRetailer(response: GetToSelfPayoutCommercialResp, rechargeAmount: String) {
         response.let {
             if (it.isSuccess == true) {
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 // Service charge calculation
                 val gst = 18.0 // Fixed GST rate of 18%
                 val serviceCharge = response.data!![0]!!.serviceCharge?.toDoubleOrNull() ?: 0.0
@@ -364,7 +369,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("admincommissionresp",Gson().toJson(response))
@@ -375,11 +380,12 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
                         }
                     }
                 }
@@ -395,7 +401,9 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
         response.let {
             if (it.isSuccess == true) {
                 // Parse values safely
-
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 // Service charge calculation
                 val gst = 18.0 // Fixed GST rate of 18%
                 val serviceCharge = response.data!![0]!!.serviceCharge?.toDoubleOrNull() ?: 0.0
@@ -423,7 +431,9 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
             }
             else {
-
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 // Save commission types in shared preferences
                 with(mStash!!) {
                     setStringValue(Constants.serviceType, "")
@@ -697,7 +707,6 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
 
@@ -737,11 +746,11 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.dismiss()
+
                     }
                 }
             }
@@ -764,17 +773,23 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                             ApiStatus.SUCCESS -> {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         getAllWalletBalanceRes(response,check)
                                     }
                                 }
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
+
                             }
                         }
                     }
@@ -821,11 +836,13 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
                     }
                 }
@@ -849,13 +866,17 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                 sendAllPayoutAmount()
             }
             else {
-                pd.dismiss()
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 Toast.makeText(this, "Yor merchant balance is low, please contact with your admin.", Toast.LENGTH_LONG).show()
             }
 
         }
         else {
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, response.returnMessage.toString(), Toast.LENGTH_SHORT).show()
         }
 
@@ -925,12 +946,14 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+
                             }
 
                         }
@@ -939,7 +962,9 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
 
         } catch (e: NumberFormatException) {
             e.printStackTrace()
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(this, e.message.toString() + " " + e.localizedMessage?.toString(), Toast.LENGTH_SHORT).show()
         }
     }
@@ -963,7 +988,7 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
             resource?.let {
                 when(it.apiStatus){
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("getAllGsonFromAPIResp", Gson().toJson(response))
@@ -973,12 +998,14 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
                         }
                     }
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         val message = it.message ?: "Something went wrong, please try again."
                         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                     }
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }

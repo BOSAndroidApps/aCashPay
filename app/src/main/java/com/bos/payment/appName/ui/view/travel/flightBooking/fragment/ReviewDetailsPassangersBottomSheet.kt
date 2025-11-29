@@ -111,7 +111,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
     lateinit var viewModel : TravelViewModel
     private var mStash: MStash? = null
-    lateinit var pd : ProgressDialog
+
     lateinit var dialogg: Dialog
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
 
@@ -131,8 +131,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
-        pd = ProgressDialog(requireContext())
-        pd.setCanceledOnTouchOutside(false)
+
 
         setonclicklistner()
         setdataonview()
@@ -228,7 +227,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let { response ->
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Log.d("FlightTempResponse", response.responseHeader.errorCode)
                                 mStash!!.setStringValue(Constants.BookingRefNo,response.bookingRefNo)
 
@@ -257,11 +258,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
                 }
             }
@@ -289,11 +292,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(requireContext())
                             }
                         }
                     }
@@ -311,7 +316,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             if(totalamoutFlightTicket<= mainBalance){
                 getMerchantBalance(totalamoutFlightTicket)
             }else{
-                pd.dismiss()
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 Toast.makeText(requireContext(), "Wallet balance is low. VBal = $mainBalance,  totalAmt = $totalamoutFlightTicket", Toast.LENGTH_LONG).show()
             }
 
@@ -319,6 +326,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
         } else {
             toast(response.returnMessage.toString())
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
         }
 
     }
@@ -342,11 +352,12 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
                         }
                     }
                 }
@@ -367,12 +378,16 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                 HitApiForFlightAddPayment()
             }
             else {
-                pd.dismiss()
+                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
                 Toast.makeText(requireContext(), "Booking is currently unavailable due to a technical issue. Please try again shortly.", Toast.LENGTH_LONG).show()
             }
         }
         else {
-            pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
+            }
             Toast.makeText(requireContext(), response.returnMessage.toString(), Toast.LENGTH_SHORT)
                 .show()
         }
@@ -405,7 +420,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                                         Log.d("AddPaymentResponse",response.paymentID)
                                         hitApiForAirTicketing()
                                     }else{
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         Toast.makeText(requireContext(),response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
                                     }
                                 }
@@ -413,11 +430,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }
@@ -454,7 +473,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
                                     if(response.responseHeader.statusId.equals("22")){
                                         Toast.makeText(context,response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
 
                                     }
 
@@ -477,7 +498,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                                     }
 
                                     else{
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         Toast.makeText(context,response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
                                     }
 
@@ -486,11 +509,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }
@@ -520,7 +545,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
                     val response = resource.data?.body()
-                    pd.dismiss()
                     Log.d("UploadAirTicketResp",Gson().toJson(response))
                     if (response != null && response.isSuccess!!) {
 
@@ -529,8 +553,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
                     }
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.dismiss()
+                ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING -> {}
             }
         }
 
@@ -570,7 +596,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
                     val response = resource.data?.body()
-                    pd.dismiss()
                     Log.d("UploadAirTicketResponseResp",Gson().toJson(response))
                     if (response != null && response.isSuccess!!) {
 
@@ -579,8 +604,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
                     }
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.dismiss()
+                ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING -> {}
             }
         }
 
@@ -627,11 +654,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }
@@ -727,7 +756,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"ReviewDetailsBottomSheetRequeryRequest",requireContext())
 
                                     Log.d("ticketrequeryresp",Gson().toJson(requeryReq))
@@ -738,11 +769,13 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+
                         }
 
                     }
@@ -788,7 +821,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             when (resource.apiStatus) {
                 ApiStatus.SUCCESS -> {
                     val response = resource.data?.body()
-                    pd.dismiss()
+
                     Log.d("RetailerCommissionResp",Gson().toJson(response))
                     if (response != null && response.isSuccess!!) {
                         getAllServiceChargeApiResRetailer(response, rechargeAmount)
@@ -819,8 +852,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
                     }
                 }
-                ApiStatus.ERROR -> pd.dismiss()
-                ApiStatus.LOADING -> pd.show()
+                ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
+                    Constants.dialog.dismiss()
+                }
+                ApiStatus.LOADING -> {}
             }
         }
 
@@ -1040,8 +1075,8 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                 detailsgstserviceslayout.visibility = View.VISIBLE
                 checkView = true
             }
-            if(pd!=null && pd.isShowing){
-                pd.dismiss()
+            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                Constants.dialog.dismiss()
             }
         }
 
@@ -1114,7 +1149,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                             ApiStatus.SUCCESS -> {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
-                                        pd.dismiss()
+
                                         Log.d("BosPayoutTransaction", response.toString())
 
                                         val commission = mStash!!.getStringValue(Constants.retailerCommission, "0.00")?.trim()?.toDoubleOrNull() ?: 0.0
@@ -1130,19 +1165,21 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+
                             }
                         }
                     }
                 }
         } catch (e: NumberFormatException) {
             e.printStackTrace()
-            pd.dismiss()
+
             Toast.makeText(requireContext(), e.message.toString() + " " + e.localizedMessage?.toString(), Toast.LENGTH_SHORT).show()
         }
     }
@@ -1192,21 +1229,20 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { commissionresp ->
-                                    if(pd!=null && pd.isShowing){
-                                        pd.dismiss()
-                                    }
+
 
                                 }
                             }
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                             Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
                         }
 
                     }

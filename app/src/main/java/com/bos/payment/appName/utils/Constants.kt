@@ -530,6 +530,28 @@ object Constants {
 
     }
 
+    fun convertToIconicsName(apiIcon: String?): String? {
+        if (apiIcon.isNullOrBlank()) return null
+
+        // Remove multiple blank spaces
+        val clean = apiIcon.trim().replace("\\s+".toRegex(), " ")
+
+        // Split by space (e.g., ["fa", "fa-home"])
+        val parts = clean.split(" ")
+
+        if (parts.size < 2) return null
+
+        // extract final icon name only
+        val iconName = parts[1] // fa-home or fa-user-cog etc.
+
+        // remove "fa-" or "fas-"
+        val name = iconName.replace("fa-", "").replace("fas-", "")
+
+        // return formatted Iconics name
+        return "faw-$name"
+    }
+
+
 
 
 

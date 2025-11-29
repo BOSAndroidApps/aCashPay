@@ -46,7 +46,6 @@ class UpcomingBus : Fragment() {
     var selectedCardPosition:Int = 0
     private var mStash: MStash? = null
     private var passangerList : MutableList<PaXDetailsItem> = mutableListOf()
-    private lateinit var pd: AlertDialog
     private lateinit var viewModel: TravelViewModel
 
 
@@ -56,7 +55,7 @@ class UpcomingBus : Fragment() {
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
         mStash = MStash.getInstance(requireContext())
-        pd = PD(context)
+
 
         if(BusTicketConsListClass.UpcomingTicketList!=null){
             UpcomingTicketList.clear()
@@ -100,7 +99,9 @@ class UpcomingBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                if(response.isSuccess){
@@ -152,11 +153,13 @@ class UpcomingBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
                 }
             }
@@ -187,7 +190,6 @@ class UpcomingBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 if(response.statuss.equals("218")){
@@ -222,11 +224,13 @@ class UpcomingBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
 
                 }
@@ -244,7 +248,7 @@ class UpcomingBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("CancelStatus",Gson().toJson(response))
@@ -275,11 +279,13 @@ class UpcomingBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }
@@ -295,7 +301,7 @@ class UpcomingBus : Fragment() {
           resource?.let {
               when (it.apiStatus) {
                   ApiStatus.SUCCESS -> {
-                      pd.dismiss()
+
                       it.data?.let { users ->
                           users.body()?.let { response ->
                               Log.d("CancelResponseResponse", Gson().toJson(response))
@@ -312,11 +318,13 @@ class UpcomingBus : Fragment() {
                   }
 
                   ApiStatus.ERROR -> {
-                      pd.dismiss()
+                      if(Constants.dialog!=null && Constants.dialog.isShowing){
+                          Constants.dialog.dismiss()
+                      }
                   }
 
                   ApiStatus.LOADING -> {
-                      pd.show()
+
                   }
               }
           }
@@ -361,7 +369,7 @@ class UpcomingBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                  Log.d("RequeryRespo", Gson().toJson(response))
@@ -386,11 +394,13 @@ class UpcomingBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }
@@ -405,7 +415,9 @@ class UpcomingBus : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("RequeryResponse", Gson().toJson(response))
@@ -417,11 +429,13 @@ class UpcomingBus : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+
                     }
                 }
             }

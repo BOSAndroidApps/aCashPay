@@ -164,5 +164,9 @@ dependencies {
 
     implementation 'com.airbnb.android:lottie:3.4.0'
 
+    // for side navigation icon
+    implementation "com.mikepenz:iconics-core:5.3.3"
+    implementation "com.mikepenz:iconics-views:5.3.3"
+    implementation "com.mikepenz:fontawesome-typeface:4.7.0.4-kotlin"
 
 }

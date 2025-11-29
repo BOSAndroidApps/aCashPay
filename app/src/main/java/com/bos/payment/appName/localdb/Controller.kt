@@ -3,6 +3,7 @@ package com.bos.payment.appName.localdb
 import android.util.Log
 import com.bos.payment.appName.localdb.AppLog.initialize
 import com.google.firebase.FirebaseApp
+import com.mikepenz.iconics.Iconics
 
 import org.apache.poi.sl.usermodel.ObjectMetaData.Application
 
@@ -25,6 +26,8 @@ class Controller : android.app.Application() {
         // Initialize global resources here (e.g., logging, DI, shared prefs)
         Log.d("MyApplication", "App Started")
         FirebaseApp.initializeApp(this)
+        Iconics.init(this)
+        Iconics.registerFont(com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome)
 
         this.initialize()
 

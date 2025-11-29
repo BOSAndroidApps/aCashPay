@@ -178,6 +178,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     private fun startMerchantListPolling(merchantId: String) {
         stopPolling() // Ensure no duplicate polling occurs
         coroutineScope = CoroutineScope(Dispatchers.Main + Job())
@@ -190,9 +191,11 @@ class JustPeDashboard : AppCompatActivity() {
         }
     }
 
+
     private fun stopPolling() {
         coroutineScope.cancel() // Cancel existing coroutine scope to stop polling
     }
+
 
     private fun getAllMerchantList(merchantId: String) {
         runIfConnected {
@@ -219,6 +222,7 @@ class JustPeDashboard : AppCompatActivity() {
                 }
         }
     }
+
 
     private fun getAllMerchantListRes(response: GetApiListMarchentWiseRes, merchantId: String) {
         if(binding.appBarDashBoard.deskdesign.swipeRefreshLayout.isRefreshing){
@@ -303,6 +307,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     private fun updateDisplayedList() {
         displayedServiceList.clear()
 
@@ -337,6 +342,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     fun setQRCodeWithBankDetailsCodition(){
         if(mStash!!.getStringValue(Constants.ISQRCodeGenerated,"No").equals("No",ignoreCase = true)){
             binding.nav.qrcodetxt.text= "Generate QR Code"
@@ -361,6 +367,7 @@ class JustPeDashboard : AppCompatActivity() {
             }
         }
     }
+
 
     fun setclickListner(){
 
@@ -500,10 +507,11 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     private fun getAllMenuList() {
         val getAllMenuListReq = GetAllMenuListReq(
             loginId = mStash!!.getStringValue(Constants.RegistrationId, ""),
-            applicationCode = "Bos"
+            applicationCode = "B2B"
         )
 
            Log.d("getAllMenuListReq", Gson().toJson(getAllMenuListReq))
@@ -533,6 +541,7 @@ class JustPeDashboard : AppCompatActivity() {
         }
 
     }
+
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllMenuListRes(response: GetAllMenuListRes) {
@@ -729,6 +738,7 @@ class JustPeDashboard : AppCompatActivity() {
         }
     }
 
+
     fun hitApiForBannerRetailer(agentType:String){
         binding.appBarDashBoard.deskdesign.viewpager.visibility= View.VISIBLE
         var retailerCode = mStash!!.getStringValue(Constants.RegistrationId,"")
@@ -772,6 +782,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     fun hitApiForBannerAdmin(agentType:String){
         var retailerCode = mStash!!.getStringValue(Constants.AdminCode,"")
         var merchantCode = mStash!!.getStringValue(Constants.MerchantId,"")
@@ -809,6 +820,7 @@ class JustPeDashboard : AppCompatActivity() {
 
 
     }
+
 
     fun hitApiForServicesRequest(){
         var retailerCode = mStash!!.getStringValue(Constants.RegistrationId,"")
@@ -897,10 +909,12 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     data class BannerItem(
         val imagePath: String,
         val urlRedirect: String
     )
+
 
     fun getBankDetails(retailerCode: String){
         val requestForBankDetails = CheckBankDetailsModel(reatilerCode =  retailerCode)
@@ -969,6 +983,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     fun getAddressFromLatLng(context: Context, latitude: Double, longitude: Double): String {
         return try {
             val geocoder = Geocoder(context, Locale.getDefault())
@@ -996,6 +1011,7 @@ class JustPeDashboard : AppCompatActivity() {
         }
     }
 
+
     private fun shareBitmap(bitmap: Bitmap, context: Context) {
         // Save bitmap to cache directory
         val cachePath = File(context.cacheDir, "shared_images")
@@ -1018,6 +1034,7 @@ class JustPeDashboard : AppCompatActivity() {
         // Start chooser
         context.startActivity(Intent.createChooser(shareIntent, "Share Image Via"))
     }
+
 
     @SuppressLint("Recycle")
     fun saveBitmapToGallery(context: Context, bitmap: Bitmap, fileName: String): Uri? {

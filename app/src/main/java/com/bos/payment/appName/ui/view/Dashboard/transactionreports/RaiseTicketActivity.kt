@@ -49,7 +49,6 @@ class RaiseTicketActivity : AppCompatActivity() {
     private val selectedUris = mutableListOf<Uri>()
     private lateinit var adapter: ImageAdapter
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    lateinit var pd: ProgressDialog
     private var mStash: MStash? = null
 
     companion object {
@@ -117,7 +116,6 @@ class RaiseTicketActivity : AppCompatActivity() {
         )[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this@RaiseTicketActivity)
-        pd = ProgressDialog(this)
 
         bindDataOnUi()
         setclicklistner()
@@ -286,7 +284,9 @@ class RaiseTicketActivity : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("RaiseTicketResp", Gson().toJson(response))
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     if (response.isSuccess!!) {
                                         Toast.makeText(
                                             this,
@@ -306,11 +306,13 @@ class RaiseTicketActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
 
                     }

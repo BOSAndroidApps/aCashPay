@@ -2,12 +2,16 @@ package com.bos.payment.appName.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.menuList.Data
 import com.bos.payment.appName.databinding.DrawerSliderItemLayoutBinding
 import com.bos.payment.appName.ui.view.CreditCardDetailsFragment
@@ -21,7 +25,13 @@ import com.bos.payment.appName.ui.view.makepayment.AdminBankListActivity
 import com.bos.payment.appName.ui.view.makepayment.MakepaymentReports
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
 import com.bos.payment.appName.ui.view.supportmanagement.TicketStatus
+import com.bos.payment.appName.utils.Constants.convertToIconicsName
 import com.google.gson.Gson
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.utils.color
+import com.mikepenz.iconics.utils.colorRes
+import com.mikepenz.iconics.utils.sizeDp
+import com.mikepenz.iconics.utils.sizePx
 
 class MenuListAdapter(
     private val context: Context,
@@ -30,6 +40,8 @@ class MenuListAdapter(
     private val containerId: Int) : RecyclerView.Adapter<MenuListAdapter.MenuListViewHolder>() {
 
     private var lastExpandedPosition: Int? = null // Track last expanded menu position
+
+
 
     inner class MenuListViewHolder(val binding: DrawerSliderItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -41,6 +53,8 @@ class MenuListAdapter(
 
     override fun getItemCount(): Int = menuList.size
 
+
+
     override fun onBindViewHolder(holder: MenuListViewHolder, position: Int) {
         Log.d("menulist", Gson().toJson(menuList))
 
@@ -48,6 +62,18 @@ class MenuListAdapter(
 
         // Set menu text
         holder.binding.dashboard.text = menuItem.menuText ?: "N/A"
+
+        val convertedIcon = convertToIconicsName(menuItem.icon)
+
+        val drawable = convertedIcon?.let {
+            IconicsDrawable(context, it).apply {
+                sizeDp = 24
+                colorRes = Color.BLACK
+            }
+        }
+
+        holder.binding.iconImageView.setImageDrawable(IconicsDrawable(context, "faw-cog").apply { sizeDp = 32 })
+       // holder.binding.iconImageView.setImageDrawable(drawable)
 
         // Adjust margin for child menus
         val layoutParams = holder.binding.root.layoutParams as ViewGroup.MarginLayoutParams
@@ -89,8 +115,14 @@ class MenuListAdapter(
                 }
             }
         }
+
     }
-     //TransactionReportsActivity
+
+    fun Int.dpToPx(context: Context): Int =
+        (this * context.resources.displayMetrics.density).toInt()
+
+
+    //TransactionReportsActivity
     // Navigation logic
     private fun navigateToFragment(fragment: Fragment, rechargeType: String) {
         fragmentManager.beginTransaction()
@@ -134,5 +166,6 @@ class MenuListAdapter(
             }
         }
     }
+
 
 }

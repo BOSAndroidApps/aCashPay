@@ -44,7 +44,6 @@ class FlightBookingPage : AppCompatActivity() {
     lateinit var  viewPager: ViewPager2
     lateinit var  tabLayout: TabLayout
     private var mStash: MStash? = null
-    lateinit var pd : ProgressDialog
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
 
 
@@ -57,10 +56,7 @@ class FlightBookingPage : AppCompatActivity() {
 
          setView()
          mStash = MStash.getInstance(this)
-         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(
-             GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
-         pd = ProgressDialog(this)
-         pd.setCanceledOnTouchOutside(false)
+         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
          hitApiForFlightTicketList()
          setOnClickListner()
 
@@ -125,7 +121,9 @@ class FlightBookingPage : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Constants.uploadDataOnFirebaseConsole(Gson().toJson(response),"FlightBookingPageAirTicketListRequest",this@FlightBookingPage)
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     var  AirBookingTicketList= response.data!!
 
                                     AirCancelTicketList = AirBookingTicketList.mapNotNull { booking ->
@@ -141,9 +139,7 @@ class FlightBookingPage : AppCompatActivity() {
 
                                         if (matchingAirPnrDetails != null) {
                                             booking.copy(
-                                                apiData = booking.apiData.copy(
-                                                    airPNRDetails = matchingAirPnrDetails
-                                                )
+                                                apiData = booking.apiData.copy(airPNRDetails = matchingAirPnrDetails)
                                             )
                                         } else null
                                     }.toMutableList()
@@ -236,11 +232,13 @@ class FlightBookingPage : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
 
                     }

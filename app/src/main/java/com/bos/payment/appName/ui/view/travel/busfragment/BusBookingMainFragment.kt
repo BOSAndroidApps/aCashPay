@@ -48,7 +48,6 @@ import java.util.Locale
 class BusBookingMainFragment : Fragment() {
     private lateinit var bin: ActivityBookingTravelBinding
     private var mStash: MStash? = null
-    private lateinit var pd: AlertDialog
     private lateinit var viewModel: TravelViewModel
     private lateinit var busList: ArrayList<CityDetails>
     private val myCalender = Calendar.getInstance()
@@ -90,9 +89,6 @@ class BusBookingMainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         mStash = MStash(requireContext())
-
-        pd = PD(requireContext())
-        pd.setCanceledOnTouchOutside(false)
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
 
@@ -177,7 +173,9 @@ class BusBookingMainFragment : Fragment() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 getAllTravelBusListRes(response)
@@ -186,11 +184,13 @@ class BusBookingMainFragment : Fragment() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.show()
+                        Constants.OpenPopUpForVeryfyOTP(requireContext())
                     }
                 }
             }
@@ -335,6 +335,7 @@ class BusBookingMainFragment : Fragment() {
 
     }
 
+
     private fun validationCity() {
         val errorMessage: String? = when{
             fromDesignation.isNullOrBlank() -> "Please select from location"
@@ -371,9 +372,6 @@ class BusBookingMainFragment : Fragment() {
 
     @SuppressLint("ResourceAsColor")
     private fun initView() {
-
-        pd = PD(requireContext())
-
         busList = ArrayList()
         mStash = MStash.getInstance(requireContext())
         bin.bus.requestFocus()

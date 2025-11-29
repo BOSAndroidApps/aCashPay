@@ -40,7 +40,6 @@ import java.util.TimeZone
 class TicketStatus : AppCompatActivity() {
     lateinit var binding:ActivityTicketStatusBinding
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    lateinit var pd: ProgressDialog
     private var mStash: MStash? = null
     lateinit var adapter : TicketStatusAdapter
     private val myCalender = Calendar.getInstance()
@@ -61,7 +60,6 @@ class TicketStatus : AppCompatActivity() {
         )[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this@TicketStatus)
-        pd = ProgressDialog(this)
 
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
@@ -242,7 +240,9 @@ class TicketStatus : AppCompatActivity() {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("ticketstatusresp", Gson().toJson(response))
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     if (response.isSuccess!!) {
                                         ticketstatuslist = response.data!!.tickets
                                         if(ticketstatuslist!!.isNotEmpty()&& !ticketstatuslist.isNullOrEmpty()){
@@ -266,11 +266,13 @@ class TicketStatus : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.show()
+                            Constants.OpenPopUpForVeryfyOTP(this)
                         }
 
                     }

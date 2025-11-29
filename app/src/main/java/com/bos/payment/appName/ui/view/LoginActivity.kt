@@ -59,7 +59,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var viewModel: LoginSignUpViewModel
     private lateinit var viewModel1: MoneyTransferViewModel
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    private lateinit var pd: AlertDialog
     private var loginText: String? = ""
     private var mStash: MStash? = null
     private var requestOption: RequestOptions? = null
@@ -205,17 +204,13 @@ class LoginActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.P)
     private fun initView() {
-        pd = PD(this)
         mStash = MStash.getInstance(context)
 
         mStash!!.getStringValue(Constants.CompanyLogo, "")?.let { Log.d("merchantIdList", it) }
         requestOption = RequestOptions()
         Constants.merchantIdList = ArrayList()
 
-        getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(
-            GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)
-        )
-        )[GetAllApiServiceViewModel::class.java]
+        getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
 
         viewModel = ViewModelProvider(this, LoginSignUpViewModelFactory(LoginSignUpRepository(RetrofitClient.apiAllInterface)))[LoginSignUpViewModel::class.java]
@@ -290,19 +285,23 @@ class LoginActivity : AppCompatActivity() {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
                                 it.data?.let { users ->
-                                    pd.dismiss()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
                                     users.body()?.let { it1 -> loginRes(it1) }
                                 }
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT)
                                     .show()
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
                         }
                     }
@@ -363,19 +362,24 @@ class LoginActivity : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
                         it.data?.let { users ->
-                            users.body()?.let { it1 -> getAllMerchantListRes(it1, merchantId) }
+                            users.body()?.let {
+
+                                it1 -> getAllMerchantListRes(it1, merchantId) }
                         }
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
 
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
 
                     }
                 }
@@ -385,6 +389,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun getAllMerchantListRes(response: GetApiListMarchentWiseRes, merchantId: String) {
+        if(Constants.dialog!=null && Constants.dialog.isShowing){
+            Constants.dialog.dismiss()
+        }
         if (response.isSuccess == true) {
             response.data.forEach { item ->
                 Constants.merchantIdList!!.add(item.featureCode!!.trim())
@@ -434,7 +441,7 @@ class LoginActivity : AppCompatActivity() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            pd.dismiss()
+
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     getAllAPIRetailerWiseActiveInActiveStatusRes(response)
@@ -443,11 +450,11 @@ class LoginActivity : AppCompatActivity() {
                         }
 
                         ApiStatus.ERROR -> {
-                            pd.dismiss()
+
                         }
 
                         ApiStatus.LOADING -> {
-                            pd.dismiss()
+
                         }
                     }
                 }

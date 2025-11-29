@@ -24,7 +24,6 @@ import com.google.gson.Gson
 class ToMobileSendMoneyActivity : AppCompatActivity() {
     lateinit var binding : ActivityToMobileSendMoneyBinding
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    private lateinit var pd: AlertDialog
     private var mStash: MStash? = null
     private var RetailerContactList : List<RetailerDataItem?>? = arrayListOf()
     private var FilterRetailerContactList : MutableList<RetailerDataItem?>? = arrayListOf()
@@ -38,7 +37,6 @@ class ToMobileSendMoneyActivity : AppCompatActivity() {
         binding = ActivityToMobileSendMoneyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        pd = PD(this)
         mStash = MStash.getInstance(this)
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
@@ -100,7 +98,9 @@ class ToMobileSendMoneyActivity : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("retailerContactListResp", Gson().toJson(response))
@@ -123,11 +123,13 @@ class ToMobileSendMoneyActivity : AppCompatActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        pd.dismiss()
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
-                        pd.dismiss()
+                        Constants.OpenPopUpForVeryfyOTP(this)
                     }
 
                 }

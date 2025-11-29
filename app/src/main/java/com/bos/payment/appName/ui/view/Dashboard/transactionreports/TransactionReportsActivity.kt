@@ -48,7 +48,6 @@ import java.util.TimeZone
 class TransactionReportsActivity : AppCompatActivity() {
     lateinit var binding: ActivityTransactionReportsBinding
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
-    lateinit var pd : ProgressDialog
     private var mStash: MStash? = null
     var displayReportList : MutableList<String?> = arrayListOf()
     var rechargeModeList : MutableList<String?> = arrayListOf()
@@ -73,7 +72,6 @@ class TransactionReportsActivity : AppCompatActivity() {
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface))
         )[GetAllApiServiceViewModel::class.java]
 
-        pd = ProgressDialog(this)
         mStash = MStash.getInstance(this)
 
         hitapiforReports()
@@ -124,6 +122,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                                 Toast.makeText(this, "From and To dates cannot be the same", Toast.LENGTH_SHORT).show()
                             }
                             else -> {
+                                Constants.OpenPopUpForVeryfyOTP(this)
                                 hitApiForGettingTransactionReports()
                             }
                         }
@@ -170,6 +169,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                                 Toast.makeText(this, "From and To dates cannot be the same", Toast.LENGTH_SHORT).show()
                             }
                             else -> {
+                                Constants.OpenPopUpForVeryfyOTP(this)
                                 hitApiForGettingTransactionReports()
                             }
                         }
@@ -197,6 +197,7 @@ class TransactionReportsActivity : AppCompatActivity() {
             }
 
         }
+
 
         binding.selectreport.onItemSelectedListener=object :OnItemSelectedListener{
 
@@ -252,7 +253,9 @@ class TransactionReportsActivity : AppCompatActivity() {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
                                         if(response.isSuccess!!){
-                                            pd.dismiss()
+                                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                                Constants.dialog.dismiss()
+                                            }
                                             response.data!!.forEach { unit->
                                                 displayReportList.add(unit!!.displayValue)
                                                 displaytxtReportList.add(unit!!.displayText)
@@ -264,11 +267,13 @@ class TransactionReportsActivity : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
                         }
                     }
@@ -281,7 +286,6 @@ class TransactionReportsActivity : AppCompatActivity() {
         var adapter = ArrayAdapter(this@TransactionReportsActivity, android.R.layout.simple_spinner_dropdown_item, displayReportList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.selectreport.adapter = adapter
-
     }
 
 
@@ -346,7 +350,9 @@ class TransactionReportsActivity : AppCompatActivity() {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
                                         Log.d("TransactionReportsResp", Gson().toJson(response))
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         if(response.isSuccess!!){
                                             response.data!!.forEach { unit->
                                                 if(response.data.size>0){
@@ -373,11 +379,13 @@ class TransactionReportsActivity : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+
                             }
 
                         }
@@ -402,7 +410,9 @@ class TransactionReportsActivity : AppCompatActivity() {
                                 it.data?.let { users ->
                                     users.body()?.let { response ->
                                         Log.d("TransactionReportsResp", Gson().toJson(response))
-                                        pd.dismiss()
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
                                         if(response.isSuccess!!){
                                           if(response.data!!.isValid!!){
                                             startActivity(Intent(this,RaiseTicketActivity::class.java))
@@ -418,11 +428,13 @@ class TransactionReportsActivity : AppCompatActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                pd.dismiss()
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
                             }
 
                             ApiStatus.LOADING -> {
-                                pd.show()
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
 
                         }
