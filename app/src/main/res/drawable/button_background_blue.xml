@@ -4,9 +4,8 @@
         android:radius="10dp"
         />
     <gradient
-        android:endColor="@color/light_Red"
-        android:startColor="@color/light_Red"
+        android:endColor="@color/colorPrimaryDark"
+        android:startColor="@color/colorPrimaryDark"
         />
 
-        //#FF336E
 </shape>

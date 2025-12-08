@@ -186,7 +186,6 @@
         android:layout_marginHorizontal="@dimen/dimen_4dp"
         android:layout_marginTop="@dimen/dimen_10dp"/>
 
-
     <LinearLayout
         android:id="@+id/notfoundlayout"
         android:layout_width="0dp"

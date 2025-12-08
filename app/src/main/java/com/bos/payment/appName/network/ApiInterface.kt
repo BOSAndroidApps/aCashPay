@@ -50,6 +50,7 @@ import com.bos.payment.appName.data.model.justpaymodel.SendMoneyToMobileResponse
 import com.bos.payment.appName.data.model.justpaymodel.UpdateBankDetailsReq
 import com.bos.payment.appName.data.model.justpaymodel.UpdateBankDetailsResponse
 import com.bos.payment.appName.data.model.justpedashboard.DashboardBannerListModel
+import com.bos.payment.appName.data.model.justpedashboard.ProfileResponse
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesRequest
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesResponse
 import com.bos.payment.appName.data.model.kyc.ReteriveAgentKYCReq
@@ -67,6 +68,12 @@ import com.bos.payment.appName.data.model.makepaymentnew.BankDetailsResp
 import com.bos.payment.appName.data.model.makepaymentnew.MakePaymentReportResp
 import com.bos.payment.appName.data.model.makepaymentnew.ReferenceIDGenerateReq
 import com.bos.payment.appName.data.model.makepaymentnew.ReferenceIDGenerateResp
+import com.bos.payment.appName.data.model.managekyc.CountryStateDistrictReq
+import com.bos.payment.appName.data.model.managekyc.CountryStateDistrictResp
+import com.bos.payment.appName.data.model.managekyc.RetailerProfileReq
+import com.bos.payment.appName.data.model.managekyc.RetailerProfileResp
+import com.bos.payment.appName.data.model.managekyc.UpdateKycReq
+import com.bos.payment.appName.data.model.managekyc.UpdateKycResp
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListRes
 import com.bos.payment.appName.data.model.merchant.activeInActiveStatus.GetAPIActiveInactiveStatusReq
@@ -142,6 +149,8 @@ import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListResp
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsResp
+import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionReq
+import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionResponse
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsReq
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsRes
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsWithCalculationReq
@@ -200,8 +209,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiInterface {
-
-     /*  BASE URL =  https://bosapi.bos.center*/
 
 
      @FormUrlEncoded
@@ -661,5 +668,34 @@ interface ApiInterface {
         @Part("AdminCode") admincode: RequestBody,
         @Part imageFile1: MultipartBody.Part
     ): Response<MakePaymentReportResp>
+
+
+
+    @Multipart
+    @POST("api/Customer/ProfileImage")
+    suspend fun uploadCustomerProfile(
+        @Part("UserID") mode: RequestBody,
+        @Part("TaskType") rid: RequestBody,
+        @Part profilePic: MultipartBody.Part
+    ): Response<ProfileResponse>
+
+
+    @POST("api/Reports/vpaTransactionReport")
+    suspend fun getVPATransactionReq(@Body req: VPATransactionReq): Response<VPATransactionResponse>?
+
+
+    // manage kyc flow ..............................................................................
+
+    @POST("api/Customer/EditRetailer")
+    suspend fun getRetailerDetailsForKYCReq(@Body req: RetailerProfileReq): Response<RetailerProfileResp>?
+
+
+    @POST("api/common/Commonlist")
+    suspend fun getCountryStateDistrictListReq(@Body req: CountryStateDistrictReq): Response<CountryStateDistrictResp>?
+
+
+    @POST("api/Customer/UpdateKyc")
+    suspend fun updateKycReq(@Body req: UpdateKycReq): Response<UpdateKycResp>?
+
 
 }

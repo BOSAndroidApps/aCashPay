@@ -16,7 +16,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +28,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -33,6 +36,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.size
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bos.payment.appName.R
@@ -134,6 +138,8 @@ class BusSeating : AppCompatActivity() {
     var forServiceChargeSeatType : MutableList<SeattypeModel> = mutableListOf()
     var rechargeAmount : String =""
     lateinit var dialog: Dialog
+
+    var checkupperandlowerbirth : Boolean = false
 
     private val date = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
         view.maxDate = System.currentTimeMillis()
@@ -286,6 +292,7 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     private fun getSeatTypes(): List<Pair<String,String>> {
         val types = mutableListOf<Pair<String,String>>()
 
@@ -297,6 +304,7 @@ class BusSeating : AppCompatActivity() {
 
         return types // size 1 (single) or 2 (both)
     }
+
 
     // for adding commission and service charge
     @RequiresApi(Build.VERSION_CODES.O)
@@ -316,8 +324,8 @@ class BusSeating : AppCompatActivity() {
             // Both Sleeper + Seater
             hitBothSeatTypeApiRetailer(seattype, retailerId!!, adminCode!!, buscategory, rechargeAmount)
         }
-
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
@@ -784,6 +792,7 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllWalletBalance() {
        runIfConnected {
@@ -817,6 +826,7 @@ class BusSeating : AppCompatActivity() {
                 }
         }
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -870,7 +880,6 @@ class BusSeating : AppCompatActivity() {
                 }
             }
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -1009,6 +1018,7 @@ class BusSeating : AppCompatActivity() {
          }
     }
 
+
     fun hitApiforPassDetailsListResponse(PaxRequeryResponseReq: BusPaxRequeryResponseReq){
         Log.d("BusRequeryRequest", Gson().toJson(PaxRequeryResponseReq))
 
@@ -1044,6 +1054,7 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     fun generateQrCode(content: String, size: Int = 512): Bitmap {
         val hints = Hashtable<EncodeHintType, String>().apply {
             put(EncodeHintType.CHARACTER_SET, "UTF-8")
@@ -1070,6 +1081,7 @@ class BusSeating : AppCompatActivity() {
         return bitmap
     }
 
+
     private fun buildQrDataWithPassengers(pnr: String?, bookingRefNo: String?, fromCity: String?, toCity: String?, travelDate: String?, busType: String?, passengerList: ArrayList<com.bos.payment.appName.data.model.travel.bus.busRequery.PaXDetails>): String {
         val builder = StringBuilder()
 
@@ -1093,6 +1105,7 @@ class BusSeating : AppCompatActivity() {
 
         return builder.toString().trim()
     }
+
 
     fun openDialogForGenerateTicket(context: Context,fileName: String,bitmap:Bitmap,data:MutableList<MutableList<String?>>, ticketDetails :MutableList<TicketDetailsForGenerateTicket>){
         if(!ticketDetails.isEmpty()&&ticketDetails.size>0) {
@@ -1470,6 +1483,7 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     // hit api for add bus ticket request.............................................................................................
     private fun getAddBusTicketRequest(referenceId: String,apirequest:String) {
         val busTicketingReq = AddTicketReq(
@@ -1655,10 +1669,11 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     private fun setDropDown() {
         bin.passengerDetails.passengerDetailsLayout.visibility = View.GONE
         try {
-            Constants.getAllBoardingPointAdapter = ArrayAdapter<String>(this, R.layout.spinner_item_selected, Constants.boardingPointName!!)
+            Constants.getAllBoardingPointAdapter = ArrayAdapter<String>(this, R.layout.spinner_right_aligned, Constants.boardingPointName!!)
             Constants.getAllBoardingPointAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
             bin.boardingPointSp.adapter = Constants.getAllBoardingPointAdapter
             bin.boardingPointSp.onItemSelectedListener =
@@ -1699,7 +1714,7 @@ class BusSeating : AppCompatActivity() {
         try {
             Constants.getAllDroppingPointAdapter = ArrayAdapter<String>(
                 this,
-                R.layout.spinner_item_selected,
+                R.layout.spinner_right_aligned,
                 Constants.droppingPointName!!
             )
 
@@ -1819,6 +1834,7 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     private fun setSpinnerForGender(){
         val arrayGenderSpinner = resources.getStringArray(R.array.gender_array)
         val genderadapters = ArrayAdapter(this@BusSeating, R.layout.spinner_right_aligned, arrayGenderSpinner)
@@ -1878,6 +1894,7 @@ class BusSeating : AppCompatActivity() {
              }*/
     }
 
+
     @SuppressLint("SetTextI18n")
     private fun setupUI() {
         mStash = MStash.getInstance(this)!!
@@ -1909,6 +1926,7 @@ class BusSeating : AppCompatActivity() {
         bin.confirmBookingLayout.recyclerViewPassenger.adapter = userPassengerDetailsAdapter
     }
 
+
     private fun getAllMappingSeat() {
         val request = BusSeatMapReq(
             boardingId = intent.getStringExtra(Constants.boarding_Id),
@@ -1929,7 +1947,11 @@ class BusSeating : AppCompatActivity() {
                     if(Constants.dialog!=null && Constants.dialog.isShowing){
                         Constants.dialog.dismiss()
                     }
-                    resource.data?.body()?.let { setupSeatGrid(it) }
+
+                    resource.data?.body()?.
+                    let {
+                        setupSeatGrid(it)
+                    }
                 }
 
                 ApiStatus.ERROR -> {
@@ -1944,9 +1966,12 @@ class BusSeating : AppCompatActivity() {
         }
     }
 
+
     private fun setupSeatGrid(response: BusSeatMapRes) {
         val lowerGrid = bin.seatLayout.lowerBerthGrid
         val upperGrid = bin.seatLayout.upperBerthGrid
+        var upperlayout = bin.seatLayout.upperlayout
+        var lowerlayout = bin.seatLayout.lowerlayout
 
         bin.seatBookingLayout.visibility = View.VISIBLE
         bin.boardingPointLayout.visibility = View.GONE
@@ -1978,42 +2003,89 @@ class BusSeating : AppCompatActivity() {
             e.printStackTrace()
         }
 
+
         response.seatMap.forEach { seat ->
             val row = seat.row?.toIntOrNull() ?: 0
             val col = seat.column ?: 0
             val zIndex = seat.zIndex?.toIntOrNull() ?: 0
             val length = seat.length?.toIntOrNull() ?: 1
-            val seatName = ("₹" + seat.fareMaster?.basicAmount) ?: ""
+            val amount = seat.fareMaster?.basicAmount ?: 0.0
+            val seatName = "₹" + String.format("%.2f", amount)
+
+            val maxColumn = response.seatMap.maxOf { it.column ?: 0 } + 1
+
+            lowerGrid.columnCount = 2
+            upperGrid.columnCount = 2
 
             mStash.setStringValue(Constants.seatNumber, seat.seatNumber.toString())
+
             val seatView = createSeatView(seatName.toString(), this, row, col, length, seat)
 
             if (zIndex == 1) {
                 upperGrid.addView(seatView)
-            } else {
+            }
+            else {
                 lowerGrid.addView(seatView)
             }
 
+            if(upperGrid.size>0){
+                upperlayout.visibility = View.VISIBLE
+            }else {
+                upperlayout.visibility = View.GONE
+            }
+
         }
+
     }
+
 
     @SuppressLint("InflateParams", "SetTextI18n")
     private fun createSeatView(seatName: String, context: Context, row: Int, column: Int, length: Int, seat: SeatMap): View {
+
         val seatView = LayoutInflater.from(context).inflate(R.layout.seat_item, null)
         val tvPrice = seatView.findViewById<TextView>(R.id.tvPrice)
+        val pillow = seatView.findViewById<View>(R.id.pillowView)
+        val lefthandle = seatView.findViewById<View>(R.id.lefthandle)
+        val righthandle = seatView.findViewById<View>(R.id.righthandle)
+        val bottomHandle = seatView.findViewById<View>(R.id.bottomHandle)
+
+        tvPrice.gravity = Gravity.CENTER
+        tvPrice.setPadding(6, 6, 6, 6)
+        tvPrice.maxLines = 1
+        tvPrice.isSingleLine = true
+        tvPrice.ellipsize = TextUtils.TruncateAt.END
+        tvPrice.textSize = 8f
         tvPrice.text = seatName
-        tvPrice.setTextColor(Color.BLACK)
 
         val isSleeper = length == 2
-        val width = if (isSleeper) 100 else 100
-        val height = if (isSleeper) 150 else 100
 
-        val layoutParams = FrameLayout.LayoutParams(width, height).apply {
-            topMargin = 10
-            leftMargin = 10
+        val widthh = if (isSleeper) 100 else 100
+        val heightt = if (isSleeper) 150 else 100
+
+
+        val params = GridLayout.LayoutParams().apply {
+            width = widthh
+            height = heightt
+            setMargins(10,10,10,10)
+            setGravity(Gravity.CENTER)
         }
 
-        seatView.layoutParams = layoutParams
+        if (isSleeper) {
+            pillow.visibility = View.VISIBLE
+            lefthandle.visibility= View.GONE
+            righthandle.visibility= View.GONE
+            bottomHandle.visibility= View.GONE
+            params.width = widthh   // wider seat
+            params.height = heightt
+        } else {
+            pillow.visibility = View.GONE
+            lefthandle.visibility= View.VISIBLE
+            righthandle.visibility= View.VISIBLE
+            bottomHandle.visibility= View.VISIBLE
+        }
+
+        seatView.layoutParams = params
+
 
         // Set initial background
         when {
@@ -2094,7 +2166,8 @@ class BusSeating : AppCompatActivity() {
             Log.d("servicetypelist",Gson().toJson(forServiceChargeSeatType))
 
             bin.selectedSeat.text = seatLabels.joinToString(" ")
-            val totalAmount = selectedSeats.sumOf { it.fareMaster?.basicAmount ?: 0 }
+
+            val totalAmount = selectedSeats.sumOf { it.fareMaster?.basicAmount ?: 0.0 }
             bin.finalAmount.text = "₹ $totalAmount"
             bin.reviewBookingInclude.totalprice.text = "₹ $totalAmount"
             rechargeAmount = totalAmount.toString()
@@ -2103,6 +2176,8 @@ class BusSeating : AppCompatActivity() {
 
         return seatView
     }
+
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getPassengerDetailsList(): List<PaXDetails> {
@@ -2162,8 +2237,8 @@ class BusSeating : AppCompatActivity() {
         return paxList
     }
 
-    // for payout transaction and commission entry
 
+    // for payout transaction and commission entry
     private fun getTransferAmountToAgentInCommissionCal(response: TransferAmountToAgentsRes) {
         var withouttdscommissionamount = mStash!!.getStringValue(Constants.retailerCommissionWithoutTDS, "")
         var tdsamount = mStash!!.getStringValue(Constants.tds, "")
@@ -2229,8 +2304,6 @@ class BusSeating : AppCompatActivity() {
                 }
             }
     }
-
-
 
 
 }

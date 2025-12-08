@@ -79,7 +79,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
-                                android:fontFamily="@font/roboto_medium"
+                                android:fontFamily="@font/roboto_regular"
                                 android:layout_weight="1"
                                 android:gravity="start"
                                 android:text="Bus Name"
@@ -107,18 +107,7 @@
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/dimen_10sp"
                                 android:textStyle="bold" />
-<!--                            <TextView-->
-<!--                                android:id="@+id/droppingTime"-->
-<!--                                android:layout_width="0dp"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginStart="10dp"-->
-<!--                                android:layout_weight="1"-->
-<!--                                android:gravity="start"-->
-<!--                                android:text="Company Name"-->
-<!--                                android:textAllCaps="false"-->
-<!--                                android:textColor="@color/black"-->
-<!--                                android:textSize="@dimen/dimen_14sp"-->
-<!--                                android:textStyle="bold" />-->
+
 
                             <TextView
                                 android:id="@+id/totalTime"

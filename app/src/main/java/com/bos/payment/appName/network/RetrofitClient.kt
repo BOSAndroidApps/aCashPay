@@ -23,6 +23,8 @@ object RetrofitClient {
     /* Live Api Fr Login*/
     private const val BASE_GETURL: String = "https://bosapi.bos.center/"
 
+    const val IMAGE_BASE_URL: String = "https://bosapi.bos.center"
+
     /*Demo Api*/
    // private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
 
@@ -30,6 +32,8 @@ object RetrofitClient {
     private const val TRAVEL_URL: String = "https://travel.bospay.in/"
 
     private const val PAYOUT_URL: String = "https://payout.aopay.in/"
+
+    const val PAN_BASE_URL = "https://api.aopay.in/"
 
 
     private var retrofit: Retrofit? = null
@@ -156,6 +160,23 @@ object RetrofitClient {
             .build()
     }
 
+    private fun getAllInstancePAN(): Retrofit{
+        // Create OkHttpClient with 1-minute timeout settings
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
+            .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
+            .writeTimeout(60, TimeUnit.SECONDS)   // Write timeout
+            .build()
+
+        // Build Retrofit instance with the custom OkHttpClient
+        return Retrofit.Builder()
+            .baseUrl(PAN_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+            .build()
+    }
+
 
     val apiInterface: ApiInterface = getInstance().create(ApiInterface::class.java)
     val apiRechargeInterface: ApiInterface = getRechargeInstance().create(ApiInterface::class.java)
@@ -164,5 +185,6 @@ object RetrofitClient {
     val apiAllAPIService: ApiInterface = getInstanceData().create(ApiInterface::class.java)
     val apiAllTravelAPI: TravelInterface = getAllTravelInstance().create(TravelInterface::class.java)
     val apiAllPayoutAPI: ApiInterface = getAllPayoutInstance().create(ApiInterface::class.java)
+    val apiInterfacePAN: TravelInterface = getAllInstancePAN().create(TravelInterface::class.java)
 
 }

@@ -1,27 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/seatContainer"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:foregroundGravity="center"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/dimen_4dp">
 
-    <LinearLayout
+    <!-- Left Handle -->
+    <View
+        android:id="@+id/lefthandle"
+        android:layout_width="8dp"
+        android:layout_height="30dp"
+        android:layout_gravity="start|bottom"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/handlelayout"
+        android:layout_marginStart="2dp" />
+
+    <!-- Right Handle -->
+    <View
+        android:id="@+id/righthandle"
+        android:layout_width="8dp"
+        android:layout_height="30dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="2dp"
+        android:background="@drawable/handlelayout" />
+
+    <!-- Seat Body -->
+    <TextView
+        android:id="@+id/tvPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="@dimen/dimen_10dp"
-        android:orientation="horizontal"
-        android:padding="4dp">
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:textSize="11sp"
+        android:text="10"
+        android:textColor="@color/black" />
 
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="₹17"
-            android:textAlignment="center"
-            android:textSize="10sp"
-            android:textColor="@android:color/black" />
+    <!-- Bottom Base (U-shape bottom bar) -->
+    <View
+        android:id="@+id/bottomHandle"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_gravity="bottom|center"
+        android:layout_marginStart="11dp"
+        android:layout_marginEnd="11dp"
+        android:background="@drawable/handlelayout" />
 
-    </LinearLayout>
+    <!-- Pillow for Sleeper (Visibility handled dynamically) -->
+    <View android:id="@+id/pillowView"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="4dp"
+        android:background="@drawable/pillow_bg"
+        android:visibility="gone" />
 
-</LinearLayout>
+</FrameLayout>

@@ -65,9 +65,9 @@ class BusSearchDetails : AppCompatActivity() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let { response ->
-
                                 Log.d("BussearchList",response.buses[0]?.availableSeats.toString())
                                 Log.d("BusList",Gson().toJson(response.buses))
+                                Log.d("BusList",Gson().toJson(response))
                                 getAllBusSearchListRes(response)
                             }
                         }
@@ -96,9 +96,7 @@ class BusSearchDetails : AppCompatActivity() {
             mStash?.setStringValue(Constants.searchKey, response.searchKey.toString())
             Log.d("responseHeader", mStash?.getStringValue(Constants.searchKey, "").toString())
             busDataList.clear()
-            response.buses.forEach { busList ->
-                busDataList.add(busList)
-            }
+            response.buses.forEach { busList -> busDataList.add(busList) }
             busSearchAdapter.notifyDataSetChanged()
         }
         else {

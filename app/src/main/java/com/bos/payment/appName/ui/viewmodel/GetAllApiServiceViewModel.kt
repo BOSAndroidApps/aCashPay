@@ -11,11 +11,15 @@ import com.bos.payment.appName.data.model.justpaymodel.RetailerContactListReques
 import com.bos.payment.appName.data.model.justpaymodel.SendMoneyToMobileReqModel
 import com.bos.payment.appName.data.model.justpaymodel.UpdateBankDetailsReq
 import com.bos.payment.appName.data.model.justpedashboard.DashboardBannerListModel
+import com.bos.payment.appName.data.model.justpedashboard.ProfileReq
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesRequest
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesResponse
 import com.bos.payment.appName.data.model.makepaymentnew.BankDetailsReq
 import com.bos.payment.appName.data.model.makepaymentnew.RaiseMakePaymentReq
 import com.bos.payment.appName.data.model.makepaymentnew.ReferenceIDGenerateReq
+import com.bos.payment.appName.data.model.managekyc.CountryStateDistrictReq
+import com.bos.payment.appName.data.model.managekyc.RetailerProfileReq
+import com.bos.payment.appName.data.model.managekyc.UpdateKycReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.GetPayoutCommercialReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.mobileCharge.GetCommercialReq
@@ -34,6 +38,7 @@ import com.bos.payment.appName.data.model.transactionreportsmodel.CheckRaiseTick
 import com.bos.payment.appName.data.model.transactionreportsmodel.RaiseTicketReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
+import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionReq
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingRequest
@@ -562,8 +567,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun sendTicketCommentListReq(complaintId: Int) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -574,7 +577,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
     fun sendTicketCommentListReq(commentreq: AddCommentReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -584,7 +586,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
     }
-
 
     fun getReferenceIdReq(referenceID: ReferenceIDGenerateReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -736,5 +737,150 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
     }
 
 
+    fun vpaTransactionReq(req: VPATransactionReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.vpaTransactionReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "Something went wrong: ${e.localizedMessage}"
+                )
+            )
+        }
+    }
+
+    fun profileReq(req: ProfileReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.uploadProfileImage(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "Something went wrong: ${e.localizedMessage}"
+                )
+            )
+        }
+    }
+
+    fun retailerprofileKycReq(req: RetailerProfileReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.retailerProfileReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "Something went wrong: ${e.localizedMessage}"
+                )
+            )
+        }
+    }
+
+
+
+
+    fun countryStateDistrictListReq(req: CountryStateDistrictReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.countryStateDistrictListReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "Something went wrong: ${e.localizedMessage}"
+                )
+            )
+        }
+    }
+
+
+
+    fun UpdateKycReq(req: UpdateKycReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.UpdateKycReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
 
 }

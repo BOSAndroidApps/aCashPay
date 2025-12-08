@@ -1,0 +1,25 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Seat Body Color -->
+
+
+    <!-- Rounded corners like bus handles -->
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp"
+        android:bottomLeftRadius="30dp"
+        android:bottomRightRadius="30dp" />
+
+    <!-- Border for handle look -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/text_hint_color" />
+
+    <!-- Padding to give inner curve space -->
+    <padding
+        android:left="12dp"
+        android:right="12dp"
+        android:top="6dp"
+        android:bottom="10dp" />
+</shape>

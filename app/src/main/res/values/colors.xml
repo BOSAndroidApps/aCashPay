@@ -7,12 +7,14 @@
     <color name="purple_700">#DD4B39</color>
     <color name="teal_200">#0371B0</color>
     <color name="teal_700">#005B8F</color>
+    <color name="teal_800">#032437</color>
     <color name="teal_300">#3793C5</color>
     <color name="black">#FF000000</color>
     <color name="orange">#ffa928</color>
     <color name="lightBlack">#0E0E0E</color>
     <color name="light_black">#1E1E1E</color>
     <color name="white">#FFFFFF</color>
+    <color name="bgcolordisable">#EBE9E9</color>
     <color name="light_Red">#FF6260</color>
     <color name="light_orange">#F5A522</color>
     <color name="purple">#7EA1FA</color>
@@ -35,7 +37,6 @@
     <color name="transparent">#00000000</color>
     <color name="progress_bg">#33144372</color>
     <color name="cardview_bg">#F8F8F8</color>
-
     <color name="mode_color">#373636</color>
     <color name="menu_color">#DDD</color>
     <color name="button_text_gray">#AFAFAF</color>
@@ -47,19 +48,18 @@
     <color name="lightest_bluee">#EAEFF6</color>
     <color name="db_brown">#efe7cf</color>
     <color name="green">#268703</color>
-
     <color name="primary">#4CAF50</color>
-
     <color name="light_grey">#F5F5F5</color>
-
     <color name="blurlight">#D0E6F2</color>
-
-
     <color name="justpecolortext">#1700AD</color>
-    <color name="dashboardiconbg">#E8E7EB</color>
+    <!--<color name="dashboardiconbg">#E8E7EB</color>-->
+    <color name="dashboardiconbg">#28BBFF</color>
+    <color name="bannerbg">#B8E3F6</color>
     <color name="cardbg">#E3E1F6</color>
     <color name="dashboardtextcolor">#5C4BC9</color>
     <color name="dashboardcardcolor">#D6CFFF</color>
+
+    <color name="pillowColor">#AAAAAA</color>
 
 
 </resources>

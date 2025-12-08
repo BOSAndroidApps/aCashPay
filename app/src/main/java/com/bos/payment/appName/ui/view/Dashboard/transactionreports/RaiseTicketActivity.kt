@@ -142,9 +142,11 @@ class RaiseTicketActivity : AppCompatActivity() {
             finish()
         }
 
+
         binding.uploadfilecard.setOnClickListener {
             checkPermissionAndPick()
         }
+
 
         binding.resetcard.setOnClickListener {
             binding.resetcard.setCardBackgroundColor(resources.getColor(R.color.blue))
@@ -155,6 +157,7 @@ class RaiseTicketActivity : AppCompatActivity() {
             adapter = ImageAdapter(this, selectedUris)
             binding.imageviewliast.adapter = adapter
         }
+
 
         binding.submitcard.setOnClickListener {
             binding.resetcard.setCardBackgroundColor(resources.getColor(R.color.grey))
@@ -185,19 +188,12 @@ class RaiseTicketActivity : AppCompatActivity() {
         }
 
         when {
-            ContextCompat.checkSelfPermission(
-                this,
-                permission
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
                 pickImages()
             }
 
             shouldShowRequestPermissionRationale(permission) -> {
-                Toast.makeText(
-                    this,
-                    "Storage permission is needed to pick images.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Storage permission is needed to pick images.", Toast.LENGTH_SHORT).show()
                 permissionLauncher.launch(permission)
             }
 

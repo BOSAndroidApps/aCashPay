@@ -397,10 +397,7 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
             if (adultList.size > 0) {
                 val bottomfrag = ReviewDetailsPassangersBottomSheet()
                 supportFragmentManager.let {
-                    bottomfrag.show(
-                        it,
-                        ReviewDetailsPassangersBottomSheet.TAG
-                    )
+                    bottomfrag.show(it, ReviewDetailsPassangersBottomSheet.TAG)
                 }
             } else {
                 if (childList.size > 0 || infantList.size > 0) {

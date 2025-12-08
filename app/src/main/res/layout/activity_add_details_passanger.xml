@@ -231,6 +231,7 @@
                     android:layout_marginBottom="@dimen/dimen_10dp"
                     android:background="@drawable/outerborder"
                     android:padding="@dimen/dimen_4dp"
+                    android:visibility="invisible"
                     app:layout_constraintTop_toBottomOf="@+id/travelDetails">
 
                     <TextView
@@ -283,6 +284,7 @@
                                 android:layout_gravity="center"
                                 android:layout_marginRight="@dimen/dimen_20dp"
                                 android:rotation="180"
+                                android:visibility="invisible"
                                 android:src="@drawable/left_arrow" />
 
 
@@ -415,6 +417,7 @@
                     android:layout_marginTop="@dimen/dimen_10dp"
                     app:cardCornerRadius="@dimen/dimen_6dp"
                     app:cardUseCompatPadding="true"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/ticketrelateddetailslayout">
 
                     <LinearLayout

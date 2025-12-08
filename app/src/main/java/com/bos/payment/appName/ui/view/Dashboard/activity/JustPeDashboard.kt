@@ -10,7 +10,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Geocoder
+import android.location.LocationManager
+import android.media.audiofx.BassBoost
+import android.media.audiofx.BassBoost.Settings
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,8 +22,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -34,7 +40,9 @@ import com.bos.payment.appName.constant.CustomFuseLocationActivity
 import com.bos.payment.appName.data.model.justpaymodel.CheckBankDetailsModel
 import com.bos.payment.appName.data.model.justpaymodel.MoneyTransferServicesModel
 import com.bos.payment.appName.data.model.justpedashboard.DashboardBannerListModel
+import com.bos.payment.appName.data.model.justpedashboard.ProfileReq
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesRequest
+import com.bos.payment.appName.data.model.managekyc.RetailerProfileReq
 import com.bos.payment.appName.data.model.menuList.Data
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListRes
@@ -54,6 +62,7 @@ import com.bos.payment.appName.ui.adapter.ImageSliderAdapter
 import com.bos.payment.appName.ui.adapter.NavAdapter
 import com.bos.payment.appName.ui.view.Dashboard.ToSelf.ToSelfMoneyTransferPage
 import com.bos.payment.appName.ui.view.Dashboard.activity.AllServicesSelectionActivity.Companion.checkType
+import com.bos.payment.appName.ui.view.Dashboard.activity.ManageKYC.Companion.CountryName
 import com.bos.payment.appName.ui.view.Dashboard.dmt.DMTMobileActivity
 import com.bos.payment.appName.ui.view.Dashboard.tomobile.ToMobileSendMoneyActivity
 import com.bos.payment.appName.ui.view.LoginActivity
@@ -84,6 +93,7 @@ import com.bos.payment.appName.utils.Constants.TravelCard
 import com.bos.payment.appName.utils.Constants.getRetailerAllServices
 import com.bos.payment.appName.utils.Constants.maskWithEllipsis
 import com.bos.payment.appName.utils.Constants.uploadDataOnFirebaseConsole
+import com.bos.payment.appName.utils.LocationPermissionHelper
 import com.bos.payment.appName.utils.MStash
 import com.bos.payment.appName.utils.Utils.PD
 import com.bos.payment.appName.utils.Utils.generateQrBitmap
@@ -91,6 +101,11 @@ import com.bos.payment.appName.utils.Utils.getScreenshotFromView
 import com.bos.payment.appName.utils.Utils.getStateCode
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.bos.payment.appName.utils.Utils.toast
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
@@ -122,7 +137,7 @@ class JustPeDashboard : AppCompatActivity() {
     private lateinit var menuListAdapter: MenuListAdapter
    // private lateinit var pd: AlertDialog
     private var doubleBackToExitPressedOnce: Boolean = false
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
+    private val locationPermissionCode = 1000
     private var coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private lateinit var viewModel: MoneyTransferViewModel
     lateinit var storageRef : StorageReference
@@ -152,6 +167,7 @@ class JustPeDashboard : AppCompatActivity() {
          var vpa : String? = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -160,22 +176,37 @@ class JustPeDashboard : AppCompatActivity() {
 
         checkPermissions()
 
-        if (!checkLocationPermission()) {
-            requestLocationPermission()
-        }
-        else {
-            // Permission already granted
-            // You can now access the location
+
+        if (!LocationPermissionHelper.hasLocationPermissions(this)) {
+            LocationPermissionHelper.requestLocationPermissions(this)
+        } else if (!isGPSEnabled()) {
+            showGPSRequiredDialog()  // Ask to turn on GPS
+
+        } else {
+            getCurrentLocation()
         }
 
         init()
-
         getfirebasetoken()
         hitApiForBannerRetailer("retailer")
         startMerchantListPolling(mStash!!.getStringValue(Constants.MerchantId, "").toString())
         setMoneyTransferServices()
         setclickListner()
+        GetProfile()
 
+    }
+
+    private fun showGPSRequiredDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Location is required to continue. Please enable GPS.")
+            .setCancelable(false) // cannot cancel with back button or outside tap
+            .setPositiveButton("Enable") { _, _ ->
+                startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+
+        val alert = builder.create()
+        alert.setCanceledOnTouchOutside(false) // restrict dismiss
+        alert.show()
     }
 
 
@@ -225,6 +256,7 @@ class JustPeDashboard : AppCompatActivity() {
 
 
     private fun getAllMerchantListRes(response: GetApiListMarchentWiseRes, merchantId: String) {
+
         if(binding.appBarDashBoard.deskdesign.swipeRefreshLayout.isRefreshing){
             binding.appBarDashBoard.deskdesign.swipeRefreshLayout.isRefreshing = false
         }
@@ -249,7 +281,8 @@ class JustPeDashboard : AppCompatActivity() {
                     mStash!!.setStringValue(Constants.APIName, featureName)
                     mStash!!.setStringValue(Constants.MerchantList, Constants.merchantIdList.toString())
                     Log.d("APINameList_Dash", mStash!!.getStringValue(Constants.MerchantList, "").toString())
-                } else {
+                }
+                else {
                     Log.w("MerchantListWarning", "Empty or null featureCode at index ")
                 }
             }
@@ -259,10 +292,10 @@ class JustPeDashboard : AppCompatActivity() {
         }
     }
 
+
     fun init(){
         mStash = MStash.getInstance(this@JustPeDashboard)
 
-        getFuseLocation()
 
         viewModel = ViewModelProvider(this, MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllInterface)))[MoneyTransferViewModel::class.java]
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
@@ -277,6 +310,7 @@ class JustPeDashboard : AppCompatActivity() {
         binding.nav.customerName.text =  "Hello ${mStash!!.getStringValue(Constants.retailerName, "")}"
 
     }
+
 
     fun  setMoneyTransferServices(){
         fullServiceList.clear()
@@ -369,6 +403,7 @@ class JustPeDashboard : AppCompatActivity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun setclickListner(){
 
         binding.appBarDashBoard.deskdesign.swipeRefreshLayout.setOnRefreshListener {
@@ -376,10 +411,11 @@ class JustPeDashboard : AppCompatActivity() {
         }
 
         binding.nav.shareqrcode.setOnClickListener {
-            if(QRBimap!=null)
-            shareBitmap(QRBimap!!,this)
+            if(QRBimap!=null) {
+                var qrbitmap = getScreenshotFromView(binding.nav.qrlayout)
+                shareBitmap(qrbitmap!!, this)
+            }
         }
-
 
         binding.nav.saveqrcode.setOnClickListener {
             if(QRBimap!=null){
@@ -387,7 +423,8 @@ class JustPeDashboard : AppCompatActivity() {
                 val imageUri =  saveBitmapToGallery(this, qrbitmap!!,"QR Code")
                 if (imageUri != null) {
                     Toast.makeText(this, "Image saved to gallery!", Toast.LENGTH_SHORT).show()
-                } else {
+                }
+                else {
                     Toast.makeText(this, "Failed to save image!", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -410,6 +447,7 @@ class JustPeDashboard : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+
 
         binding.nav.switchButton.setOnClickListener {
             fingerPrint = !fingerPrint // Toggle the value
@@ -448,11 +486,24 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.O)
     fun refreshData(){
         hitApiForBannerRetailer("retailer")
         hitApiForServicesRequest()
+        getAllMenuList()
         startMerchantListPolling(mStash!!.getStringValue(Constants.MerchantId, "").toString())
+        GetProfile()
+        if (!LocationPermissionHelper.hasLocationPermissions(this)) {
+            LocationPermissionHelper.requestLocationPermissions(this)
+        } else if (!isGPSEnabled()) {
+            showGPSRequiredDialog()  // Ask to turn on GPS
+
+        } else {
+            getCurrentLocation()
+        }
     }
+
 
     fun setViewPagerData(response:DashboardBannerListModel){
         // Example: taking only 2 banners from API response
@@ -492,6 +543,7 @@ class JustPeDashboard : AppCompatActivity() {
 
     }
 
+
     private fun startAutoSlide() {
         val runnable = object : Runnable {
             override fun run() {
@@ -520,7 +572,7 @@ class JustPeDashboard : AppCompatActivity() {
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        Constants.dialog.dismiss()
+                       // Constants.dialog.dismiss()
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("MenuList",Gson().toJson(response))
@@ -534,14 +586,13 @@ class JustPeDashboard : AppCompatActivity() {
                     }
 
                     ApiStatus.LOADING -> {
-                        Constants.OpenPopUpForVeryfyOTP(this)
+                       // Constants.OpenPopUpForVeryfyOTP(this)
                     }
                 }
             }
         }
 
     }
-
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllMenuListRes(response: GetAllMenuListRes) {
@@ -587,6 +638,7 @@ class JustPeDashboard : AppCompatActivity() {
         }
     }
 
+
     private fun getWalletBalance() {
         this.runIfConnected {
             val walletBalanceReq = GetBalanceReq(
@@ -598,7 +650,7 @@ class JustPeDashboard : AppCompatActivity() {
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
-                            Constants.dialog.dismiss()
+                            //Constants.dialog.dismiss()
                             it.data?.let { users ->
                                 users.body()?.let { response ->
                                     Log.d("checkwalletresp", Gson().toJson(response))
@@ -612,13 +664,14 @@ class JustPeDashboard : AppCompatActivity() {
                         }
 
                         ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(this)
+
                         }
                     }
                 }
             }
         }
     }
+
 
     @SuppressLint("SetTextI18n", "DefaultLocale")
     private fun getAllWalletBalanceRes(response: GetBalanceRes) {
@@ -662,12 +715,26 @@ class JustPeDashboard : AppCompatActivity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
+
         startAutoSlide()
+
+        if (LocationPermissionHelper.hasLocationPermissions(this) && isGPSEnabled()) {
+            getCurrentLocation()
+        }
+
         getWalletBalance()
         hitApiForServicesRequest()
         getBankDetails(mStash!!.getStringValue(Constants.RegistrationId, "").toString())
+
+    }
+
+
+    private fun isGPSEnabled(): Boolean {
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
 
@@ -683,25 +750,6 @@ class JustPeDashboard : AppCompatActivity() {
         Handler().postDelayed({ doubleBackToExitPressedOnce = false }, 2000)
     }
 
-
-    private fun requestLocationPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-    }
-
-
-    private fun checkLocationPermission(): Boolean {
-        val fineLocationPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        val coarseLocationPermission = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-        return fineLocationPermission == PackageManager.PERMISSION_GRANTED &&
-                coarseLocationPermission == PackageManager.PERMISSION_GRANTED
-    }
 
     private fun checkPermissions() {
         Dexter.withActivity(this).withPermissions(
@@ -722,20 +770,6 @@ class JustPeDashboard : AppCompatActivity() {
                     token.continuePermissionRequest()
                 }
             }).check()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                // You can now access the location
-            } else {
-                // Permission denied
-                // Handle accordingly (e.g., show an error message or disable location functionality)
-            }
-        }
     }
 
 
@@ -970,16 +1004,28 @@ class JustPeDashboard : AppCompatActivity() {
     }
 
 
-    private fun getFuseLocation() {
+    private fun getCurrentLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        customFuseLocation = CustomFuseLocationActivity(this, this) { mCurrentLocation ->
-            latt = mCurrentLocation.latitude
-            long = mCurrentLocation.longitude
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
 
-            Log.d("Lat Long", "Lat: $latt : Long: $long")
-            getAddressFromLatLng(this, latt, long)
+            return
         }
 
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val latitude = location.latitude
+                val longitude = location.longitude
+                getAddressFromLatLng(this, latitude, longitude)
+                Log.d("CurrentLocation", "Lat: $latitude, Long: $longitude")
+                // Toast.makeText(this, "Lat: $latitude\nLong: $longitude", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Unable to get location", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     }
 
@@ -998,10 +1044,11 @@ class JustPeDashboard : AppCompatActivity() {
                 val state = address.adminArea ?: ""
                 statecode = getStateCode(state ?: "")
                 pincode = address.postalCode ?: ""
+                CountryName = address.countryName ?: ""
 
                 // You can return full formatted string
                  Log.d("Address", "Address: $Address\nCity: $cityName\nDistrict: $district\nState: $state\nPincode: $pincode")
-                "Address: $Address\nCity: $cityName\nDistrict: $district\nState: $state\nPincode: $pincode"
+                "Address: $Address\nCity: $cityName\nDistrict: $district\nState: $state\nPincode: $pincode $CountryName"
             } else {
                 "Address not found"
             }
@@ -1060,6 +1107,172 @@ class JustPeDashboard : AppCompatActivity() {
         }
 
         return imageUri
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun GetProfile(){
+        var userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
+
+        runIfConnected {
+            val request = ProfileReq(
+                UserId = userCode,
+                TaskType = "GET",
+                profileImage = null,
+            )
+
+            Log.d("GetProfileReq", Gson().toJson(request))
+
+            getAllApiServiceViewModel.profileReq(request).observe(this) { resource ->
+                resource?.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data?.let { users ->
+                                users.body()?.let { response ->
+                                    Log.d("GetProfileResponse", Gson().toJson(response))
+                                    Constants.dialog.dismiss()
+                                    if (response.isSuccess!!) {
+                                        var uri =  "${RetrofitClient.IMAGE_BASE_URL}${response.data!!.profileImage}".trim()
+                                        Log.d("ProfileImage", uri)
+                                        Glide.get(this).clearMemory()
+                                        Thread {
+                                            Glide.get(this).clearDiskCache()
+                                        }.start()
+
+                                        Glide.with(this).load(uri).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(binding.nav.ownerPhoto)
+                                        Glide.with(this)
+                                            .load(uri)
+                                            .placeholder(R.drawable.profile_image)  // shown while loading
+                                            .error(R.drawable.profile_image)        // shown if loading failed
+                                            .skipMemoryCache(true)
+                                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                            .into(binding.nav.ownerPhoto)
+                                             GetRetailerDataForEdit()
+                                    }
+                                    else {
+                                        Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+
+                        ApiStatus.ERROR -> {
+                            Constants.dialog.dismiss()
+                        }
+
+                        ApiStatus.LOADING -> {
+                            Constants.OpenPopUpForVeryfyOTP(this)
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun GetRetailerDataForEdit(){
+        var userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
+
+        runIfConnected {
+            val request = RetailerProfileReq(
+                fromDate = null,
+                parmFlag = "detail",
+                agentType = "",
+                searchType = "",
+                toDate = null,
+                adminid = "",
+                searchValue = "",
+                userID = userCode,
+            )
+
+            Log.d("GetProfileReq", Gson().toJson(request))
+
+            getAllApiServiceViewModel.retailerprofileKycReq(request).observe(this) { resource ->
+                resource?.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data?.let { users ->
+                                users.body()?.let { response ->
+                                    Log.d("GetProfileResponse", Gson().toJson(response))
+
+                                    if (response.isSuccess!!) {
+                                        if(response.data?.get(0)!!.kycUpdate!!.lowercase().equals("verified",ignoreCase = true)){
+                                            binding.nav.verifiedkyc.visibility=View.VISIBLE
+                                        }else{
+                                            binding.nav.verifiedkyc.visibility=View.GONE
+                                        }
+
+                                    }
+                                    else {
+                                        Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+
+                        ApiStatus.ERROR -> {
+
+                        }
+
+                        ApiStatus.LOADING -> {
+
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LocationPermissionHelper.BASIC_PERMISSION_REQUESTCODE -> {
+                if (!LocationPermissionHelper.hasLocationPermissions(this)) {
+                    Toast.makeText(this, "Location permission is needed to run this application", Toast.LENGTH_LONG).show();
+
+                    if (!LocationPermissionHelper.shouldShowRequestPermissionRationale(this)) {  // checking if don't show Again box checked and denied
+                        // Location permission denied with Do not ask again
+                        LocationPermissionHelper.launchPermissionSettings(this)   // redirect user to Setting screen
+                    }
+                    else{
+                        showAlertDialog()   // shown 1st time user select Deny
+                    }
+                }else {
+                   Log.d("successresp","yes")
+                }
+            }
+        }
+    }
+
+
+    private fun showAlertDialog() {
+        // Create the AlertDialog builder
+        val builder = AlertDialog.Builder(this)
+
+        // Set the title and message
+        builder.setTitle("Permissions Required")
+            .setMessage("Location permissions need to be granted ")
+
+            // Set the positive button
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss() // Dismiss the dialog when user presses OK
+            }
+
+            // Optional: Set a negative button (if needed)
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss() // Dismiss the dialog if user chooses to cancel
+            }
+
+        // Create and show the AlertDialog
+        builder.create().show()
     }
 
 

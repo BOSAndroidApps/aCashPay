@@ -5,11 +5,16 @@ import com.bos.payment.appName.data.model.justpaymodel.GetToselfPayoutCommercial
 import com.bos.payment.appName.data.model.justpaymodel.RetailerContactListRequestModel
 import com.bos.payment.appName.data.model.justpaymodel.SendMoneyToMobileReqModel
 import com.bos.payment.appName.data.model.justpaymodel.UpdateBankDetailsReq
+import com.bos.payment.appName.data.model.justpedashboard.ProfileReq
+import com.bos.payment.appName.data.model.justpedashboard.ProfileResponse
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesRequest
 import com.bos.payment.appName.data.model.makepaymentnew.BankDetailsReq
 import com.bos.payment.appName.data.model.makepaymentnew.MakePaymentReportResp
 import com.bos.payment.appName.data.model.makepaymentnew.RaiseMakePaymentReq
 import com.bos.payment.appName.data.model.makepaymentnew.ReferenceIDGenerateReq
+import com.bos.payment.appName.data.model.managekyc.CountryStateDistrictReq
+import com.bos.payment.appName.data.model.managekyc.RetailerProfileReq
+import com.bos.payment.appName.data.model.managekyc.UpdateKycReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.GetPayoutCommercialReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.mobileCharge.GetCommercialReq
@@ -27,6 +32,7 @@ import com.bos.payment.appName.data.model.transactionreportsmodel.RaiseTicketReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.RaiseTicketResp
 import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
+import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionReq
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingRequest
@@ -197,5 +203,28 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
     suspend fun putRechargeapiresponseReq(req: RechargeapiresponseReq)= apiInterface.putRechargeapiresponseReq(req)
 
     suspend fun transferToAgentReq(req: TransferToAgentReq)= apiInterface.getTransferAmountToAgentsForCommission(req)
+
+    suspend fun vpaTransactionReq(req: VPATransactionReq)= apiInterface.getVPATransactionReq(req)
+
+    suspend fun retailerProfileReq(req: RetailerProfileReq)= apiInterface.getRetailerDetailsForKYCReq(req)
+
+    suspend fun countryStateDistrictListReq(req: CountryStateDistrictReq)= apiInterface.getCountryStateDistrictListReq(req)
+
+    suspend fun UpdateKycReq(req: UpdateKycReq)= apiInterface.updateKycReq(req)
+
+    suspend fun uploadProfileImage(req : ProfileReq) : retrofit2.Response<ProfileResponse> {
+        val userId = req.UserId.toRequestBody("text/plain".toMediaTypeOrNull())
+        val tasktype = req.TaskType.toRequestBody("text/plain".toMediaTypeOrNull())
+        // Convert image file to MultipartBody.Part
+        val imagePart1 = if (req.profileImage != null && req.profileImage.exists()) {
+            val requestFile = req.profileImage.asRequestBody("image/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("ProfileImageFile", req.profileImage.name, requestFile)
+        } else {
+            // send empty multipart field
+            MultipartBody.Part.createFormData("ProfileImageFile", "")
+        }
+
+        return apiInterface.uploadCustomerProfile(userId, tasktype, imagePart1)
+    }
 
 }

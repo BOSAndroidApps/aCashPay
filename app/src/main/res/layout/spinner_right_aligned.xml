@@ -3,8 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textSize="18sp"
+    android:textSize="@dimen/dimen_14sp"
     android:gravity="left"
     android:text="dfd"
-    android:textColor="@color/black"
+    android:fontFamily="@font/roboto_regular"
+    android:textColor="@color/lightBlack"
     android:padding="5dip" />

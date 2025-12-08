@@ -54,6 +54,7 @@ class TransactionReportAdapter(var context: Context, var transactionList: List<D
         return ViewHolder(binding)
     }
 
+
     override fun onBindViewHolder(holder: TransactionReportAdapter.ViewHolder, position: Int) {
          if(transactionList[position]!!.status.isNullOrBlank()){
              // for commission report

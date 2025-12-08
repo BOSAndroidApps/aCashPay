@@ -2,7 +2,6 @@ package com.bos.payment.appName.ui.view.Dashboard.transactionreports
 
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -16,19 +15,14 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.transactionreportsmodel.CheckRaiseTicketExistReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
-import com.bos.payment.appName.data.model.walletBalance.walletBalanceCal.GetBalanceReq
 import com.bos.payment.appName.data.repository.GetAllAPIServiceRepository
 import com.bos.payment.appName.data.viewModelFactory.GetAllApiServiceViewModelFactory
 import com.bos.payment.appName.databinding.ActivityTransactionReportsBinding
@@ -69,8 +63,7 @@ class TransactionReportsActivity : AppCompatActivity() {
         binding = ActivityTransactionReportsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface))
-        )[GetAllApiServiceViewModel::class.java]
+        getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
 
         mStash = MStash.getInstance(this)
 
@@ -308,7 +301,6 @@ class TransactionReportsActivity : AppCompatActivity() {
         payoutModeList.add("Commission History")
 
 
-
         depositModeList.add("All")
         depositModeList.add("Make Payment Deposit")
         depositModeList.add("Wallet Transfer")
@@ -319,9 +311,8 @@ class TransactionReportsActivity : AppCompatActivity() {
         transferModeList.add("To Mobile Transfer")
         transferModeList.add("To Self Transfer")
 
-
-
     }
+
 
     private fun setDataForModeBasedOnSelectedReport(report :MutableList<String?> ){
         var adapter = ArrayAdapter(this@TransactionReportsActivity, android.R.layout.simple_spinner_dropdown_item, report)
@@ -395,7 +386,7 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
-     fun hitApiForCheckRaiseTicket(transactionID:String){
+    fun hitApiForCheckRaiseTicket(transactionID:String){
         runIfConnected {
             val reportReq = CheckRaiseTicketExistReq(
                 transactionID = transactionID ,
@@ -447,7 +438,7 @@ class TransactionReportsActivity : AppCompatActivity() {
     fun popupforshowingraiseticketstatus(transactionId : String){
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.signoutalert)
+        dialog.setContentView(R.layout.ticketraisedalert)
 
         dialog.window?.apply {
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

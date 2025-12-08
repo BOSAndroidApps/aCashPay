@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -44,12 +45,14 @@ import com.bos.payment.appName.utils.Constants.FinanceCard
 import com.bos.payment.appName.utils.Constants.RETAILERALLSERVICES
 import com.bos.payment.appName.utils.Constants.TravelCard
 import com.bos.payment.appName.utils.Constants.getRetailerAllServices
+import com.bos.payment.appName.utils.LocationPermissionHelper
 import com.bos.payment.appName.utils.MStash
 import com.example.example.LoginReq
 import com.bos.payment.appName.utils.Utils.PD
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.bos.payment.appName.utils.Utils.toast
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.location.LocationServices
 import com.google.gson.Gson
 
 class LoginActivity : AppCompatActivity() {
@@ -72,8 +75,16 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (!checkLocationPermission()) {
+      /*  if (!checkLocationPermission()) {
             requestLocationPermission()
+        }*/
+
+        if (!LocationPermissionHelper.hasLocationPermissions(this)) {
+            LocationPermissionHelper.requestLocationPermissions(this)
+        } else if (!isGPSEnabled()) {
+            showGPSRequiredDialog()  // Ask to turn on GPS
+
+        } else {
         }
 
         initView()
@@ -82,10 +93,31 @@ class LoginActivity : AppCompatActivity() {
             showConsentDialog()
             showBiometricDialog()
         }
+
 //      setDropDown()
         btnListener()
 
     }
+
+    private fun isGPSEnabled(): Boolean {
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    private fun showGPSRequiredDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Location is required to continue. Please enable GPS.")
+            .setCancelable(false) // cannot cancel with back button or outside tap
+            .setPositiveButton("Enable") { _, _ ->
+                startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+
+        val alert = builder.create()
+        alert.setCanceledOnTouchOutside(false) // restrict dismiss
+        alert.show()
+    }
+
+
 
     //    private fun setDropDown() {
 //        val arrayListSpinner = resources.getStringArray(R.array.login_array)
@@ -466,52 +498,19 @@ class LoginActivity : AppCompatActivity() {
 
     private fun getAllAPIRetailerWiseActiveInActiveStatusRes(response: GetAPIActiveInactiveStatusRes) {
         if (response.Status == true) {
-            mStash!!.setStringValue(
-                Constants.RechargeAPI_Status,
-                response.RechargeAPIStatus.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.RechargeAPI_2_Status,
-                response.RechargeAPI2Status.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.MoneyTransferAPI_Status,
-                response.MoneyTransferAPIStatus.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.MoneyTransferAPI_2_Status,
-                response.MoneyTransferAPI2Status.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.Payout_API_Status,
-                response.PayoutAPIStatus.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.Payout_API_2_Status,
-                response.PayoutAPI2Status.toString()
-            )
+            mStash!!.setStringValue(Constants.RechargeAPI_Status, response.RechargeAPIStatus.toString())
+            mStash!!.setStringValue(Constants.RechargeAPI_2_Status, response.RechargeAPI2Status.toString())
+            mStash!!.setStringValue(Constants.MoneyTransferAPI_Status, response.MoneyTransferAPIStatus.toString())
+            mStash!!.setStringValue(Constants.MoneyTransferAPI_2_Status, response.MoneyTransferAPI2Status.toString())
+            mStash!!.setStringValue(Constants.Payout_API_Status, response.PayoutAPIStatus.toString())
+            mStash!!.setStringValue(Constants.Payout_API_2_Status, response.PayoutAPI2Status.toString())
             mStash!!.setStringValue(Constants.Payin_API_Status, response.PayinAPIStatus.toString())
-            mStash!!.setStringValue(
-                Constants.Payin_API_2_Status,
-                response.PayinAPI2Status.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.Fastag_API_Status,
-                response.FastagAPIStatus.toString()
-            )
-            mStash!!.setStringValue(
-                Constants.PANCardAPI_Status,
-                response.PANCardAPIStatus.toString()
-            )
+            mStash!!.setStringValue(Constants.Payin_API_2_Status, response.PayinAPI2Status.toString())
+            mStash!!.setStringValue(Constants.Fastag_API_Status, response.FastagAPIStatus.toString())
+            mStash!!.setStringValue(Constants.PANCardAPI_Status, response.PANCardAPIStatus.toString())
             mStash!!.setStringValue(Constants.AEPS_API_Status, response.AEPSAPIStatus.toString())
-            mStash!!.setStringValue(
-                Constants.CreditCardAPI_Status,
-                response.CreditCardAPIStatus.toString()
-            )
+            mStash!!.setStringValue(Constants.CreditCardAPI_Status, response.CreditCardAPIStatus.toString())
 
-//            toast("Login Successful")
-//            startActivity(Intent(context, DashboardActivity::class.java))
-//            finish()
         } else {
             toast(response.message.toString())
         }
@@ -532,15 +531,49 @@ class LoginActivity : AppCompatActivity() {
         return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED
     }
 
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, you can now access the location
-            } else {
-                // Permission denied, handle accordingly (e.g., show an error message or disable location functionality)
+        when (requestCode) {
+            LocationPermissionHelper.BASIC_PERMISSION_REQUESTCODE -> {
+                if (!LocationPermissionHelper.hasLocationPermissions(this)) {
+                    Toast.makeText(this, "Location permission is needed to run this application", Toast.LENGTH_LONG).show();
+
+                    if (!LocationPermissionHelper.shouldShowRequestPermissionRationale(this)) {  // checking if don't show Again box checked and denied
+                        // Location permission denied with Do not ask again
+                        LocationPermissionHelper.launchPermissionSettings(this)   // redirect user to Setting screen
+                    }
+                    else{
+                        showAlertDialog()   // shown 1st time user select Deny
+                    }
+                }else {
+
+                }
             }
         }
+    }
+
+
+    private fun showAlertDialog() {
+        // Create the AlertDialog builder
+        val builder = AlertDialog.Builder(this)
+
+        // Set the title and message
+        builder.setTitle("Permissions Required")
+            .setMessage("Location permissions need to be granted ")
+
+            // Set the positive button
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss() // Dismiss the dialog when user presses OK
+            }
+
+            // Optional: Set a negative button (if needed)
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss() // Dismiss the dialog if user chooses to cancel
+            }
+
+        // Create and show the AlertDialog
+        builder.create().show()
     }
 
 

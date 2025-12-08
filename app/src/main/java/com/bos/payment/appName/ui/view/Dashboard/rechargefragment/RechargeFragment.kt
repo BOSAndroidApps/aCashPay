@@ -613,6 +613,7 @@ class RechargeFragment : Fragment() {
             binding.etMobileNumber2.visibility = View.VISIBLE
             binding.tvCircle.visibility = View.GONE
             binding.etCircle.visibility = View.GONE
+            binding.circlelayout.visibility = View.GONE
             binding.tvBtnViewPlan.visibility = View.GONE
             capitalizeEditText(binding.etMobileNumber2)
         }
@@ -625,6 +626,7 @@ class RechargeFragment : Fragment() {
             binding.rechargeAmount.visibility = View.GONE
             binding.tvCircle.visibility = View.GONE
             binding.etCircle.visibility = View.GONE
+            binding.circlelayout.visibility = View.GONE
             binding.tvBtnViewPlan.visibility = View.GONE
 
             if(rechargeType == "postpaid"){
@@ -667,6 +669,7 @@ class RechargeFragment : Fragment() {
 
                 override fun onNothingSelected(adapterView: AdapterView<*>) {}
             }
+
         }
 
 
@@ -3206,8 +3209,7 @@ class RechargeFragment : Fragment() {
 
 
         val circleArray = resources.getStringArray(R.array.recharge_circle)
-        Constants.getAllCircleAdapter =
-            ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, circleArray)
+        Constants.getAllCircleAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, circleArray)
         Constants.getAllCircleAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
         binding.etCircle.adapter = Constants.getAllCircleAdapter
 

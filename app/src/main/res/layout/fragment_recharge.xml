@@ -42,7 +42,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:paddingLeft="10dp"
@@ -56,7 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:inputType="number"
@@ -72,7 +72,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:drawableEnd="@drawable/contact_icon"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
@@ -105,7 +105,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:layout_marginTop="10dp"
-                        android:background="@drawable/bg_button_plane">
+                        android:background="@drawable/fromtoback">
 
                         <Spinner
                             android:id="@+id/spMode"
@@ -116,6 +116,7 @@
                             android:gravity="center"
                             android:textColor="@color/black" />
                     </RelativeLayout>
+
                 </LinearLayout>
 
                 <TextView
@@ -131,13 +132,13 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/fromtoback">
 
                     <com.bos.payment.appName.utils.searchableSp.SearchableSpinner
                         android:id="@+id/spOperator"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/dropdownListPreferredItemHeight"
-                        android:background="@drawable/bg_edittext"
                         android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
                         android:gravity="center" />
 
@@ -154,13 +155,21 @@
                     android:textColor="@color/black"
                     android:textSize="12dp" />
 
+                <RelativeLayout
+                    android:id="@+id/circlelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/fromtoback"
+                    android:paddingStart="12dp">
+
                 <com.bos.payment.appName.utils.searchableSp.SearchableSpinner
                     android:id="@+id/etCircle"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/dropdownListPreferredItemHeight"
-                    android:background="@drawable/bg_edittext"
                     android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
                     android:gravity="center" />
+
+                </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/dthinfo"
@@ -187,7 +196,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:inputType="number"
@@ -201,7 +210,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:paddingLeft="10dp"
@@ -227,7 +236,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:inputType="number"
@@ -253,7 +262,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_button_plane"
+                    android:background="@drawable/outerborder"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="left|center"
                     android:paddingLeft="10dp"

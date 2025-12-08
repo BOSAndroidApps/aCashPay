@@ -34,7 +34,6 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-
         if(checkType.equals(FINANCESERVICES)){
             setFinanceServices()
         }

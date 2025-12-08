@@ -40,6 +40,12 @@ import com.bos.payment.appName.data.model.travel.flight.FlightTempBookingReq
 import com.bos.payment.appName.data.model.travel.flight.FlightTempBookingResponse
 import com.bos.payment.appName.data.model.travel.flight.airReprintresponse.AirReprintRespo
 import com.bos.payment.appName.data.model.travel.flight.flightticketcancelResponse.TicketCancelResponse
+import com.example.theemiclub.data.model.loginsignup.verification.AAdhaarDetailesReq
+import com.example.theemiclub.data.model.loginsignup.verification.AadhaarDetailsResponse
+import com.example.theemiclub.data.model.loginsignup.verification.AadharVerificationReq
+import com.example.theemiclub.data.model.loginsignup.verification.AadharVerificationResp
+import com.example.theemiclub.data.model.loginsignup.verification.PanVerificationReq
+import com.example.theemiclub.data.model.loginsignup.verification.PanVerificationResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -113,6 +119,17 @@ interface TravelInterface {
     @POST("api/V1/Air/Travel/AirTicketCancellation")
     suspend fun getAirTicketCancelationReq(@Body req: AirTicketCancelReq): Response<TicketCancelResponse>? // Annu
 
+
+    // Adhar verification
+    @POST("api/AOP/V1/Validation/AadhaarValidateUrl")
+    suspend fun getAadharVarification(@Body req : AadharVerificationReq): Response<AadharVerificationResp>?
+
+    // Adhar details
+    @POST("api/AOP/V1/Fetch/Digilocker/TransactionID")
+    suspend fun getAadharDetails(@Body req : AAdhaarDetailesReq): Response<AadhaarDetailsResponse>?
+
+    @POST("api/AOP/V1/Validation/PanDetails")
+    suspend fun getPanVarification(@Body req : PanVerificationReq): Response<PanVerificationResponse>?
 
 
 }

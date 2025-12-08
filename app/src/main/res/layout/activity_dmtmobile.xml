@@ -79,7 +79,7 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="15dp"
-                android:background="@drawable/bg_button_border_blue"
+                android:background="@drawable/outerborder"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="left|center"
                 android:inputType="number"

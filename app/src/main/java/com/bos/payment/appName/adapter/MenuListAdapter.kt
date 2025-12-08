@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.*
@@ -19,19 +20,18 @@ import com.bos.payment.appName.ui.view.Dashboard.activity.GenerateQRCodeActivity
 import com.bos.payment.appName.ui.view.Dashboard.activity.ServiceWiseTransaction
 import com.bos.payment.appName.ui.view.Dashboard.rechargefragment.RechargeFragment
 import com.bos.payment.appName.ui.view.Dashboard.activity.JustPeDashboard
+import com.bos.payment.appName.ui.view.Dashboard.activity.ManageKYC
 import com.bos.payment.appName.ui.view.Dashboard.dmt.PayoutDMT
 import com.bos.payment.appName.ui.view.Dashboard.transactionreports.TransactionReportsActivity
+import com.bos.payment.appName.ui.view.Dashboard.transactionreports.VPATransactionReports
 import com.bos.payment.appName.ui.view.makepayment.AdminBankListActivity
 import com.bos.payment.appName.ui.view.makepayment.MakepaymentReports
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
 import com.bos.payment.appName.ui.view.supportmanagement.TicketStatus
-import com.bos.payment.appName.utils.Constants.convertToIconicsName
 import com.google.gson.Gson
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.utils.color
-import com.mikepenz.iconics.utils.colorRes
 import com.mikepenz.iconics.utils.sizeDp
-import com.mikepenz.iconics.utils.sizePx
+
 
 class MenuListAdapter(
     private val context: Context,
@@ -60,29 +60,32 @@ class MenuListAdapter(
 
         val menuItem = menuList[position]
 
+        if (menuItem.parentMenuCode.isNullOrEmpty()) {
+            holder.binding.arrowIcon.visibility = View.VISIBLE
+            holder.binding.iconImageView.visibility = View.VISIBLE
+        } else {
+            holder.binding.arrowIcon.visibility = View.GONE
+            holder.binding.iconImageView.visibility = View.GONE
+        }
+
         // Set menu text
         holder.binding.dashboard.text = menuItem.menuText ?: "N/A"
 
-        val convertedIcon = convertToIconicsName(menuItem.icon)
+        var icon = convertFontAwesomeToIconics(menuItem.icon)
 
-        val drawable = convertedIcon?.let {
-            IconicsDrawable(context, it).apply {
-                sizeDp = 24
-                colorRes = Color.BLACK
-            }
-        }
-
-        holder.binding.iconImageView.setImageDrawable(IconicsDrawable(context, "faw-cog").apply { sizeDp = 32 })
-       // holder.binding.iconImageView.setImageDrawable(drawable)
+        holder.binding.iconImageView.setImageDrawable(IconicsDrawable(context, icon).apply { sizeDp = 25 })
 
         // Adjust margin for child menus
         val layoutParams = holder.binding.root.layoutParams as ViewGroup.MarginLayoutParams
+
         if (menuItem.parentMenuCode.isNullOrEmpty()) {
             layoutParams.setMargins(0, 0, 0, 0) // Parent menu: no margin
-        } else {
+        }
+        else {
             val leftMarginInPx = (20 * context.resources.displayMetrics.density).toInt()
             layoutParams.setMargins(leftMarginInPx, 0, 0, 0) // Child menu: add left margin
         }
+
         holder.binding.root.layoutParams = layoutParams
 
         // Handle click for expanding/collapsing
@@ -95,11 +98,12 @@ class MenuListAdapter(
                     collapsePreviousMenu() // Collapse only previously expanded menu
                     expandChildren(position, menuItem.childMenus)
                 }
+
             }
             else {
                 // Child menu clicked -> Navigate
                 when (menuItem.childMenuCode) {
-                    "M00011" -> context.startActivity(Intent(context, PayoutDMT::class.java))
+                    "M00011" -> context.startActivity(Intent(context,JustPeDashboard::class.java )) //PayoutDMT::class.java
                     "M00012" -> context.startActivity(Intent(context, ScannerFragment::class.java))
                     "M00013" -> navigateToFragment(CreditCardDetailsFragment(), "CreditCard")
                     "M00014" -> context.startActivity(Intent(context, GenerateQRCodeActivity::class.java))
@@ -108,15 +112,17 @@ class MenuListAdapter(
                     "M00087" -> context.startActivity(Intent(context, AdminBankListActivity::class.java))
                     "M00089" -> context.startActivity(Intent(context, MakepaymentReports::class.java))
                     "M00080" -> context.startActivity(Intent(context, TicketStatus::class.java /*DashboardActivity::class.java*/))
-                    "M00042" -> context.startActivity(Intent(context,JustPeDashboard::class.java /*DashboardActivity::class.java*/))
+                    "M00042" -> context.startActivity(Intent(context, ManageKYC::class.java /*DashboardActivity::class.java*/))
                     "M00009" -> context.startActivity(Intent(context,JustPeDashboard::class.java /*DashboardActivity::class.java*/))
                     "M00010" -> navigateToFragment(RechargeFragment(), "FastTag")
+                    "M00098" -> context.startActivity(Intent(context,VPATransactionReports::class.java))
                     else -> { /* Handle other cases */ }
                 }
             }
         }
 
     }
+
 
     fun Int.dpToPx(context: Context): Int =
         (this * context.resources.displayMetrics.density).toInt()
@@ -138,6 +144,7 @@ class MenuListAdapter(
             menuList.addAll(parentPosition + 1, children)
             notifyItemRangeInserted(parentPosition + 1, children.size)
             lastExpandedPosition = parentPosition // Update last expanded position
+
         }
     }
 
@@ -166,6 +173,20 @@ class MenuListAdapter(
             }
         }
     }
+
+
+    fun convertFontAwesomeToIconics(icon: String?): String {
+        if (icon.isNullOrEmpty()) return ""  // default icon
+
+        return icon
+            .replace("fas ", "") // remove fas
+            .replace("fa ", "")  // remove fa
+            .replace("far ", "") // remove far
+            .replace("fab ", "") // remove fab
+            .replace("fa-", "faw-") // replace prefix
+            .trim()
+    }
+
 
 
 }

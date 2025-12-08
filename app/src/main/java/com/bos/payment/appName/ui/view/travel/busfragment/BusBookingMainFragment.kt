@@ -101,7 +101,7 @@ class BusBookingMainFragment : Fragment() {
 
     private fun setDropDown() {
         /**************************************** Get All from location ***************************/
-        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item_selected, Constants.busListName!!)
+        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.busListName!!)
         Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
         bin.fromDestinationSp.adapter = Constants.getAllBusListAdapter
         bin.fromDestinationSp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -127,7 +127,7 @@ class BusBookingMainFragment : Fragment() {
         Constants.getAllBusListAdapter!!.notifyDataSetChanged()
 
         /**************************************** Get All to location ***************************/
-        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item_selected, Constants.toLocationName!!)
+        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.toLocationName!!)
 
         Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
 
@@ -370,6 +370,7 @@ class BusBookingMainFragment : Fragment() {
 
     }
 
+
     @SuppressLint("ResourceAsColor")
     private fun initView() {
         busList = ArrayList()
@@ -404,8 +405,6 @@ class BusBookingMainFragment : Fragment() {
     }
 
 
-
-
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun getAllBusRequaryTicketRes(response: BusRequeryRes?) {
         if (response?.responseHeader?.errorCode == "0000") {
@@ -421,5 +420,6 @@ class BusBookingMainFragment : Fragment() {
             Toast.makeText(requireContext(), response?.responseHeader?.errorInnerException.toString(), Toast.LENGTH_SHORT).show()
         }
     }
+
 
 }

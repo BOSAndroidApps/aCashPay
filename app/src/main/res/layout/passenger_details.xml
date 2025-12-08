@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/passengerDetailsLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -11,19 +12,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Seat Passenger"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textSize="@dimen/dimen_14sp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="@color/black"/>
 
-    <Spinner
-        android:id="@+id/titleSp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/dropdownListPreferredItemHeight"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_14dp"
-        android:background="@drawable/bg_edittext"
-        android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
-        android:entries="@array/title_type"
-        android:paddingStart="@dimen/dimen_10dp"
-        android:paddingEnd="@dimen/dimen_10dp" />
+        android:background="@drawable/fromtoback">
+
+        <Spinner
+            android:id="@+id/titleSp"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/dropdownListPreferredItemHeight"
+            android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
+            android:entries="@array/title_type"
+           />
+
+    </RelativeLayout>
+
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/inputtextlayout_style"
@@ -42,25 +50,28 @@
             android:textAllCaps="true"
             android:textColor="@color/text_color"
             android:textColorHint="@color/button_text_gray" />
+
     </com.google.android.material.textfield.TextInputLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_14dp"
+        android:background="@drawable/fromtoback">
     <Spinner
         android:id="@+id/passengerGender"
         android:layout_width="match_parent"
         android:layout_height="?attr/dropdownListPreferredItemHeight"
-        android:layout_marginTop="@dimen/dimen_14dp"
-        android:background="@drawable/bg_edittext"
         android:dropDownVerticalOffset="?attr/dropdownListPreferredItemHeight"
-        android:entries="@array/gender_array"
-        android:paddingStart="@dimen/dimen_10dp"
-        android:paddingEnd="@dimen/dimen_10dp" />
+        android:entries="@array/gender_array" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/passengerDob"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="@dimen/dimen_20dp"
-        android:background="@drawable/bg_edittext"
+        android:background="@drawable/outerborder"
         android:clickable="true"
         android:drawableStart="@drawable/calendar_icon"
         android:drawablePadding="10dp"
@@ -70,6 +81,6 @@
         android:maxLines="1"
         android:paddingStart="@dimen/dimen_10dp"
         android:textColor="@android:color/black"
-        android:textSize="16sp" />
+        android:textSize="@dimen/dimen_14sp" />
 
 </LinearLayout>

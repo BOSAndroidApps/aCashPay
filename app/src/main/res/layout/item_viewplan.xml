@@ -9,7 +9,8 @@
     android:padding="10dp"
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
-    android:background="@drawable/bg_button_border_blue">
+    android:layout_marginHorizontal="@dimen/dimen_4dp"
+    android:background="@drawable/outerborder">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -35,7 +36,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_regular"
                     android:textColor="@color/black" />
 
                 <TextView
@@ -46,7 +47,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_regular"
                     android:textColor="@color/black" />
 
                 <TextView
@@ -57,7 +58,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_regular"
                     android:textColor="@color/black" />
             </LinearLayout>
 
@@ -75,8 +76,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:textSize="11sp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/black"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/text_color"
                     tools:text="07-Feb-2023" />
 
                 <TextView
@@ -86,8 +87,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:textSize="11sp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/black"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/text_color"
                     tools:text="1.5 GB" />
 
                 <TextView
@@ -97,8 +98,8 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:textSize="11sp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/black"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/text_color"
                     tools:text="28 Days" />
             </LinearLayout>
         </LinearLayout>

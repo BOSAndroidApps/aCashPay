@@ -247,6 +247,7 @@ object Constants {
    var BranchNamee =  "branchname"
    var CashDeposit =  "Cash Deposit"
    var DateSelectionHint =  "Select Date"
+
     lateinit var  dialog : Dialog
 
     val KEY_192 = "your-24-byte-key-here!".toByteArray(Charsets.UTF_8) // 24 bytes
@@ -260,6 +261,9 @@ object Constants {
     var TravelCard: Boolean = false
 
     var TYPE = "RTE"
+    const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
+    var AadharTransactionIdNo : String = ""
+    var AadharVerified : String = ""
 
     var compressedBitmap: Bitmap? = null
     const val OWNER_PAN_CARD: Int = 1
@@ -550,6 +554,59 @@ object Constants {
         // return formatted Iconics name
         return "faw-$name"
     }
+
+    fun isValidPAN(pan: String): Boolean {
+        val regex = Regex("[A-Z]{5}[0-9]{4}[A-Z]{1}")
+        return regex.matches(pan)
+    }
+
+
+    object AadhaarUtils {
+
+        fun isValidAadhaar(aadhaar: String): Boolean {
+            val trimmed = aadhaar.trim()
+            if (!Regex("^\\d{12}\$").matches(trimmed)) return false
+            return verhoeffValidate(trimmed)
+        }
+
+        // Verhoeff checksum
+        private val d = arrayOf(
+            intArrayOf(0,1,2,3,4,5,6,7,8,9),
+            intArrayOf(1,2,3,4,0,6,7,8,9,5),
+            intArrayOf(2,3,4,0,1,7,8,9,5,6),
+            intArrayOf(3,4,0,1,2,8,9,5,6,7),
+            intArrayOf(4,0,1,2,3,9,5,6,7,8),
+            intArrayOf(5,9,8,7,6,0,4,3,2,1),
+            intArrayOf(6,5,9,8,7,1,0,4,3,2),
+            intArrayOf(7,6,5,9,8,2,1,0,4,3),
+            intArrayOf(8,7,6,5,9,3,2,1,0,4),
+            intArrayOf(9,8,7,6,5,4,3,2,1,0)
+        )
+
+        private val p = arrayOf(
+            intArrayOf(0,1,2,3,4,5,6,7,8,9),
+            intArrayOf(1,5,7,6,2,8,3,0,9,4),
+            intArrayOf(5,8,0,3,7,9,6,1,4,2),
+            intArrayOf(8,9,1,6,0,4,3,5,2,7),
+            intArrayOf(9,4,5,3,1,2,6,8,7,0),
+            intArrayOf(4,2,8,6,5,7,3,9,0,1),
+            intArrayOf(2,7,9,3,8,0,6,4,1,5),
+            intArrayOf(7,0,4,6,9,1,3,2,5,8)
+        )
+
+        private val inv = intArrayOf(0,4,3,2,1,5,6,7,8,9)
+
+        private fun verhoeffValidate(num: String): Boolean {
+            var c = 0
+            val len = num.length
+            for (i in 0 until len) {
+                val digit = Character.getNumericValue(num[len - 1 - i])
+                c = d[c][p[i % 8][digit]]
+            }
+            return c == 0
+        }
+    }
+
 
 
 

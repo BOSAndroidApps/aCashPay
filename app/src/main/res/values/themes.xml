@@ -8,9 +8,10 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/teal_700</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="materialThemeOverlay">@null</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -18,19 +19,35 @@
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
+
     <declare-styleable name="SearchableSpinner_Style">
 
         <attr name="hintText" format="string" />
 
     </declare-styleable>
+
     <style name="Theme.Design.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="Theme.SBTMS.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="Theme.SBTMS.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="DialogAnimationUptoDown">
         <item name="android:windowEnterAnimation">@anim/slide_up</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom</item>
     </style>
+
+    <!-- Base application theme. -->
+    <style name="Base.Theme.BOS_App" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="materialCalendarTheme">@style/CalendarThemeOverlay</item>
+    </style>
+
 </resources>

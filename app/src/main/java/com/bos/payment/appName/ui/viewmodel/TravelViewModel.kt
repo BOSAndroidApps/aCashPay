@@ -39,6 +39,9 @@ import com.bos.payment.appName.data.model.travel.flight.FlightTempBookingReq
 import com.bos.payment.appName.data.repository.TravelRepository
 import com.bos.payment.appName.utils.ApiResponse
 import com.bos.payment.appName.utils.Resource
+import com.example.theemiclub.data.model.loginsignup.verification.AAdhaarDetailesReq
+import com.example.theemiclub.data.model.loginsignup.verification.AadharVerificationReq
+import com.example.theemiclub.data.model.loginsignup.verification.PanVerificationReq
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
@@ -55,7 +58,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
 
         viewModelScope.launch {
             try {
-                val response = withTimeout(10_0000) {
+                val response = withTimeout(30_000) {
                     travelRepository.getAllBusCityList(req)
                 }
                 if (response!!.isSuccessful) {
@@ -133,7 +136,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
 //    fun getAllBusSearchList(req: BusSearchReq) = liveData(Dispatchers.IO) {
 //        emit(ApiResponse.loading(data = null))
 //        try {
-//            val response = withTimeout(10_0000) { // 10 seconds timeout
+//            val response = withTimeout(30_000) { // 10 seconds timeout
 //                travelRepository.getAllBusSearchList(req)
 //            }
 //            emit(ApiResponse.success(response))
@@ -159,7 +162,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllBusSeatMap(req: BusSeatMapReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllBusSeatMap(req)
             }
             emit(ApiResponse.success(response))
@@ -186,7 +189,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllBusTempBooking(req: BusTempBookingReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllBusTempBooking(req)
             }
             emit(ApiResponse.success(response))
@@ -212,7 +215,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllAddMoney(req: BusAddMoneyReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllAddMoney(req)
             }
             emit(ApiResponse.success(response))
@@ -239,7 +242,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllBusTicketing(req: BusTicketingReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllBusTicketing(req)
             }
             emit(ApiResponse.success(response))
@@ -266,7 +269,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAddBusTicketRequest(req: AddTicketReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAddBusTicketRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -293,7 +296,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusCommissionRequest(req: BusCommissionReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusCommissionRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -321,7 +324,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAddBusTicketResponse(req: AddTicketResponseReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAddBusTicketResponse(req)
             }
             emit(ApiResponse.success(response))
@@ -348,7 +351,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusBookListResponse(req: BusBookingListReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusBookListResponse(req)
             }
             emit(ApiResponse.success(response))
@@ -375,7 +378,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusTicketCancelResponseReq(req: BusTicketCancelResponseReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusTicketCancelResponseReq(req)
             }
             emit(ApiResponse.success(response))
@@ -397,7 +400,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusTampBookRequest(req: BusTempBookingRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusTampBookRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -423,7 +426,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getTampBusTicketResponse(req: BusTampBookTicketResponseRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusTampBookResponse(req)
             }
             emit(ApiResponse.success(response))
@@ -452,7 +455,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllBusRequary(req: BusRequeryReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllBusRequary(req)
             }
             emit(ApiResponse.success(response))
@@ -478,7 +481,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAllBusTicketHistory(req: BusHistoryReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAllBusHistory(req)
             }
             emit(ApiResponse.success(response))
@@ -505,7 +508,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusTicketCancellationCharge(req: BusTicketCancellationChargeReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusTicketCancellationChargeRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -533,7 +536,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusTicketCancelRequest(req: BusTicketCancelReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusTicketCancelRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -561,7 +564,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getPassangerDetailsRequest(req: BusPassengerDetailsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getPassangerDetails(req)
             }
             emit(ApiResponse.success(response))
@@ -588,7 +591,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getBusCancelTicketRequest(req: BusBookingListReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getBusCancelTicketDetails(req)
             }
             emit(ApiResponse.success(response))
@@ -615,7 +618,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getPassangerDetailsRequest(req: BusPaxRequeryResponseReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getPaxRequeryResponseRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -643,7 +646,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAirportListRequet(req: AirportListReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAirportListRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -670,7 +673,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getFlightSearchRequest(req: FlightSearchReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getFlightSearchRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -697,7 +700,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getFlightRePriseRequest(req: FlightRePriceReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getFlightRepriceRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -727,7 +730,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getFlightTempBookingRequest(req: FlightTempBookingReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getFlightTempBookingRequestt(req)
             }
             emit(ApiResponse.success(response))
@@ -758,7 +761,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getFlightAddPaymentRequest(req: FlightAddPaymentReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getFlightAddPaymentRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -788,7 +791,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAirTicketingRequest(req: AirTicketingReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAirTicketingRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -818,7 +821,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAirTicketReprintRequest(req: AirReprintReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAirTicketReprintRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -848,7 +851,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     fun getAirTicketCancelRequest(req: AirTicketCancelReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = withTimeout(10_0000) { // 10 seconds timeout
+            val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getAirTicketCancelRequest(req)
             }
             emit(ApiResponse.success(response))
@@ -873,6 +876,89 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
             )
         }
     }
+
+
+
+    fun getAadharVerificationRequest(req: AadharVerificationReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(30_000) { // 10 seconds timeout
+                travelRepository.getAadharVarificationRequest(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+
+    fun getAAdhaarDetailesReq(req: AAdhaarDetailesReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(30_000) { // 10 seconds timeout
+                travelRepository.getAadharDetailsReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+
+    fun getPanVerificationReq(req: PanVerificationReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(30_000) { // 10 seconds timeout
+                travelRepository.getPanVerificationReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        }
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
 
 
 }

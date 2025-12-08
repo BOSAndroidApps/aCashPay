@@ -35,8 +35,6 @@
             android:layout_centerVertical="true" />
     </RelativeLayout>
 
-
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -49,21 +47,41 @@
             android:gravity="center_horizontal"
             android:padding="12dp">
 
-            <!-- Profile Image -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                app:cardCornerRadius="55dp"
-                app:cardElevation="5dp"
-                android:translationY="25dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_120dp"
+                android:translationY="25dp"
+                android:gravity="center"
+                android:elevation="@dimen/dimen_20dp">
+
+                <!-- Profile Image -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/profilecard"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    app:cardCornerRadius="55dp">
+
+                    <ImageView
+                        android:id="@+id/imgProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_d_profile" />
+
+                </androidx.cardview.widget.CardView>
 
                 <ImageView
-                    android:id="@+id/imgProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_d_profile" />
-            </androidx.cardview.widget.CardView>
+                    android:id="@+id/cameraicon"
+                    android:layout_width="@dimen/dimen_50dp"
+                    android:layout_height="@dimen/dimen_50dp"
+                    android:src="@drawable/cameraicon"
+                    android:elevation="@dimen/dimen_2dp"
+                    android:layout_marginRight="-20dp"
+                    android:padding="@dimen/dimen_4dp"
+                    android:layout_alignRight="@id/profilecard"
+                    android:layout_alignBottom="@id/profilecard"/>
+
+            </RelativeLayout>
 
             <!-- Main Card -->
             <androidx.cardview.widget.CardView
@@ -71,8 +89,8 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="4dp"
-                app:cardUseCompatPadding="true"
                 android:layout_marginTop="-30dp"
+                app:cardUseCompatPadding="true"
                 android:paddingTop="45dp">
 
                 <LinearLayout
@@ -115,9 +133,23 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <Button
+                android:id="@+id/updateBtn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="@dimen/dimen_8dp"
+                android:backgroundTint="#0D47A1"
+                android:text="UPDATE"
+                android:textColor="#FFFFFF"
+                android:alpha=".4"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
 
         </LinearLayout>
 
     </ScrollView>
+
+
+
 
 </LinearLayout>

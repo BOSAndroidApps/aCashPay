@@ -15,6 +15,7 @@ import com.bos.payment.appName.ui.view.Dashboard.rechargefragment.RechargeFragme
 import com.bos.payment.appName.ui.view.Dashboard.activity.AllServicesSelectionActivity
 import com.bos.payment.appName.ui.view.travel.busfragment.BusBookingMainFragment
 import com.bos.payment.appName.ui.view.travel.flightBooking.fragment.FlightMainFragment
+import com.bos.payment.appName.ui.view.travel.train.Trainpage
 
 class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesModel>, var context: Context, private val activity: AppCompatActivity) : RecyclerView.Adapter<MoneyTransferServicesAdapter.ViewHolder>(){
     var selectionPosition = -1
@@ -42,7 +43,7 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
             holder.binding.servicesName.setTextColor(context.getColor(R.color.colorPrimary))
         } else {
             holder.binding.backcard.visibility = View.GONE
-            holder.binding.servicesName.setTextColor(context.getColor(R.color.text_color))
+            holder.binding.servicesName.setTextColor(context.getColor(R.color.black))
         }
 
 
@@ -51,6 +52,7 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
 
             selectionPosition = position
             notifyDataSetChanged()
+
 
            if(servicesList[position].name.equals(context.getString(R.string.flight)))
            {
@@ -61,6 +63,15 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
            }
 
 
+            if(servicesList[position].name.equals(context.getString(R.string.train)))
+            {
+                // context.startActivity(Intent(context, FlightMainActivity::class.java))
+                if (activity is AllServicesSelectionActivity) {
+                    activity.callFragment(Trainpage(), "fight",servicesList[position].featurecode,"FlightMainFragment")
+                }
+            }
+
+
            if(servicesList[position].name.equals(context.getString(R.string.bus))){
                //context.startActivity(Intent(context, BookingTravel::class.java))
 
@@ -68,6 +79,7 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
                    activity.callFragment(BusBookingMainFragment(), "bus",servicesList[position].featurecode,"BusMainFragment")
                }
            }
+
 
            if(servicesList[position].name.equals(context.getString(R.string.recharge))){
                if (activity is AllServicesSelectionActivity) {

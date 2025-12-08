@@ -17,7 +17,7 @@
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Email"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Agency Name"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Merchant Code"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -98,7 +98,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Admin Code"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -125,7 +125,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Agent Type"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -152,7 +152,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="Application Type"
             android:textSize="14sp"
             android:textColor="#777777" />
@@ -177,7 +177,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight=".6"
             android:text="User ID"
             android:textSize="14sp"
             android:textColor="#777777" />
