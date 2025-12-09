@@ -1,124 +1,130 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <!-- Horizontal scroll should ALWAYS wrap content -->
+
+    <HorizontalScrollView
+        android:id="@+id/hScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:padding="@dimen/dimen_6dp"
-            android:gravity="center"
+        <!-- Vertical scroll inside horizontal scroll -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/vScroll"
             android:layout_width="match_parent"
-            android:weightSum="4"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fillViewport="true"
+            android:scrollbars="none">
 
-            <!-- Lower Berth Layout -->
+            <!-- Row that contains BOTH decks -->
+
             <LinearLayout
-                android:id="@+id/lowerlayout"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_gravity="start"
-                android:layout_weight="2"
-                android:gravity="center"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/outerborder"
-                android:paddingBottom="@dimen/dimen_4dp">
+                android:orientation="horizontal"
+                android:padding="@dimen/dimen_6dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/dimen_4dp"
-                    android:layout_marginTop="@dimen/dimen_4dp"
-                    android:layout_gravity="center">
+                <!-- LOWER DECK -->
+                <LinearLayout
+                    android:id="@+id/lowerlayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/outerborder"
+                    android:orientation="vertical"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/dimen_4dp">
 
-                    <TextView
-                        android:text="Lower Deck"
-                        android:textSize="@dimen/dimen_14sp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="@dimen/dimen_10dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/dimen_4dp">
+
+                        <!-- Left side: Deck name -->
+                        <TextView
+                            android:id="@+id/deckname"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Lower Deck"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:gravity="start"/>
+
+                        <!-- Right side: Steering icon -->
+                        <ImageView
+                            android:id="@+id/bussteering"
+                            android:layout_width="@dimen/dimen_20dp"
+                            android:layout_height="@dimen/dimen_20dp"
+                            android:src="@drawable/handle"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="end"
+                            app:tint="@color/greydark"/>
+                    </LinearLayout>
+
+
+                    <GridLayout
+                        android:id="@+id/lowerBerthGrid"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:useDefaultMargins="true"
+                        android:alignmentMode="alignBounds"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:gravity="center"/>
 
-                    <ImageView
-                        android:layout_width="@dimen/dimen_20dp"
-                        android:layout_height="@dimen/dimen_20dp"
-                        android:src="@drawable/handle"
-                        app:tint="@color/greydark"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="@dimen/dimen_4dp"/>
+                </LinearLayout>
 
-                </RelativeLayout>
+                <!-- UPPER DECK -->
+                <LinearLayout
+                    android:id="@+id/upperlayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/outerborder"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/dimen_20dp"
+                    android:paddingBottom="@dimen/dimen_4dp"
+                    android:visibility="gone"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
 
-                <!-- GridLayout for lower berth seats -->
-                <GridLayout
-                    android:id="@+id/lowerBerthGrid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="10"
-                    android:alignmentMode="alignBounds"
-                    android:useDefaultMargins="true"
-                    android:gravity="center" />
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/dimen_4dp">
+
+                        <TextView
+                            android:text="Upper Deck"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </RelativeLayout>
+
+                    <GridLayout
+                        android:id="@+id/upperBerthGrid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alignmentMode="alignBounds"
+                        android:useDefaultMargins="true"
+                        android:gravity="center"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
+        </androidx.core.widget.NestedScrollView>
 
-            <!-- Upper Berth Layout -->
-            <LinearLayout
-                android:id="@+id/upperlayout"
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_gravity="end"
-                android:layout_marginStart="@dimen/dimen_20dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:visibility="gone"
-                android:background="@drawable/outerborder"
-                android:paddingBottom="@dimen/dimen_4dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/dimen_4dp"
-                    android:layout_marginTop="@dimen/dimen_4dp">
-
-                    <TextView
-                        android:text="Upper Deck"
-                        android:textSize="@dimen/dimen_14sp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:layout_width="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/dimen_10dp"
-                        android:layout_height="wrap_content"/>
-
-                </RelativeLayout>
-
-
-                <!-- GridLayout for upper berth seats -->
-                <GridLayout
-                    android:id="@+id/upperBerthGrid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:columnCount="10"
-                    android:alignmentMode="alignBounds"
-                    android:useDefaultMargins="true"
-                    android:gravity="center" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-    </ScrollView>
-
+    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

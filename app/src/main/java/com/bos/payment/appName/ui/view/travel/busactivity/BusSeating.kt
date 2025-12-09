@@ -1979,9 +1979,9 @@ class BusSeating : AppCompatActivity() {
         bin.proceedBtn.visibility = View.GONE
         bin.proceedToBookBtn.visibility = View.GONE
 
-
         lowerGrid.removeAllViews()
         upperGrid.removeAllViews()
+
         mStash.setStringValue(Constants.seatMap_Key, response.seatMapKey.toString())
 
         Log.d("removeAllViews", mStash.getStringValue(Constants.seatMap_Key, "").toString())
@@ -2003,23 +2003,41 @@ class BusSeating : AppCompatActivity() {
             e.printStackTrace()
         }
 
+        // swapped
+        val maxApiRow = response.seatMap.maxOf { it.row?.toIntOrNull() ?: 0 }
+        val maxApiCol = response.seatMap.maxOf { it.column ?: 0 }
+
+        val totalRows = maxApiCol + 1   // because API column → row
+        val totalCols = maxApiRow + 1   // because API row → column
+
+        lowerGrid.rowCount = totalRows
+        lowerGrid.columnCount = totalCols
+
+        upperGrid.rowCount = totalRows
+        upperGrid.columnCount = totalCols
+
 
         response.seatMap.forEach { seat ->
-            val row = seat.row?.toIntOrNull() ?: 0
-            val col = seat.column ?: 0
+            val apiRow = seat.row?.toIntOrNull() ?: 0
+            val apiCol = seat.column ?: 0
+
+            val row = apiCol     // <-- row takes column
+            val col = apiRow     // <-- column takes row
+
             val zIndex = seat.zIndex?.toIntOrNull() ?: 0
-            val length = seat.length?.toIntOrNull() ?: 1
+            val length = seat.length?.toIntOrNull() ?: 0
             val amount = seat.fareMaster?.basicAmount ?: 0.0
-            val seatName = "₹" + String.format("%.2f", amount)
+           //val seatName = "₹" + String.format("%.2f", amount)
+           //val seatamount = String.format("%.2f", amount)
 
-            val maxColumn = response.seatMap.maxOf { it.column ?: 0 } + 1
-
-            lowerGrid.columnCount = 2
-            upperGrid.columnCount = 2
+            val formatted = if (amount % 1 == 0.0)
+                amount.toInt().toString()
+            else
+                String.format("%.2f", amount)
 
             mStash.setStringValue(Constants.seatNumber, seat.seatNumber.toString())
 
-            val seatView = createSeatView(seatName.toString(), this, row, col, length, seat)
+            val seatView = createSeatView(formatted.toString(), this, row, col, length, seat)
 
             if (zIndex == 1) {
                 upperGrid.addView(seatView)
@@ -2027,46 +2045,43 @@ class BusSeating : AppCompatActivity() {
             else {
                 lowerGrid.addView(seatView)
             }
-
-            if(upperGrid.size>0){
-                upperlayout.visibility = View.VISIBLE
-            }else {
-                upperlayout.visibility = View.GONE
-            }
-
+            upperlayout.visibility = if (upperGrid.childCount > 0) View.VISIBLE else View.GONE
         }
 
     }
 
 
     @SuppressLint("InflateParams", "SetTextI18n")
-    private fun createSeatView(seatName: String, context: Context, row: Int, column: Int, length: Int, seat: SeatMap): View {
-
+    private fun createSeatView(seatAmountText: String, context: Context, row: Int, column: Int, length: Int, seat: SeatMap): View {
         val seatView = LayoutInflater.from(context).inflate(R.layout.seat_item, null)
+
         val tvPrice = seatView.findViewById<TextView>(R.id.tvPrice)
         val pillow = seatView.findViewById<View>(R.id.pillowView)
         val lefthandle = seatView.findViewById<View>(R.id.lefthandle)
         val righthandle = seatView.findViewById<View>(R.id.righthandle)
         val bottomHandle = seatView.findViewById<View>(R.id.bottomHandle)
+        val seatContainer = seatView.findViewById<FrameLayout>(R.id.seatContainer)
 
-        tvPrice.gravity = Gravity.CENTER
-        tvPrice.setPadding(6, 6, 6, 6)
-        tvPrice.maxLines = 1
-        tvPrice.isSingleLine = true
-        tvPrice.ellipsize = TextUtils.TruncateAt.END
+         try{
+             tvPrice.text = "₹$seatAmountText"
+         }
+         catch (e:Exception){
+             e.message
+         }
+
         tvPrice.textSize = 8f
-        tvPrice.text = seatName
 
         val isSleeper = length == 2
 
-        val widthh = if (isSleeper) 100 else 100
-        val heightt = if (isSleeper) 150 else 100
-
+        val seatWidth = if (isSleeper) 60 else 75
+        val seatHeight = if (isSleeper) 160 else 90
 
         val params = GridLayout.LayoutParams().apply {
-            width = widthh
-            height = heightt
-            setMargins(10,10,10,10)
+            width = seatWidth
+            height = seatHeight
+            setMargins(10, 10, 10, 10)
+            rowSpec = if (isSleeper) GridLayout.spec(row, 2) else GridLayout.spec(row)
+            columnSpec = GridLayout.spec(column)
             setGravity(Gravity.CENTER)
         }
 
@@ -2075,9 +2090,8 @@ class BusSeating : AppCompatActivity() {
             lefthandle.visibility= View.GONE
             righthandle.visibility= View.GONE
             bottomHandle.visibility= View.GONE
-            params.width = widthh   // wider seat
-            params.height = heightt
-        } else {
+        }
+        else {
             pillow.visibility = View.GONE
             lefthandle.visibility= View.VISIBLE
             righthandle.visibility= View.VISIBLE
@@ -2086,12 +2100,11 @@ class BusSeating : AppCompatActivity() {
 
         seatView.layoutParams = params
 
-
         // Set initial background
         when {
-            seat.ladiesSeat == true -> seatView.setBackgroundResource(R.drawable.bg_ladies_seat)
-            seat.bookable == true -> seatView.setBackgroundResource(R.drawable.bg_edittext)
-            else -> seatView.setBackgroundResource(R.drawable.booked_seat)
+            seat.ladiesSeat == true -> seatContainer.setBackgroundResource(R.drawable.bg_ladies_seat)
+            seat.bookable == true -> seatContainer.setBackgroundResource(R.drawable.bg_edittext)
+            else -> seatContainer.setBackgroundResource(R.drawable.booked_seat)
         }
 
         seatView.setOnClickListener {
@@ -2100,14 +2113,15 @@ class BusSeating : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+
             if (selectedSeats.contains(seat)) {
                 selectedSeats.remove(seat)
 
                 // Set background after deselection
                 if (seat.ladiesSeat == true) {
-                    seatView.setBackgroundResource(R.drawable.bg_ladies_seat)
+                    seatContainer.setBackgroundResource(R.drawable.bg_ladies_seat)
                 } else {
-                    seatView.setBackgroundResource(R.drawable.bg_edittext)
+                    seatContainer.setBackgroundResource(R.drawable.bg_edittext)
                 }
 
                 // Remove passenger form
@@ -2118,9 +2132,13 @@ class BusSeating : AppCompatActivity() {
 
             }
             else {
+                if(selectedSeats.size==6){
+                    Toast.makeText(context, "Selected seats cannot be greater than 6", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
                 selectedSeats.add(seat)
                 bin.finalSeatLayout.visibility = View.VISIBLE
-                seatView.setBackgroundResource(R.drawable.your_seat)
+                seatContainer.setBackgroundResource(R.drawable.your_seat)
 
                 // Add passenger form
                 val formView = LayoutInflater.from(context).inflate(R.layout.passenger_details, null)

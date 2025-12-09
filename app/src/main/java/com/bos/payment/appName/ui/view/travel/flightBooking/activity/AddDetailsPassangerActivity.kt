@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
+import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.travel.flight.AirRepriceRequests
 import com.bos.payment.appName.data.model.travel.flight.AirportListReq
 import com.bos.payment.appName.data.model.travel.flight.FareDetailsFlightItem
@@ -182,7 +183,8 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
             )
 
         var airportIcon = GetAirlineLogo(flightDetailsPassangerDetail[0]!!.airlineCode)
-        Glide.with(this).load(airportIcon).into(binding.airlineicon)
+        Glide.with(this).load(airportIcon).error(
+            R.drawable.airplaceholder).into(binding.airlineicon)
 
         binding.adultcount.text = adultList.size.toString().plus("/").plus(adultcount)
         binding.childcount.text = childList.size.toString().plus("/").plus(childcount)

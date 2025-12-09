@@ -1,13 +1,14 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base pink background -->
-    <item>
+    <item
+        >
         <shape android:shape="rectangle">
             <solid android:color="#FFCCE5"/>
-
-            <corners
-                android:radius="@dimen/dimen_6dp"/>
-
+            <corners android:topLeftRadius="@dimen/dimen_1dp"
+                android:topRightRadius="@dimen/dimen_1dp"
+                android:bottomLeftRadius="@dimen/dimen_1dp"
+                android:bottomRightRadius="@dimen/dimen_1dp"/>
         </shape>
     </item>
 
@@ -15,4 +16,5 @@
     <item
         android:drawable="@drawable/ic_ladies"
         android:gravity="center" />
+
 </layer-list>

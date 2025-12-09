@@ -82,7 +82,7 @@ class FlightDetailsAdapter (private val context: Context, private var flightList
 
         Glide.with(context)
             .load(airportIcon)
-            .error(R.drawable.ic_error)
+            .error(R.drawable.airplaceholder)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,

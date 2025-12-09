@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
+import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.travel.flight.DataItem
 import com.bos.payment.appName.data.model.travel.flight.FlightsItem
 import com.bos.payment.appName.data.model.travel.flight.SegmentsItem
@@ -60,7 +61,7 @@ class FlightTicketDetailsAdapter (private val context: Context, private var flig
             holder.durationtime.visibility = View.INVISIBLE
 
             var airportIcon = GetAirlineLogo(segmentDataList[position]!!.airlineCode)
-            Glide.with(context).load(airportIcon).into(holder.airlineicon)
+            Glide.with(context).load(airportIcon).error(R.drawable.airplaceholder).into(holder.airlineicon)
 
             holder.airlinename.text=segmentDataList[position]!!.airlineName.plus(" | ")
             holder.flightnumberwithcode.text= segmentDataList[position]!!.airlineCode.plus(" ").plus(segmentDataList[position]!!.flightNumber)
@@ -109,7 +110,7 @@ class FlightTicketDetailsAdapter (private val context: Context, private var flig
 
 
             var airportIcon = GetAirlineLogo(segmentDataList[position]!!.airlineCode)
-            Glide.with(context).load(airportIcon).into(holder.airlineicon)
+            Glide.with(context).load(airportIcon).error(R.drawable.airplaceholder).into(holder.airlineicon)
 
             holder.airlinename.text=segmentDataList[position]!!.airlineName.plus(" | ")
             holder.flightnumberwithcode.text= segmentDataList[position]!!.airlineCode.plus(" ").plus(segmentDataList[position]!!.flightNumber)
