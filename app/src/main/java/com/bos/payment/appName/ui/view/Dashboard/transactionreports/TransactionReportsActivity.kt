@@ -340,8 +340,6 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
-
-
     private fun setReportInSpinner(){
         var adapter = ArrayAdapter(this@TransactionReportsActivity, android.R.layout.simple_spinner_dropdown_item, displayReportList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -387,6 +385,7 @@ class TransactionReportsActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.reportmode.adapter = adapter
     }
+
 
 
     private fun hitApiForGettingTransactionReports(){
@@ -458,6 +457,7 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
+
     fun hitApiForCheckRaiseTicket(transactionID:String){
         runIfConnected {
             val reportReq = CheckRaiseTicketExistReq(
@@ -505,6 +505,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                 }
         }
      }
+
 
 
     fun popupforshowingraiseticketstatus(transactionId : String){
