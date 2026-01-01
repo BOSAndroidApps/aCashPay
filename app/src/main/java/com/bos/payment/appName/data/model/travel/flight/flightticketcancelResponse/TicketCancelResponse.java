@@ -1,5 +1,6 @@
 package com.bos.payment.appName.data.model.travel.flight.flightticketcancelResponse;
 
+import com.bos.payment.appName.data.model.travel.flight.ResponseHeader;
 import com.google.gson.annotations.SerializedName;
 
 public class TicketCancelResponse{

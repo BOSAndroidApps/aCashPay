@@ -29,6 +29,7 @@ class FlightDetailListActivity : AppCompatActivity() {
        lateinit var context: Context
    }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -62,6 +63,7 @@ class FlightDetailListActivity : AppCompatActivity() {
 
     }
 
+
     fun setdataonView(){
 
         binding.fromtocityname.text= FlightConstant.fromCityName.plus(" to ").plus(FlightConstant.toCityName)
@@ -74,6 +76,7 @@ class FlightDetailListActivity : AppCompatActivity() {
 
     }
 
+
     fun setClickListner(){
 
         binding.back.setOnClickListener { finish() }
@@ -84,7 +87,10 @@ class FlightDetailListActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
            }
 
+
         }
+
+
 
 
     }

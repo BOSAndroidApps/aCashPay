@@ -41,6 +41,9 @@ data class BusPaxRequeryResponseReq (
     var apiResponse  : String?,
 
     @SerializedName("paramuser")
-    var paramUser  : String?
+    var paramUser  : String?,
+
+    @SerializedName("Ticketcancelstatus")
+    var ticketcancelstatus  : String?,
 
 )

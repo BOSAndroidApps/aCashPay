@@ -88,7 +88,7 @@ class BusTicketUpcomingAdapter(
             holder.busType.text=(passangerList.get(position).busType)
             holder.mainPassangerName.text=(passangerList.get(position).passangerList?.get(0)!!.paXName)
             holder.travelDate.text=(passangerList.get(position).travelDate)
-            holder.passangerquantity.text=(passangerList.get(position).passangerquantity)
+            holder.passangerquantity.text="${passangerList[position].passangerList!!.size}"
             holder.duration.text= calculateDuration(passangerList.get(position).boardingTime,passangerList.get(position).droppingTime)
 
                 holder.passangerListTable.removeAllViews()
@@ -162,8 +162,7 @@ class BusTicketUpcomingAdapter(
                             )
                             setTextColor(Color.BLACK)
                             gravity = Gravity.START
-                            layoutParams =
-                                TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                            layoutParams = TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                         }
                         tableRow.addView(textView)
                     }
@@ -203,6 +202,7 @@ class BusTicketUpcomingAdapter(
                 fragment.hitApiForTicketCancellationCharge(selectedPositions,position)
             }
         }
+
 
         holder.view_ticket.setOnClickListener {
             if(fragment!=null) {

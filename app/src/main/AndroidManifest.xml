@@ -17,7 +17,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -58,6 +57,38 @@
         android:theme="@style/Theme.BOS_App"
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
+        <activity
+            android:name=".ui.view.promocode.PromocodeDetailsPage"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".ui.view.promocode.PromocodeListActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".notification.NotificationPage"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.view.subscriptionservices.RenewServicesReport"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.BOS_App" />
+
+        <activity
+            android:name=".ui.view.subscriptionservices.RenewServices"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <activity
+            android:name=".ui.view.travel.busactivity.BusFilterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.BOS_App" />
 
         <activity
             android:name=".ui.view.Dashboard.activity.ManageKYC"
@@ -74,86 +105,100 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.makepayment.MakepaymentReports"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.makepayment.AdminBankListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.makepayment.MakePaymentActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.supportmanagement.ChatToAdminActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.supportmanagement.TicketStatus"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.Dashboard.transactionreports.RaiseTicketActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.Dashboard.transactionreports.TransactionReportsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.Dashboard.ToSelf.ToSelfMoneyTransferPage"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+
         <activity
             android:name=".ui.view.Dashboard.tomobile.SendWalletAmountPage"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+
         <activity
             android:name=".ui.view.Dashboard.tomobile.ToMobileSendMoneyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.Dashboard.activity.AllServicesSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.Dashboard.activity.JustPeDashboard"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
+
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightBookingPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightBookedTicketActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.travel.flightBooking.activity.AddDetailsPassangerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightFilterActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightDetailListActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-      <!--  <activity
-            android:name=".ui.view.travel.flightBooking.activity.FlightMainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />-->
+
         <activity
             android:name=".ui.view.travel.busactivity.BusHistory"
             android:exported="false"
@@ -179,10 +224,7 @@
             android:name=".ui.view.travel.busactivity.BusSearchDetails"
             android:exported="false"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.view.travel.busactivity.BookingTravel"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.Dashboard.dmt.FingerCaptureActivity"
             android:exported="false"
@@ -326,6 +368,7 @@
             android:name=".ui.view.ForgotPasswordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.LoginActivity"
             android:exported="false"
@@ -333,14 +376,10 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
-        </activity> <!-- <activity android:name=".ui.view.FingerprintActivity" -->
-        <!-- android:exported="true" -->
-        <!-- tools:ignore="DuplicateActivity"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.MAIN" /> -->
-        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
+
+        </activity>
+
+
         <activity
             android:name=".ui.view.SplashActivity"
             android:exported="true"
@@ -378,6 +417,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+
         <activity-alias
             android:name=".ui.view.UserType3Alias"
             android:enabled="false"
@@ -401,6 +441,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
+        <service
+            android:name=".notification.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

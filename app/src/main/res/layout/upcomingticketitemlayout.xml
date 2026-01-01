@@ -132,8 +132,11 @@
                                 android:padding="2dp"
                                 android:textColor="@color/black"
                                 android:textSize="@dimen/dimen_12sp" />
+
                         </LinearLayout>
+
                     </androidx.cardview.widget.CardView>
+
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -402,7 +405,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/dimen_4dp"
-                        android:text=" Narendra Yadav"
                         android:textColor="@color/black"
                         android:textSize="@dimen/dimen_12sp"
                         app:layout_constraintLeft_toRightOf="@id/pasIcon"
@@ -443,7 +445,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/dimen_4dp"
-                        android:text="01/08/2025"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="@dimen/dimen_12sp"
                         app:layout_constraintLeft_toRightOf="@+id/traveltxt"
@@ -483,7 +485,6 @@
                         android:id="@+id/passangerquantity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="2"
                         android:padding="@dimen/dimen_6dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/black"
@@ -568,7 +569,6 @@
 
 
             </LinearLayout>
-
 
             <TableLayout
                 android:id="@+id/passangerList"

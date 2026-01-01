@@ -182,6 +182,7 @@ class FlightDetailsAdapter (private val context: Context, private var flightList
             (context as FlightDetailListActivity).supportFragmentManager.let { bottomfrag.show(it, FlightDetailsBottomSheet.TAG) }
         }
 
+
     }
 
 

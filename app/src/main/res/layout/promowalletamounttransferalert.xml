@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#33000000">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:alpha=".6"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cashbackdata"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/white"
+        android:layout_margin="@dimen/dimen_4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_6dp">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redeem Cashback"
+                android:textSize="@dimen/dimen_16sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/roboto_bold"
+                android:padding="@dimen/dimen_6dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="12dp" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/light_grey"
+                app:layout_constraintTop_toBottomOf="@+id/title"/>
+
+
+            <TextView
+                android:id="@+id/promocodetxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Promo Code"
+                android:textSize="@dimen/dimen_12sp"
+                android:padding="@dimen/dimen_6dp"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@color/edittext_color"
+                app:layout_constraintTop_toBottomOf="@id/view"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/promocodevalue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ADSRWTGE"
+                android:textSize="@dimen/dimen_14sp"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/edittext_color"
+                app:layout_constraintTop_toBottomOf="@id/promocodetxt"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/chashbacktxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cashback Amount"
+                android:textSize="@dimen/dimen_12sp"
+                android:padding="@dimen/dimen_6dp"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@color/edittext_color"
+                app:layout_constraintTop_toBottomOf="@id/promocodevalue"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/cashbackamount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹100.00"
+                android:textSize="@dimen/dimen_16sp"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:textColor="@color/green"
+                android:fontFamily="@font/roboto_bold"
+                app:layout_constraintTop_toBottomOf="@id/chashbacktxt"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/msg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="This action will transfer the cashback amount to your wallet"
+                android:textSize="@dimen/dimen_12sp"
+                android:padding="@dimen/dimen_4dp"
+                android:textColor="@color/edittext_color"
+                android:background="@color/light_orange_promo"
+                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:layout_marginHorizontal="@dimen/dimen_6dp"
+                app:layout_constraintTop_toBottomOf="@id/cashbackamount"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <View
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/light_grey"
+                app:layout_constraintTop_toBottomOf="@+id/msg"/>
+
+            <Button
+                android:id="@+id/btncancel"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="Cancel"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/greydark"
+                android:layout_margin="@dimen/dimen_10dp"
+                app:layout_constraintRight_toLeftOf="@id/btnDone"
+                app:layout_constraintTop_toBottomOf="@id/view1" />
+
+
+            <Button
+                android:id="@+id/btnDone"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="Transfer to Wallet"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/blue"
+                android:layout_margin="@dimen/dimen_10dp"
+                app:layout_constraintTop_toBottomOf="@id/view1"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/confirmationPayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/white"
+        android:layout_margin="@dimen/dimen_4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_6dp">
+
+            <ImageView
+                android:id="@+id/questionmarks"
+                android:layout_width="@dimen/dimen_50dp"
+                android:layout_height="@dimen/dimen_50dp"
+                android:src="@drawable/questionmarks"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="12dp" />
+
+
+            <TextView
+                android:id="@+id/confirmtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm Redemption"
+                android:textSize="@dimen/dimen_16sp"
+                android:padding="@dimen/dimen_6dp"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/edittext_color"
+                app:layout_constraintTop_toBottomOf="@id/questionmarks"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/msgtxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Are you sure you want to transfer promo cashback to wallet ?"
+                android:textSize="@dimen/dimen_12sp"
+                android:padding="@dimen/dimen_4dp"
+                android:textColor="@color/edittext_color"
+                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:layout_marginHorizontal="@dimen/dimen_6dp"
+                app:layout_constraintTop_toBottomOf="@id/confirmtitle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="Cancel"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/greydark"
+                android:layout_margin="@dimen/dimen_10dp"
+                app:layout_constraintRight_toLeftOf="@id/transfer"
+                app:layout_constraintTop_toBottomOf="@id/msgtxt" />
+
+
+            <Button
+                android:id="@+id/transfer"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:text="Yes,Transfer"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="@color/blue"
+                android:layout_margin="@dimen/dimen_10dp"
+                app:layout_constraintTop_toBottomOf="@id/msgtxt"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

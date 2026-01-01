@@ -13,6 +13,7 @@ import com.bos.payment.appName.data.model.travel.bus.busSeatMap.BusSeatMapReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.AddTicketReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.AddTicketResponseReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusBookingListReq
+import com.bos.payment.appName.data.model.travel.bus.busTicket.BusManageCancelTicketReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPassengerDetailsReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPaxRequeryResponseReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTampBookTicketResponseRequest
@@ -24,6 +25,7 @@ import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketingReq
 import com.bos.payment.appName.data.model.travel.bus.city.BusCityListReq
 import com.bos.payment.appName.data.model.travel.bus.city.BusCityListRes
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionReq
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeReq
 import com.bos.payment.appName.data.model.travel.bus.history.BusHistoryReq
 import com.bos.payment.appName.data.model.travel.bus.searchBus.BusSearchReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
@@ -42,10 +44,13 @@ import com.bos.payment.appName.utils.Resource
 import com.example.theemiclub.data.model.loginsignup.verification.AAdhaarDetailesReq
 import com.example.theemiclub.data.model.loginsignup.verification.AadharVerificationReq
 import com.example.theemiclub.data.model.loginsignup.verification.PanVerificationReq
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import org.json.JSONObject
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 
@@ -504,7 +509,7 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
         }
     }
 
-   //
+
     fun getBusTicketCancellationCharge(req: BusTicketCancellationChargeReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -530,7 +535,6 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
             )
         }
     }
-
 
 
     fun getBusTicketCancelRequest(req: BusTicketCancelReq) = liveData(Dispatchers.IO) {
@@ -559,13 +563,39 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
         }
     }
 
-    //
 
     fun getPassangerDetailsRequest(req: BusPassengerDetailsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             val response = withTimeout(30_000) { // 10 seconds timeout
                 travelRepository.getPassangerDetails(req)
+            }
+            emit(ApiResponse.success(response))
+        } catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        } catch (e: IOException) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "No internet connection. Please check your network."
+                )
+            )
+        } catch (e: Exception) {
+            emit(
+                ApiResponse.error(
+                    data = null,
+                    message = "Something went wrong: ${e.localizedMessage}"
+                )
+            )
+        }
+    }
+
+
+    fun getBusManageCancelTicketRequest(req: BusManageCancelTicketReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(30_000) { // 10 seconds timeout
+                travelRepository.getBusManageCancelTicketReq(req)
             }
             emit(ApiResponse.success(response))
         } catch (e: TimeoutCancellationException) {
@@ -615,31 +645,58 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
     }
 
 
-    fun getPassangerDetailsRequest(req: BusPaxRequeryResponseReq) = liveData(Dispatchers.IO) {
-        emit(ApiResponse.loading(data = null))
-        try {
-            val response = withTimeout(30_000) { // 10 seconds timeout
-                travelRepository.getPaxRequeryResponseRequest(req)
-            }
-            emit(ApiResponse.success(response))
-        } catch (e: TimeoutCancellationException) {
-            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
-        } catch (e: IOException) {
-            emit(
-                ApiResponse.error(
+
+    // ....................Working here for requery response ....................................................................
+    fun getPassangerDetailsRequest(req: BusPaxRequeryResponseReq) =
+        liveData(Dispatchers.IO) {
+
+            emit(ApiResponse.loading(data = null))
+
+            try {
+                val response = withTimeout(30_000) {
+                    travelRepository.getPaxRequeryResponseRequest(req)
+                }
+                emit(ApiResponse.success(response))
+
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string()
+
+                val errorMessage = try {
+                    if (!errorBody.isNullOrEmpty()) {
+                        JSONObject(errorBody).optString("returnMessage", "Something went wrong")
+                    } else {
+                        "Something went wrong"
+                    }
+                } catch (ex: Exception) {
+                    "Something went wrong"
+                }
+
+                emit(ApiResponse.error(data = null, message = errorMessage))
+
+            } catch (e: TimeoutCancellationException) {
+
+                emit(ApiResponse.error(
+                    data = null,
+                    message = "Request timed out. Please try again."
+                ))
+
+            } catch (e: IOException) {
+
+                emit(ApiResponse.error(
                     data = null,
                     message = "No internet connection. Please check your network."
-                )
-            )
-        } catch (e: Exception) {
-            emit(
-                ApiResponse.error(
+                ))
+
+            } catch (e: Exception) {
+
+                emit(ApiResponse.error(
                     data = null,
-                    message = "Something went wrong: ${e.localizedMessage}"
-                )
-            )
+                    message = e.localizedMessage ?: "Unexpected error occurred"
+                ))
+            }
         }
-    }
+
+    //...............................................................................................................................
 
    // for flight .................................................................................................................
 
@@ -958,6 +1015,37 @@ class TravelViewModel (private val travelRepository: TravelRepository) : ViewMod
             )
         }
     }
+
+
+
+    fun ServiceChargeReq(req: ServiceChargeReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                travelRepository.GetServiceChargeReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+
+    }
+
+
+
 
 
 

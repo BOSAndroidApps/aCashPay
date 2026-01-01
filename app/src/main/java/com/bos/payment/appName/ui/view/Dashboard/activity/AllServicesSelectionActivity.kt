@@ -63,12 +63,14 @@ class AllServicesSelectionActivity : AppCompatActivity() {
 
 
     fun addIfActive(icon: Int, name: String, featureCode: String, extra: String = "") {
-      var  activeFeatureCodes = RETAILERALLSERVICES?.filter { it!!.activeYN.equals("Y", ignoreCase = true) }
-            ?.mapNotNull { it!!.featureCode } ?: emptyList()
+     /* var  activeFeatureCodes = RETAILERALLSERVICES?.filter { it!!.activeYN.equals("Y", ignoreCase = true) }?.mapNotNull { it!!.featureCode } ?: emptyList()*/
 
-        if (activeFeatureCodes.contains(featureCode)) {
-            serviceslist.add(MoneyTransferServicesModel(icon, name, featureCode, extra))
+        val matchedService = RETAILERALLSERVICES?.firstOrNull { it?.featureCode == featureCode }
+
+        if (matchedService != null) {
+            serviceslist.add(MoneyTransferServicesModel( icon,  name,  featureCode, matchedService.activeYN ?: "N"))
         }
+
     }
 
 
@@ -83,22 +85,12 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         addIfActive(R.drawable.balanceenquirey, getString(R.string.balanceenquiry), "F0141")
         addIfActive(R.drawable.ministatement, getString(R.string.ministatement), "F0141")
 
-
-       /*serviceslist.add(MoneyTransferServicesModel(R.drawable.eminew,getString(R.string.emi),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.creditcardpayment,getString(R.string.creditcard),"F0125",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.tax,getString(R.string.muncipal),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.cashwithdraw,getString(R.string.cashwithdraw),"F0141",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.balanceenquirey,getString(R.string.balanceenquiry),"F0141",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.ministatement,getString(R.string.ministatement),"","F0141"))*/
-
-
-       // binding.financialserviceslist.layoutManager = GridLayoutManager(this, 3)
         moneyTransferServicesadapter= MoneyTransferServicesAdapter(serviceslist,this@AllServicesSelectionActivity,this@AllServicesSelectionActivity)
         moneyTransferServicesadapter= MoneyTransferServicesAdapter(serviceslist,this@AllServicesSelectionActivity,this@AllServicesSelectionActivity)
         binding.financialserviceslist.adapter = moneyTransferServicesadapter
         moneyTransferServicesadapter.notifyDataSetChanged()
 
-        callFragment(RechargeFragment(), "EMI","F0116","")
+        callFragment(RechargeFragment(), "EMI","F0116",serviceslist[0].activeYN,"")
 
     }
 
@@ -115,15 +107,6 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         addIfActive(R.drawable.postpaidnew,getString(R.string.postpaid),"F0116")
 
 
-       /*serviceslist.add(MoneyTransferServicesModel(R.drawable.rechargenew,getString(R.string.recharge),"F0140",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.postpaidnew,getString(R.string.postpaid),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.dthnew,getString(R.string.dth),"F0140",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.electricitynew,getString(R.string.electricity),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.gasnew,getString(R.string.gas),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.waterbill,getString(R.string.waterbill),"F0116",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.internet,getString(R.string.broadband),"F0116",""))*/
-
-       // binding.financialserviceslist.layoutManager = GridLayoutManager(this, 3)
         moneyTransferServicesadapter= MoneyTransferServicesAdapter(serviceslist,this@AllServicesSelectionActivity,this@AllServicesSelectionActivity)
 
         moneyTransferServicesadapter= MoneyTransferServicesAdapter(serviceslist,this@AllServicesSelectionActivity,this@AllServicesSelectionActivity)
@@ -131,10 +114,9 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         moneyTransferServicesadapter.notifyDataSetChanged()
 
         moneyTransferServicesadapter.selectionPosition  = 0
-        callFragment(RechargeFragment(), "mobile","F0140","")
+        callFragment(RechargeFragment(), "mobile","F0140",serviceslist[0].activeYN,"")
 
     }
-
 
 
     fun  setTravel(){
@@ -144,26 +126,22 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         addIfActive(R.drawable.busnew,getString(R.string.bus),"F0133")
         addIfActive(R.drawable.trainnew,getString(R.string.train),"F0140")
 
-       /* serviceslist.add(MoneyTransferServicesModel(R.drawable.planenew,getString(R.string.flight),"F0134",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.busnew,getString(R.string.bus),"F0133",""))
-        serviceslist.add(MoneyTransferServicesModel(R.drawable.trainnew,getString(R.string.train),"",""))*/
-       // binding.financialserviceslist.layoutManager = GridLayoutManager(this, 3)
-
         moneyTransferServicesadapter= MoneyTransferServicesAdapter(serviceslist,this@AllServicesSelectionActivity,this@AllServicesSelectionActivity)
         binding.financialserviceslist.adapter = moneyTransferServicesadapter
         moneyTransferServicesadapter.notifyDataSetChanged()
 
         moneyTransferServicesadapter.selectionPosition  = 0
-        callFragment(FlightMainFragment(), "flight", "F0134","FlightMainFragment")
+        callFragment(FlightMainFragment(), "flight", "F0134",serviceslist[0].activeYN,"FlightMainFragment")
 
     }
 
 
 
-     fun callFragment(fragment: Fragment, rechargeType: String,featureCode:String,tag: String) {
+     fun callFragment(fragment: Fragment, rechargeType: String,featureCode:String,activestatus:String,tag: String) {
         val bundle = Bundle()
         bundle.putString("RechargeType", rechargeType)
         bundle.putString("FeatureCode", featureCode)
+        bundle.putString("ActiveStatus", activestatus)
         fragment.arguments = bundle
 
         val fragmentManager: FragmentManager = supportFragmentManager
@@ -171,7 +149,6 @@ class AllServicesSelectionActivity : AppCompatActivity() {
         transaction.replace(R.id.fragment, fragment,tag)
         transaction.addToBackStack(tag)
         transaction.commit()
-       // binding.financialserviceslist.visibility= View.GONE
         binding.fragment.visibility=View.VISIBLE
     }
 

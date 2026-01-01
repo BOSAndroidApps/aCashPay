@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +18,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.R
@@ -34,10 +36,13 @@ import com.bos.payment.appName.utils.Constants
 import com.bos.payment.appName.utils.MStash
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.google.gson.Gson
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+
 
 class TransactionReportsActivity : AppCompatActivity() {
     lateinit var binding: ActivityTransactionReportsBinding
@@ -56,6 +61,7 @@ class TransactionReportsActivity : AppCompatActivity() {
     var ToDate: String =""
     lateinit var adapter : TransactionReportAdapter
     lateinit var dialog: Dialog
+    var transactionReports:String =""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,8 +79,20 @@ class TransactionReportsActivity : AppCompatActivity() {
 
     }
 
+    private val createExcelLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) { uri ->
+
+            uri ?: return@registerForActivityResult
+
+            writeExcelToUri(uri,transactionReports)
+        }
+
 
     private fun setClickListner(){
+
+       binding.excellayout.setOnClickListener {
+           createExcelLauncher.launch("Transaction_Report.xlsx")
+       }
+
 
         binding.back.setOnClickListener {
             finish()
@@ -275,6 +293,55 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
+    private fun writeExcelToUri(uri: Uri, reportsList: String) {
+        try {
+            val jsonArray = JSONArray(reportsList)
+            if (jsonArray.length() == 0) {
+                Toast.makeText(this, "No data to write", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val workbook = XSSFWorkbook()
+            val sheet = workbook.createSheet("Transactions")
+
+            // Extract headers
+            val keys = jsonArray.getJSONObject(0).keys().asSequence().toList()
+
+            // Header row
+            val headerRow = sheet.createRow(0)
+            keys.forEachIndexed { index, key ->
+                headerRow.createCell(index).setCellValue(key)
+            }
+
+            // Data rows
+            for (i in 0 until jsonArray.length()) {
+                val row = sheet.createRow(i + 1)
+                val obj = jsonArray.getJSONObject(i)
+                keys.forEachIndexed { colIndex, key ->
+                    row.createCell(colIndex).setCellValue(obj.optString(key, ""))
+                }
+            }
+
+            // Auto-size columns
+            keys.indices.forEach { sheet.autoSizeColumn(it) }
+
+            // Write to file
+            contentResolver.openOutputStream(uri)?.use { outputStream ->
+                workbook.write(outputStream)
+                outputStream.flush()
+            }
+
+            workbook.close()
+            Toast.makeText(this, "File saved successfully", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error saving file: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+
+
     private fun setReportInSpinner(){
         var adapter = ArrayAdapter(this@TransactionReportsActivity, android.R.layout.simple_spinner_dropdown_item, displayReportList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -306,6 +373,7 @@ class TransactionReportsActivity : AppCompatActivity() {
         depositModeList.add("Wallet Transfer")
         depositModeList.add("Refunds Deposit")
         depositModeList.add("To Mobile Deposit")
+        depositModeList.add("Promo cashback")
 
 
         transferModeList.add("To Mobile Transfer")
@@ -348,8 +416,10 @@ class TransactionReportsActivity : AppCompatActivity() {
                                             response.data!!.forEach { unit->
                                                 if(response.data.size>0){
                                                     binding.notfoundlayout.visibility= View.GONE
+                                                    binding.excellayout.visibility= View.VISIBLE
                                                     binding.reportslayout.visibility = View.VISIBLE
                                                     var datalist = response.data
+                                                    transactionReports = Gson().toJson(datalist)
                                                     adapter= TransactionReportAdapter(this,datalist)
                                                     binding.reportslayout.adapter=adapter
                                                     adapter.notifyDataSetChanged()
@@ -357,6 +427,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                                                 else{
                                                     binding.notfoundlayout.visibility= View.VISIBLE
                                                     binding.reportslayout.visibility = View.GONE
+                                                    binding.excellayout.visibility= View.GONE
                                                 }
 
                                             }
@@ -364,6 +435,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                                         else{
                                             binding.notfoundlayout.visibility= View.VISIBLE
                                             binding.reportslayout.visibility = View.GONE
+                                            binding.excellayout.visibility= View.GONE
                                         }
                                     }
                                 }

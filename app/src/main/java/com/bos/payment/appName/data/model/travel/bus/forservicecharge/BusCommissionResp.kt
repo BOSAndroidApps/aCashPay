@@ -8,7 +8,7 @@ data class BusCommissionResp(
 	val returnCode: Any? = null,
 
 	@field:SerializedName("data")
-	val data: List<DataItem> = emptyList(),
+	val data: List<BusCommissionDataItem> = emptyList(),
 
 	@field:SerializedName("returnMessage")
 	val returnMessage: String? = null,
@@ -17,7 +17,7 @@ data class BusCommissionResp(
 	val isSuccess: Boolean? = null
 )
 
-data class DataItem(
+data class BusCommissionDataItem(
 
 	@field:SerializedName("productSource")
 	val productSource: String? = null,

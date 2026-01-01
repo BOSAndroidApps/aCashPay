@@ -1,5 +1,6 @@
 package com.bos.payment.appName.data.repository
 
+import com.bos.payment.appName.data.model.promocode.GetPromotionListReq
 import com.bos.payment.appName.data.model.travel.bus.addMoney.BusAddMoneyReq
 import com.bos.payment.appName.data.model.travel.bus.busBooking.BusTempBookingReq
 import com.bos.payment.appName.data.model.travel.bus.busRequery.BusRequeryReq
@@ -7,6 +8,7 @@ import com.bos.payment.appName.data.model.travel.bus.busSeatMap.BusSeatMapReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.AddTicketReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.AddTicketResponseReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusBookingListReq
+import com.bos.payment.appName.data.model.travel.bus.busTicket.BusManageCancelTicketReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPassengerDetailsReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPaxRequeryResponseReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTampBookTicketResponseRequest
@@ -17,6 +19,7 @@ import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketCancella
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketingReq
 import com.bos.payment.appName.data.model.travel.bus.city.BusCityListReq
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionReq
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeReq
 import com.bos.payment.appName.data.model.travel.bus.history.BusHistoryReq
 import com.bos.payment.appName.data.model.travel.bus.searchBus.BusSearchReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
@@ -52,6 +55,7 @@ class TravelRepository(private val travelInterface: TravelInterface, private val
     suspend fun getBusTicketCancelRequest(req:BusTicketCancelReq)= travelInterface.getBusTicketCancel(req)
     suspend fun getPassangerDetails(req: BusPassengerDetailsReq)= apiInterface!!.getPassangerDetails(req)
     suspend fun getBusCancelTicketDetails(req: BusBookingListReq)= apiInterface!!.getBusCancelList(req)
+    suspend fun getBusManageCancelTicketReq(req: BusManageCancelTicketReq)= apiInterface!!.getManageBusCancelList(req)
     suspend fun getPaxRequeryResponseRequest(req: BusPaxRequeryResponseReq)= apiInterface!!.getPaxRequeryResponseReq(req)
 
 
@@ -84,6 +88,11 @@ class TravelRepository(private val travelInterface: TravelInterface, private val
     suspend fun getAadharDetailsReq(req: AAdhaarDetailesReq) = travelInterface.getAadharDetails(req)
 
     suspend fun getPanVerificationReq(req: PanVerificationReq) = travelInterface.getPanVarification(req)
+
+
+    suspend fun GetServiceChargeReq(req: ServiceChargeReq)= apiInterface!!.GetServiceChargeReq(req)
+
+
 
 
 

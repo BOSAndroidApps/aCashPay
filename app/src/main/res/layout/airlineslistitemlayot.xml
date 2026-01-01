@@ -8,8 +8,8 @@
 
     <CheckBox
         android:id="@+id/airlinecheck"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:buttonTint="@color/text_hint_color"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -42,7 +42,7 @@
                 android:id="@+id/titlelayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Price Summery"
+                android:text="Price Summary"
                 android:textColor="@color/black"
                 android:textSize="@dimen/dimen_16sp"
                 android:textStyle="bold"
@@ -64,6 +64,150 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/titlelayout"/>
 
+            <LinearLayout
+                android:id="@+id/pricebreakuplayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/warningmsg">
+
+                <LinearLayout
+                    android:id="@+id/seaterlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/dimen_4dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pricebreakuplayout">
+
+                    <TextView
+                        android:id="@+id/seatetxt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Seater Fare"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:fontFamily="@font/roboto_medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".2"
+                        android:text=":" />
+
+                    <TextView
+                        android:id="@+id/seateramount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:textColor="@color/text_color" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/sleeperlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/dimen_4dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pricebreakuplayout">
+
+                    <TextView
+                        android:id="@+id/sleepertxt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Sleeper Fare"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:fontFamily="@font/roboto_medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".2"
+                        android:text=":" />
+
+                    <TextView
+                        android:id="@+id/sleeperamount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:textColor="@color/text_color" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/flightbasefarelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/dimen_4dp"
+                    android:visibility="gone"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pricebreakuplayout">
+
+                    <TextView
+                        android:id="@+id/flightbasefaretxt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Base Fare (2)"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:fontFamily="@font/roboto_medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".2"
+                        android:text=":" />
+
+                    <TextView
+                        android:id="@+id/flightbasefareamount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:textColor="@color/text_color" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/operatorgstlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/dimen_4dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pricebreakuplayout">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Operator GST"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:fontFamily="@font/roboto_medium" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".2"
+                        android:text=":" />
+
+                    <TextView
+                        android:id="@+id/operatorgst"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:textColor="@color/text_color" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/transferamtlayout"
@@ -72,7 +216,7 @@
                 android:padding="@dimen/dimen_4dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/warningmsg">
+                app:layout_constraintTop_toBottomOf="@+id/pricebreakuplayout">
 
                 <TextView
                     android:layout_width="0dp"
@@ -80,6 +224,7 @@
                     android:layout_weight="1"
                     android:text="Onword Fare "
                     android:textColor="@color/black"
+                    android:textSize="@dimen/dimen_14sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -93,6 +238,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textSize="@dimen/dimen_14sp"
                     android:textColor="@color/text_color" />
 
             </LinearLayout>
@@ -124,6 +270,7 @@
                             android:layout_height="wrap_content"
                             android:text="Convenience Fee "
                             android:textColor="@color/black"
+                            android:textSize="@dimen/dimen_14sp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -168,6 +315,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textSize="@dimen/dimen_14sp"
                     android:textColor="@color/text_color" />
 
             </LinearLayout>
@@ -192,7 +340,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight=".2"
-                        android:text="BaseFare"
+                        android:text="Service Charge"
                         android:textColor="@color/text_color"
                         android:textSize="@dimen/dimen_12sp" />
 
@@ -250,6 +398,7 @@
                     android:layout_weight="1"
                     android:text="Grand Total "
                     android:textColor="@color/black"
+                    android:textSize="@dimen/dimen_14sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -263,6 +412,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textSize="@dimen/dimen_14sp"
                     android:textColor="@color/green" />
 
             </LinearLayout>

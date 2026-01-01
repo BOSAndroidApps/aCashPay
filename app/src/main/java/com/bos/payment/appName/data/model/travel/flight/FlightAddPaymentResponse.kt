@@ -2,31 +2,44 @@ package com.bos.payment.appName.data.model.travel.flight
 
 import com.google.gson.annotations.SerializedName
 
-data class FlightAddPaymentResponse(@SerializedName("amount")
-                                    val amount: Int = 0,
-                                    @SerializedName("debitedAmount")
-                                    val debitedAmount: Int = 0,
-                                    @SerializedName("paymentID")
-                                    val paymentID: String = "",
-                                    @SerializedName("response_Header")
-                                    val responseHeader: FlightResponseHeader,
-                                    @SerializedName("message")
-                                    val message: String = "",
-                                    @SerializedName("statuss")
-                                    val statuss: String = "",
-                                    @SerializedName("value")
-                                    val value: String = "")
+data class FlightAddPaymentResponse(
 
+	@field:SerializedName("amount")
+	val amount: String? = null,
 
+	@field:SerializedName("debitedAmount")
+	val debitedAmount: String? = null,
 
-data class FlightResponseHeader(@SerializedName("status_Id")
-                          val statusId: String = "",
-                          @SerializedName("error_Code")
-                          val errorCode: String = "",
-                          @SerializedName("error_Desc")
-                          val errorDesc: String = "",
-                          @SerializedName("error_InnerException")
-                          val errorInnerException: String = "",
-                          @SerializedName("request_Id")
-                          val requestId: String = "")
+	@field:SerializedName("paymentID")
+	val paymentID: String? = null,
 
+	@field:SerializedName("response_Header")
+	val responseHeader: FlightResponseHeader? = null,
+
+	@field:SerializedName("message")
+	val message: String? = null,
+
+	@field:SerializedName("statuss")
+	val statuss: String? = null,
+
+	@field:SerializedName("value")
+	val value: String? = null
+)
+
+data class FlightResponseHeader(
+
+	@field:SerializedName("status_Id")
+	val statusId: String? = null,
+
+	@field:SerializedName("error_Code")
+	val errorCode: String? = null,
+
+	@field:SerializedName("error_Desc")
+	val errorDesc: String? = null,
+
+	@field:SerializedName("error_InnerException")
+	val errorInnerException: String? = null,
+
+	@field:SerializedName("request_Id")
+	val requestId: String? = null
+)

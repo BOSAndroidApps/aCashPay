@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha=".3"
+        android:background="@color/black" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/dimen_6dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_6dp"
+            android:padding="@dimen/dimen_10dp">
+
+            <TextView
+                android:id="@+id/titlelayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirm Cancellation"
+                android:textColor="@color/black"
+                android:textSize="@dimen/dimen_16sp"
+                android:fontFamily="@font/roboto_medium"
+                android:layout_marginLeft="@dimen/dimen_10dp"
+                app:layout_constraintLeft_toRightOf="@+id/alerticon"
+                app:layout_constraintBottom_toBottomOf="@+id/alerticon" />
+
+            <ImageView
+                android:id="@+id/alerticon"
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:src="@drawable/alerticon"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/titlelayout"
+                app:layout_constraintBottom_toBottomOf="@+id/titlelayout"/>
+
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/alerticon"
+                android:textSize="@dimen/dimen_12sp"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:textColor="@color/edittext_color"
+                android:text="Are you sure you want to cancel this booking?"/>
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/greylight"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                app:layout_constraintTop_toBottomOf="@+id/subtitle"/>
+
+            <TextView
+                android:id="@+id/policytitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/view"
+                android:textSize="@dimen/dimen_14sp"
+                android:textColor="@color/edittext_color"
+                android:text="Cancellation Policy"
+                android:layout_marginTop="@dimen/dimen_10dp"/>
+
+            <LinearLayout
+                android:id="@+id/transferamtlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="@dimen/dimen_6dp"
+                app:layout_constraintTop_toBottomOf="@+id/policytitle">
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_20dp"
+                    android:layout_height="@dimen/dimen_20dp"
+                    android:src="@drawable/doticon"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/cancelpolicy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:textSize="@dimen/dimen_12sp"
+                    android:textColor="@color/text_color" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/adminservicecharge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginTop="@dimen/dimen_6dp"
+                app:layout_constraintTop_toBottomOf="@+id/transferamtlayout">
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_20dp"
+                    android:layout_height="@dimen/dimen_20dp"
+                    android:src="@drawable/doticon"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/servicechargepolicy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:textSize="@dimen/dimen_12sp"
+                    android:textColor="@color/text_color" />
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/greylight"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                app:layout_constraintTop_toBottomOf="@+id/adminservicecharge"/>
+
+            <TextView
+                android:id="@+id/cancelchargetitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/view2"
+                android:text="Cancellation Charges"
+                android:textSize="@dimen/dimen_14sp"
+                android:textColor="@color/edittext_color"
+                android:layout_marginTop="@dimen/dimen_10dp" />
+
+            <LinearLayout
+                android:id="@+id/chargesdetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/cancelchargetitle"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/dimen_4dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/dimen_4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Base Fare"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="@dimen/dimen_14sp"/>
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|end"
+                        android:text=":"/>
+
+                    <TextView
+                        android:id="@+id/basefareamt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_regular"/>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/dimen_4dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Operator Charge"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="@dimen/dimen_14sp"/>
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|end"
+                        android:text=":"/>
+
+                    <TextView
+                        android:id="@+id/operatorcharge"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_regular"/>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/servicechargelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/dimen_4dp">
+
+                    <LinearLayout
+                        android:id="@+id/viewbreaklayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin Cancel Charge"
+                            android:textColor="@color/black"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textSize="@dimen/dimen_14sp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="(Including GST)"
+                                android:textColor="@color/text_color"
+                                android:textSize="@dimen/dimen_12sp"/>
+
+                            <ImageView
+                                android:id="@+id/info"
+                                android:layout_width="@dimen/dimen_20dp"
+                                android:layout_height="17dp"
+                                android:layout_marginStart="@dimen/dimen_4dp"
+                                android:src="@drawable/info"
+                                app:tint="@color/text_color"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical|end"
+                        android:text=":"/>
+
+                    <TextView
+                        android:id="@+id/cancellationcharge"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="center"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_regular"/>
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/chargesdetailslayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_grey"
+                    android:padding="@dimen/dimen_4dp"
+                    android:visibility="gone"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/servicechargelayout">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/basefaretxt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight=".2"
+                            android:text="Service Charge"
+                            android:textColor="@color/text_color"
+                            android:textSize="@dimen/dimen_12sp" />
+
+                        <TextView
+                            android:id="@+id/servicescharge"
+                            android:layout_width="0dp"
+                            android:layout_weight=".5"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="15"
+                            android:textColor="@color/text_color"
+                            android:textSize="@dimen/dimen_12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight=".2"
+                            android:text="GST"
+                            android:textColor="@color/text_color"
+                            android:textSize="@dimen/dimen_12sp" />
+
+                        <TextView
+                            android:id="@+id/gstamount"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight=".5"
+                            android:text="15"
+                            android:textColor="@color/text_color"
+                            android:textSize="@dimen/dimen_12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/notemsg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/chargesdetailslayout"
+                    android:textSize="@dimen/dimen_10sp"
+                    android:layout_marginTop="@dimen/dimen_10dp"
+                    android:visibility="gone"
+                    android:textColor="@color/edittext_color"
+                    android:text="Note:If you proceed with cancellation, the refundable amount will be ₹0 " />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/proceedmsg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/chargesdetails"
+                android:textSize="@dimen/dimen_12sp"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                android:textColor="@color/edittext_color"
+                android:text="Do you want to proceed?"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/proceedmsg">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:id="@+id/cancel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_20dp"
+                    android:background="@drawable/searchbutton"
+                    android:backgroundTint="#D5D5D7"
+                    app:layout_constraintTop_toBottomOf="@+id/transferamtlayout">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="@dimen/dimen_10dp"
+                        android:text="No"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/dimen_14sp" />
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="@dimen/dimen_30dp"
+                    android:layout_height="@dimen/dimen_2dp"
+                    android:background="@color/greylight"
+                    android:layout_marginTop="@dimen/dimen_4dp" />
+
+                <LinearLayout
+                    android:id="@+id/donebutton"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_20dp"
+                    android:background="@drawable/searchbutton"
+                    android:backgroundTint="#007BFF"
+                    app:layout_constraintTop_toBottomOf="@+id/transferamtlayout">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="@dimen/dimen_10dp"
+                        android:text="Yes,Cancel"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/dimen_14sp"
+                       android:fontFamily="@font/roboto_bold" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

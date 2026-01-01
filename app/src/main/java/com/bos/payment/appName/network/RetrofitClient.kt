@@ -20,16 +20,19 @@ object RetrofitClient {
      /*Demo Api*/
      private const val BASE_URLAPI: String = "https://api.boscenter.in/"
 
-    /* Live Api Fr Login*/
-    private const val BASE_GETURL: String = "https://bosapi.bos.center/"
-
+    /* UAT Api Fr Login*/
+    private const val BASE_GETURL: String = "https://bosapi.bos.center"
     const val IMAGE_BASE_URL: String = "https://bosapi.bos.center"
 
+    /* Live Api Fr Login*/
+   /* private const val BASE_GETURL: String = "https://bosapi.businessonlinesolution.in"
+    const val IMAGE_BASE_URL: String = "https://bosapi.businessonlinesolution.in"*/
+
     /*Demo Api*/
-   // private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
+    private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
 
     /*Live Api*/
-    private const val TRAVEL_URL: String = "https://travel.bospay.in/"
+   // private const val TRAVEL_URL: String = "https://travel.bospay.in/"
 
     private const val PAYOUT_URL: String = "https://payout.aopay.in/"
 
@@ -50,6 +53,7 @@ object RetrofitClient {
         return retrofit!!.create(ApiInterface::class.java)
     }
 
+
     fun getService2(): ApiInterface? {
         if (retrofit2 == null) {
             retrofit2 = Retrofit.Builder()
@@ -59,6 +63,7 @@ object RetrofitClient {
         }
         return retrofit2!!.create(ApiInterface::class.java)
     }
+
 
     private fun getInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
@@ -76,6 +81,7 @@ object RetrofitClient {
             .build()
     }
 
+
     private fun getInstanceData(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
@@ -91,6 +97,7 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .build()
     }
+
 
     private fun getAllInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
@@ -109,6 +116,7 @@ object RetrofitClient {
             .build()
     }
 
+
     private fun getAllTravelInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
@@ -125,6 +133,7 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .build()
     }
+
 
     private fun getRechargeInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
@@ -143,6 +152,7 @@ object RetrofitClient {
             .build()
     }
 
+
     private fun getAllPayoutInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
@@ -159,6 +169,7 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .build()
     }
+
 
     private fun getAllInstancePAN(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings

@@ -29,104 +29,103 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:background="@color/blue"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/dimen_10dp"
+                android:background="@drawable/fromtoback">
 
                 <ImageView
                     android:id="@+id/backBtn"
                     android:layout_width="@dimen/dimen_40dp"
                     android:layout_height="30dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="@dimen/dimen_10dp"
-                    android:layout_marginTop="@dimen/dimen_10dp"
-                    android:gravity="start"
-                    android:src="@drawable/ic_back" />
-            </RelativeLayout>
+                    android:src="@drawable/left_arrow"
+                    android:layout_gravity="center_vertical"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:gravity="center"
-                android:text="Select your seat!"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginStart="@dimen/dimen_60dp"
-                android:layout_marginTop="@dimen/dimen_4dp"
-                android:layout_marginEnd="@dimen/dimen_60dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/fromLocation"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="end"
-                    android:text="Pune"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:orientation="vertical"
+                    android:padding="@dimen/dimen_2dp">
 
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="20dp"
-                    android:layout_weight=".8"
-                    android:src="@drawable/arrow_swap" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="Select seats"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/edittext_color" />
 
-                <TextView
-                    android:id="@+id/toLocation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="start"
-                    android:text="Mumbai"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/fromLocation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="Pune"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:textColor="@color/edittext_color" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="to"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:layout_marginLeft="@dimen/dimen_4dp"
+                            android:layout_marginRight="@dimen/dimen_4dp"
+                            android:textColor="@color/edittext_color"/>
+
+                        <TextView
+                            android:id="@+id/toLocation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="Mumbai"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:textColor="@color/edittext_color" />
+
+                        <TextView
+                            android:id="@+id/dateAndTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="20 - April - 2025"
+                            android:textColor="@color/edittext_color"
+                            android:textSize="14sp"
+                            android:layout_marginLeft="@dimen/dimen_4dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/dateAndTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/roboto_medium"
-                android:text="20 - April - 2025"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-
-            <!-- Card with Bus Info -->
+            <!-- Bus Info Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/dimen_10dp"
-                android:layout_marginTop="@dimen/dimen_4dp"
-                android:layout_marginEnd="@dimen/dimen_10dp"
-                android:background="@drawable/bg_button_plane"
-                android:padding="@dimen/dimen_10dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="@dimen/dimen_10dp"
-                app:cardPreventCornerOverlap="true"
-                app:cardUseCompatPadding="false">
+                app:cardCornerRadius="@dimen/dimen_12dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/dimen_10dp">
+                    android:padding="@dimen/dimen_12dp">
 
+                    <!-- Company Name & Price -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -136,72 +135,64 @@
                             android:id="@+id/companyName"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1.5"
+                            android:layout_weight="1"
                             android:fontFamily="@font/roboto_medium"
-                            android:gravity="start"
-                            android:text="Company Name"
+                            android:text="VRL Travels"
                             android:textColor="@color/black"
-                            android:textSize="@dimen/dimen_16sp"
+                            android:textSize="@dimen/dimen_14sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/travelAmount"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/dimen_10dp"
-                            android:layout_weight=".5"
-                            android:fontFamily="@font/roboto_medium"
-                            android:gravity="end"
                             android:text="₹ 600"
-                            android:textColor="@color/light_orange"
-                            android:textSize="@dimen/dimen_16sp"
+                            android:visibility="gone"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="@dimen/dimen_14sp"
                             android:textStyle="bold" />
-                    </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/busName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="@dimen/dimen_4dp"
-                        android:fontFamily="@font/roboto_medium"
-                        android:gravity="start"
-                        android:text="Bus Name"
-                        android:textSize="@dimen/dimen_14sp" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dimen_4dp"
-                        android:orientation="horizontal">
+                        android:layout_gravity="center">
 
+                        <!-- Bus Type -->
+                        <TextView
+                            android:id="@+id/busName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AC Sleeper (2+1)"
+                            android:layout_marginTop="@dimen/dimen_2dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="@color/edittext_color" />
+                    </LinearLayout>
+
+                    <!-- Timing Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/dimen_2dp"
+                        android:gravity="center_vertical">
+
+                        <!-- Start Time -->
                         <TextView
                             android:id="@+id/arrivalTime"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
+                            android:text="6:00 PM"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/dimen_14sp"
                             android:fontFamily="@font/roboto_medium"
-                            android:gravity="start"
-                            android:text="6:00 PM - 3:00 AM"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/dimen_10sp"
-                            android:textStyle="bold" />
+                            android:gravity="start" />
 
-                        <TextView
-                            android:id="@+id/totalTime"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="10dp"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:text="9h"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/dimen_12sp"
-                            android:textStyle="bold" />
                     </LinearLayout>
+
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
@@ -209,10 +200,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-30dp"
             android:layout_marginBottom="@dimen/dimen_14dp"
-            android:orientation="vertical"
-            android:visibility="visible">
+            android:orientation="vertical">
 
             <!-- Seat Booking Layout -->
             <androidx.core.widget.NestedScrollView
@@ -229,132 +218,144 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dimen_6dp"
                         android:layout_weight="6"
-                        app:cardBackgroundColor="@color/white"
-                        app:cardCornerRadius="@dimen/dimen_10dp">
+                        app:cardBackgroundColor="@color/white">
 
                         <LinearLayout
+                            android:id="@+id/boradingdroplayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:weightSum="4"
                             android:paddingBottom="@dimen/dimen_6dp"
+                            android:visibility="gone"
                             android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/seatSelectBtn"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1.5"
-                            android:fontFamily="@font/roboto_medium"
-                            android:paddingStart="10sp"
-                            android:text="Select seat"
-                            android:textAllCaps="false"
-                            android:textColor="@color/black"
-                            android:textSize="@dimen/dimen_16sp" />
 
                             <TextView
                                 android:id="@+id/pickupAndDroppingPoint"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:layout_weight="2.5"
+                                android:gravity="center"
                                 android:fontFamily="@font/roboto_medium"
-                                android:paddingStart="10sp"
                                 android:text="Pick-up &amp; Dropping point"
                                 android:textAllCaps="false"
-                                android:textColor="@color/black"
+                                android:textColor="@color/edittext_color"
                                 android:textSize="@dimen/dimen_16sp" />
+
                         </LinearLayout>
+
                         <LinearLayout
                             android:id="@+id/seatBookingLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="30dp"
                             android:orientation="vertical"
                             android:visibility="visible">
 
-                            <LinearLayout
+                            <androidx.cardview.widget.CardView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/dimen_20dp"
-                                android:orientation="horizontal">
+                                app:cardCornerRadius="@dimen/dimen_8dp"
+                                app:cardElevation="4dp"
+                                app:cardUseCompatPadding="true">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="10dp"
-                                    android:layout_weight="2"
-                                    android:orientation="horizontal">
+                                    android:orientation="vertical"
+                                    android:padding="@dimen/dimen_6dp">
 
-                                    <ImageView
-                                        android:layout_width="18dp"
-                                        android:layout_height="20dp"
-                                        android:layout_marginStart="10dp"
-                                        android:src="@drawable/booked" />
-
+                                    <!-- Title -->
                                     <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:paddingStart="10sp"
-                                        android:text="Booked"
-                                        android:textColor="@color/text_color"
-                                        android:textAllCaps="false"
-                                        android:textSize="@dimen/dimen_14sp"
-                                        android:textStyle="bold" />
-                                </LinearLayout>
+                                        android:text="Bus Info"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:textSize="@dimen/dimen_12sp"
+                                        android:textColor="@color/black"
+                                        android:paddingBottom="@dimen/dimen_8dp"/>
 
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="-20dp"
-                                    android:layout_marginEnd="@dimen/dimen_10dp"
-                                    android:layout_weight="2"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_marginStart="@dimen/dimen_20dp"
-                                        android:src="@drawable/available_seat" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:paddingStart="10sp"
-                                        android:text="Available"
-                                        android:textAllCaps="false"
-                                        android:textColor="@color/text_color"
-                                        android:textSize="@dimen/dimen_14sp"
-                                        android:textStyle="bold" />
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="-20dp"
-                                    android:layout_marginEnd="@dimen/dimen_10dp"
-                                    android:layout_weight="2"
-                                    android:orientation="horizontal">
-
-                                    <ImageView
-                                        android:layout_width="20dp"
-                                        android:layout_height="20dp"
-                                        android:layout_marginStart="@dimen/dimen_10dp"
-                                        android:src="@drawable/your_seat" />
-
-                                    <TextView
+                                    <!-- Seat Status Row -->
+                                    <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:paddingStart="10sp"
-                                        android:text="Your Seat"
-                                        android:textAllCaps="false"
-                                        android:textSize="@dimen/dimen_14sp"
-                                        android:textColor="@color/text_color"
-                                        android:textStyle="bold" />
+                                        android:orientation="horizontal"
+                                        android:gravity="center_vertical"
+                                        android:weightSum="3">
+
+                                        <!-- Booked -->
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="horizontal"
+                                            android:gravity="center_vertical">
+
+                                            <ImageView
+                                                android:layout_width="20dp"
+                                                android:layout_height="20dp"
+                                                android:src="@drawable/booked"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="@dimen/dimen_6dp"
+                                                android:text="Booked"
+                                                android:fontFamily="@font/roboto_medium"
+                                                android:textSize="@dimen/dimen_12sp"
+                                                android:textColor="@color/text_color"/>
+                                        </LinearLayout>
+
+                                        <!-- Available -->
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="horizontal"
+                                            android:gravity="center_vertical">
+
+                                            <ImageView
+                                                android:layout_width="20dp"
+                                                android:layout_height="20dp"
+                                                android:src="@drawable/available_seat"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="@dimen/dimen_6dp"
+                                                android:text="Available"
+                                                android:fontFamily="@font/roboto_medium"
+                                                android:textSize="@dimen/dimen_12sp"
+                                                android:textColor="@color/text_color"/>
+                                        </LinearLayout>
+
+                                        <!-- Your Seat -->
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:orientation="horizontal"
+                                            android:gravity="center_vertical">
+
+                                            <ImageView
+                                                android:layout_width="20dp"
+                                                android:layout_height="20dp"
+                                                android:src="@drawable/your_seat"/>
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginStart="@dimen/dimen_6dp"
+                                                android:text="Your Seat"
+                                                android:fontFamily="@font/roboto_medium"
+                                                android:textSize="@dimen/dimen_12sp"
+                                                android:textColor="@color/text_color"/>
+
+                                        </LinearLayout>
+
+                                    </LinearLayout>
+
                                 </LinearLayout>
 
-                            </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
 
                             <HorizontalScrollView
                                 android:layout_width="match_parent"
@@ -497,10 +498,9 @@
                         android:id="@+id/finalSeatLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_edittext"
+                        android:background="@drawable/outerborder"
                         android:layout_gravity="bottom|center"
-                        android:layout_marginStart="@dimen/dimen_10dp"
-                        android:layout_marginEnd="@dimen/dimen_10dp"
+                        android:layout_marginHorizontal="@dimen/dimen_6dp"
                         android:orientation="vertical"
                         android:visibility="gone">
 
@@ -515,7 +515,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
                                 android:layout_weight="2"
-                                android:fontFamily="@font/roboto_medium"
+                                android:fontFamily="@font/roboto_bold"
                                 android:paddingStart="10sp"
                                 android:text="Seats selected"
                                 android:textAllCaps="false"
@@ -531,8 +531,9 @@
                                 android:gravity="end"
                                 android:paddingStart="10sp"
                                 android:text="₹ 6000"
+                                android:fontFamily="@font/roboto_medium"
                                 android:textAllCaps="false"
-                                android:textColor="@color/black"
+                                android:textColor="@color/edittext_color"
                                 android:textSize="@dimen/dimen_16sp" />
 
                         </LinearLayout>
@@ -550,8 +551,9 @@
                                 android:layout_weight="2"
                                 android:paddingStart="10sp"
                                 android:text="L1 U2"
+                                android:fontFamily="@font/roboto_regular"
                                 android:textAllCaps="false"
-                                android:textColor="@color/black"
+                                android:textColor="@color/edittext_color"
                                 android:textSize="@dimen/dimen_16sp" />
 
                             <TextView
@@ -580,8 +582,9 @@
                             android:text="Next"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/dimen_18sp"
+                            android:textSize="@dimen/dimen_16sp"
                             android:textStyle="bold" />
+
                         <Button
                             android:id="@+id/proceedBtn"
                             android:layout_width="200dp"
@@ -597,6 +600,7 @@
                             android:textColor="@color/white"
                             android:textSize="@dimen/dimen_18sp"
                             android:textStyle="bold" />
+
                         <Button
                             android:id="@+id/proceedToBookBtn"
                             android:layout_width="match_parent"
@@ -653,7 +657,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:orientation="vertical">
 
-    <include
+        <include
         layout="@layout/activity_seat_booking_confirmation"
         android:id="@+id/confirmBookingLayout"/>
 
@@ -694,6 +698,9 @@
                 android:textSize="@dimen/dimen_14sp" />
 
         </LinearLayout>
+
     </LinearLayout>
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

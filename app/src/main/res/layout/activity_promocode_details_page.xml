@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.view.promocode.PromocodeDetailsPage">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_56dp"
+        android:background="@color/blue"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dimen_10dp"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:padding="@dimen/dimen_10dp"
+            android:text="Promo Details"
+            android:textColor="@color/white"
+            android:textSize="17sp" />
+
+
+    </RelativeLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        app:cardUseCompatPadding="true"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginHorizontal="@dimen/dimen_6dp"
+        app:layout_constraintTop_toBottomOf="@+id/header">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_140dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/promobanner"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/promonamecard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/banner"
+        android:layout_marginHorizontal="@dimen/dimen_4dp"
+        app:cardUseCompatPadding="true"
+        android:layout_marginTop="-40dp"
+        app:cardCornerRadius="@dimen/dimen_14dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dimen_4dp">
+
+            <TextView
+                android:id="@+id/promocode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="WINSALE"
+                android:layout_marginTop="@dimen/dimen_4dp"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:textSize="@dimen/dimen_16sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/roboto_bold" />
+
+            <LinearLayout
+                android:id="@+id/statuslayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/promocode">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/statuscard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="@dimen/dimen_4dp"
+                    android:layout_marginRight="@dimen/dimen_6dp"
+                    android:layout_alignParentRight="true"
+                    app:cardBackgroundColor="@color/green"
+                    app:cardCornerRadius="@dimen/dimen_8dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Active"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:paddingVertical="@dimen/dimen_4dp"
+                            android:paddingHorizontal="@dimen/dimen_16dp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/promotionTypecard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="@dimen/dimen_4dp"
+                    android:layout_marginRight="@dimen/dimen_6dp"
+                    android:layout_alignParentRight="true"
+                    app:cardBackgroundColor="@color/light_orange_promo"
+                    app:cardCornerRadius="@dimen/dimen_8dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/promotionType_applicationMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="B2B Cashback"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:paddingVertical="@dimen/dimen_4dp"
+                            android:paddingHorizontal="@dimen/dimen_10dp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/moregreylight"
+                app:layout_constraintTop_toBottomOf="@+id/statuslayout"/>
+
+            <TextView
+                android:id="@+id/promoname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/promocode"
+                android:text="B2B WINTER SALE"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:textColor="@color/blue"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="@dimen/dimen_16sp"
+                app:layout_constraintTop_toBottomOf="@+id/view1"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/validitycard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_6dp"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@+id/promonamecard">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_140dp"
+                android:src="@drawable/cloudimage"
+                android:scaleType="fitXY"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+            <LinearLayout
+                android:id="@+id/validitytitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/dimen_4dp"
+                android:layout_marginTop="@dimen/dimen_10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginHorizontal="@dimen/dimen_14dp">
+
+                <ImageView
+                    android:src="@drawable/clockicon"
+                    android:layout_width="@dimen/dimen_20dp"
+                    android:layout_height="@dimen/dimen_20dp"
+                    app:tint="@color/black"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:text="Validity Period"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:padding="@dimen/dimen_4dp"
+                    android:layout_marginLeft="@dimen/dimen_4dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fromdatelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/validitytitle"
+                android:weightSum="1.3"
+                android:layout_marginHorizontal="@dimen/dimen_14dp">
+
+                <TextView
+                    android:layout_weight=".2"
+                    android:src="@drawable/clockicon"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="From"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:textColor="@color/edittext_color"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_weight="1.1"
+                    android:id="@+id/fromdate"
+                    android:layout_width="0dp"
+                    android:text="21 Dec 2025, 10:10 am"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:layout_marginLeft="@dimen/dimen_4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/todatelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/fromdatelayout"
+                android:weightSum="1.3"
+                android:paddingVertical="@dimen/dimen_4dp"
+                android:layout_marginHorizontal="@dimen/dimen_14dp">
+
+                <TextView
+                    android:layout_weight=".2"
+                    android:src="@drawable/clockicon"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="To"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:textColor="@color/edittext_color"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_weight="1.1"
+                    android:id="@+id/todate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:text="30 Dec 2025, 03:00 am"
+                    android:layout_marginLeft="@dimen/dimen_4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true"
+                app:layout_constraintTop_toBottomOf="@+id/todatelayout"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/redeemlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/dimen_6dp">
+
+                        <ImageView
+                            android:layout_width="@dimen/dimen_30dp"
+                            android:layout_height="@dimen/dimen_30dp"
+                            android:src="@drawable/gifticon"
+                            android:padding="@dimen/dimen_6dp"
+                            app:tint="@color/green"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ready to Redeem"
+                            android:layout_gravity="center"
+                            android:textColor="@color/green"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_medium"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Redeem this coupon before it expires"
+                        android:textColor="@color/green"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:layout_marginHorizontal="@dimen/dimen_14dp"
+                        android:fontFamily="@font/roboto_medium"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/expiringlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/dimen_6dp">
+
+                        <ImageView
+                            android:layout_width="@dimen/dimen_30dp"
+                            android:layout_height="@dimen/dimen_30dp"
+                            android:src="@drawable/warning"
+                            android:padding="@dimen/dimen_4dp"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Expiring Soon"
+                            android:layout_gravity="center"
+                            android:textColor="@color/red"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_medium"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Complete your target to redeem this service"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:layout_marginHorizontal="@dimen/dimen_14dp"
+                        android:fontFamily="@font/roboto_medium"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/timealertlayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/dimen_6dp">
+
+                        <ImageView
+                            android:layout_width="@dimen/dimen_30dp"
+                            android:layout_height="@dimen/dimen_30dp"
+                            android:src="@drawable/hoursglass"
+                            android:padding="@dimen/dimen_6dp"
+                            android:layout_gravity="center"/>
+
+                        <TextView
+                            android:id="@+id/expriedate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Expires in 15h 10m 30s"
+                            android:layout_gravity="center"
+                            android:textColor="@color/red"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_bold"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/showingprogresstarget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_6dp"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@+id/validitycard">
+        
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_10dp">
+            
+            <LinearLayout
+                android:id="@+id/amountlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_10dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Promo Target"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/edittext_color"
+                        android:fontFamily="@font/roboto_bold" />
+
+                    <TextView
+                        android:id="@+id/targetamount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="(₹ ______)"
+                        android:layout_marginLeft="@dimen/dimen_6dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:visibility="gone">
+
+
+                    <TextView
+                        android:id="@+id/earnedamount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="₹ 500.00"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/green"
+                        android:fontFamily="@font/roboto_bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Earned"
+                        android:layout_marginLeft="@dimen/dimen_6dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/green"
+                        android:fontFamily="@font/roboto_bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_14dp"
+                android:max="100"
+                android:layout_marginTop="@dimen/dimen_6dp"
+                android:layout_marginHorizontal="@dimen/dimen_6dp"
+                android:progressDrawable="@drawable/progress_drawable"
+                app:layout_constraintTop_toBottomOf="@+id/amountlayout"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/progressBar"
+                android:layout_marginHorizontal="@dimen/dimen_10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_6dp">
+
+
+                    <TextView
+                        android:id="@+id/achievedamount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="₹ _____"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/blue"
+                        android:fontFamily="@font/roboto_bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="of"
+                        android:layout_marginLeft="@dimen/dimen_6dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_bold" />
+                    <TextView
+                        android:id="@+id/maxamount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="₹ _____"
+                        android:layout_marginLeft="@dimen/dimen_6dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="achieved"
+                        android:layout_marginLeft="@dimen/dimen_6dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_bold" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_2dp"
+                    android:background="@color/moregreylight"
+                    android:layout_below="@+id/offeramount"
+                    android:layout_marginTop="@dimen/dimen_6dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/dimen_6dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/dimen_30dp"
+                        android:layout_height="@dimen/dimen_30dp"
+                        android:src="@drawable/infopromo"
+                        android:padding="@dimen/dimen_4dp"
+                        android:layout_marginLeft="-3dp"
+                        android:layout_gravity="center" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Cashback credited after target completion"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:textColor="@color/text_color"
+                        android:fontFamily="@font/roboto_bold"
+                        android:layout_gravity="center"/>
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+
+
+            
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/completetarget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_6dp"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@+id/showingprogresstarget">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/dimen_10dp">
+
+            <LinearLayout
+                android:id="@+id/targetcompletelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/completetargetback"
+                android:layout_marginHorizontal="@dimen/dimen_2dp"
+                android:layout_marginTop="@dimen/dimen_2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dimen_4dp">
+
+                    <LinearLayout
+                        android:layout_weight=".5"
+                        android:layout_width="0dp"
+                        android:gravity="start"
+                        android:layout_height="wrap_content">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardCornerRadius="@dimen/dimen_6dp"
+                            android:layout_gravity="center"
+                            app:cardUseCompatPadding="true"
+                            app:cardBackgroundColor="@color/light_green">
+
+                            <ImageView
+                                android:layout_width="@dimen/dimen_40dp"
+                                android:layout_height="@dimen/dimen_40dp"
+                                android:src="@drawable/checkiconn"
+                                app:tint="@color/green"
+                                android:padding="@dimen/dimen_8dp"/>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Target Completed"
+                            android:textSize="@dimen/dimen_16sp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="@color/text_color"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Cashback Earned"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="@color/text_color"/>
+
+                        <TextView
+                            android:id="@+id/earnedamountforwithdraw"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="₹ _____"
+                            android:textSize="@dimen/dimen_18sp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="@color/black"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_gravity="bottom"
+                        android:orientation="vertical"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Promo Code"
+                            android:gravity="right"
+                            android:textSize="@dimen/dimen_14sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="@color/text_color"/>
+
+                        <TextView
+                            android:id="@+id/promocodeforachieved"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="WINSALE"
+                            android:gravity="right"
+                            android:textSize="@dimen/dimen_16sp"
+                            android:textColor="@color/blue"
+                            android:fontFamily="@font/roboto_bold" />
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/redeemcard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                app:layout_constraintTop_toBottomOf="@+id/targetcompletelayout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:cardBackgroundColor="@color/blue"
+                app:cardCornerRadius="@dimen/dimen_6dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Redeem"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:paddingVertical="@dimen/dimen_4dp"
+                        android:paddingHorizontal="@dimen/dimen_16dp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,16 +7,21 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.bos.payment.appName.ui.view.travel.busfragment.CancelledRefundBus
 import com.bos.payment.appName.ui.view.travel.busfragment.UpcomingBus
 
-/*private const val NUM_TABS = 4*/
-
-private const val NUM_TABS = 2
 
 class ViewPagerAdapter(fm: FragmentManager,lifecycle: Lifecycle) : FragmentStateAdapter(fm,lifecycle) {
 
+    private val fragments = mutableListOf<Fragment>()
+
+    init {
+        fragments.add(UpcomingBus())
+        fragments.add(CancelledRefundBus())
+    }
+
 
     override fun getItemCount(): Int {
-        return NUM_TABS
+        return fragments.size
     }
+
 
 
     override fun createFragment(position: Int): Fragment {
@@ -28,12 +33,17 @@ class ViewPagerAdapter(fm: FragmentManager,lifecycle: Lifecycle) : FragmentState
             else -> UpcomingBus()
         }*/
 
-          return when (position) {
+         /* return when (position) {
             0 -> UpcomingBus()
-            else -> CancelledRefundBus()
+            else -> CancelledRefundBus()*/
+
+        return fragments[position]
 
         }
 
+
+    fun getFragment(position: Int): Fragment {
+        return fragments[position]
     }
 
 

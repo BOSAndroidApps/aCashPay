@@ -64,9 +64,11 @@ import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTampBookingRes
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTempBookingRequest
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketingReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketingRes
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionDataItem
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionReq
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionResp
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.DataItem
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.SeatFair
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.SeattypeModel
 import com.bos.payment.appName.data.model.walletBalance.merchantBal.GetMerchantBalanceReq
 import com.bos.payment.appName.data.model.walletBalance.merchantBal.GetMerchantBalanceRes
@@ -193,7 +195,6 @@ class BusSeating : AppCompatActivity() {
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setClickListeners() {
         bin.backBtn.setOnClickListener {
@@ -213,6 +214,10 @@ class BusSeating : AppCompatActivity() {
             validationPassenger()
         }
 
+        bin.bookAgainBtn.setOnClickListener {
+            finish()
+        }
+
         bin.passengerDetails.passengerDob.parent.requestDisallowInterceptTouchEvent(true)
 
         bin.passengerDetails.passengerDob.setOnClickListener {
@@ -227,9 +232,9 @@ class BusSeating : AppCompatActivity() {
             ).show()
         }
 
-        bin.seatSelectBtn.setOnClickListener {
+        /*bin.seatSelectBtn.setOnClickListener {
             getAllMappingSeat()
-        }
+        }*/
 
         bin.reviewBookingInclude.backBtn.setOnClickListener {
             onBackPressed()
@@ -258,6 +263,7 @@ class BusSeating : AppCompatActivity() {
 
     }
 
+
     private fun getAllBusRequaryTicket() {
         val busRequery = BusRequeryReq(
             bookingRefNo = mStash.getStringValue(Constants.booking_RefNo, ""),
@@ -266,12 +272,15 @@ class BusSeating : AppCompatActivity() {
             imeINumber = "215237488",
             registrationID = mStash.getStringValue(Constants.MerchantId, ""))
 
+        Log.d("BusRequeryReq",Gson().toJson(busRequery))
+
         viewModel.getAllBusRequary(busRequery).observe(this) { resource ->
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let { response ->
+                                Log.d("BusRequeryResp",Gson().toJson(response))
                                 getAllBusRequaryTicketRes(response)
                             }
                         }
@@ -348,7 +357,6 @@ class BusSeating : AppCompatActivity() {
                     val response = resource.data?.body()
                     Log.d("RetailerCommissionResp",Gson().toJson(response))
                         if (response != null && response.isSuccess!!) {
-
                             getAllServiceChargeApiResRetailer(response, rechargeAmount)
                         }
                         else {
@@ -407,42 +415,13 @@ class BusSeating : AppCompatActivity() {
                     val response = resource.data?.body()
                     if (response != null && response.isSuccess == true) {
                         callback.onSuccess(response)   // 🔥 return data
-                    } else {
+                    }
+                    else {
                         callback.onError("Slab not found") // 🔥 return error
                         if(Constants.dialog!=null && Constants.dialog.isShowing){
                             Constants.dialog.dismiss()
                         }
                     }
-                   /* val response = resource.data?.body()
-                    Log.d("RetailerCommissionResp",Gson().toJson(response))
-                    if (response != null && response.isSuccess!!) {
-
-                        getAllServiceChargeApiResRetailer(response, rechargeAmount)
-                    }
-                    else {
-                        // Save commission types in shared preferences
-                        with(mStash!!) {
-                            setStringValue(Constants.retailer_CommissionType, "")
-                            setStringValue(Constants.serviceType, "")
-                        }
-
-                        mStash!!.setStringValue(Constants.retailerCommissionWithoutTDS, String.format("%.2f", 0.0))
-                        mStash!!.setStringValue(Constants.retailerCommission, String.format("%.2f", 0.0))
-                        mStash!!.setStringValue(Constants.tds, String.format("%.2f", 0.0))
-
-                        val totalRechargeAmount = (rechargeAmount.toDoubleOrNull() ?: 0.0) + 0.0
-                        mStash!!.setStringValue(Constants.totalTransaction, String.format("%.2f", totalRechargeAmount))
-
-                        serviceChargeWithGST = mStash!!.getStringValue(Constants.serviceChargeWithGST, "")!!
-                        mStash!!.setStringValue(Constants.gst, String.format("%.2f", 0.0))
-                        mStash!!.setStringValue(Constants.serviceCharge, String.format("%.2f", 0.0))
-                        mStash!!.setStringValue(Constants.retailerCommission, String.format("%.2f", 0.0))
-                        mStash!!.setStringValue(Constants.tds, String.format("%.2f", 0.0))
-
-                        var msg = "Warning : Slab structure not found. This transaction will proceed without any commission being credited."
-                        openDialogForPayout(rechargeAmount.toDoubleOrNull() ?: 0.0, 0.0, totalRechargeAmount, 0.0, msg)
-
-                    }*/
                 }
                 ApiStatus.ERROR ->  if(Constants.dialog!=null && Constants.dialog.isShowing){
                     Constants.dialog.dismiss()
@@ -504,7 +483,6 @@ class BusSeating : AppCompatActivity() {
     }
 
 
-
     interface ApiCallback<T> {
         fun onSuccess(response: T)
         fun onError(message: String)
@@ -514,11 +492,10 @@ class BusSeating : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale", "SetTextI18n", "SuspiciousIndentation")
     private fun mergeAndCalculateRetailer(resp1: BusCommissionResp, resp2: BusCommissionResp, rechargeAmount: String) {
-
         val combined = BusCommissionResp(
             isSuccess = true,
             data = listOf(
-                DataItem(
+                BusCommissionDataItem(
                     commissionValue = (resp1.data!![0].commissionValue ?: 0.0) + (resp2.data[0].commissionValue ?: 0.0),
                     commissionType = resp1.data!![0].commissionType, // assume same type
                     servicesValue = (resp1.data!![0].servicesValue ?: 0.0) + (resp2.data[0].servicesValue ?: 0.0),
@@ -643,7 +620,6 @@ class BusSeating : AppCompatActivity() {
 
     @SuppressLint("DefaultLocale", "SetTextI18n")
     private fun serviceChargeCalculation(serviceCharge: Double, gstRate: Double, rechargeAmount: String, response: BusCommissionResp): Double {
-
         val rechargeAmountValue = rechargeAmount.toDoubleOrNull() ?: 0.0
         var type =  response.data!![0]?.servicesType!!.trim()?.lowercase() ?: ""
         val totalAmountWithGst = when (type) {
@@ -682,6 +658,7 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     fun openDialogForPayout(transferAmount: Double, servicechargeGst: Double, totalRechargeAmount: Double, retailerCommission: Double, msg: String) {
@@ -712,6 +689,43 @@ class BusSeating : AppCompatActivity() {
         val detailsgstserviceslayout = dialog.findViewById<LinearLayout>(R.id.chargesdetailslayout)
         val retailercommissionlayout = dialog.findViewById<LinearLayout>(R.id.retailercommissionlayout)
 
+        val seaterlayout = dialog.findViewById<LinearLayout>(R.id.seaterlayout)
+        val sleeperlayout = dialog.findViewById<LinearLayout>(R.id.sleeperlayout)
+        val seateramount = dialog.findViewById<TextView>(R.id.seateramount)
+        val sleeperamount = dialog.findViewById<TextView>(R.id.sleeperamount)
+        val seattxt = dialog.findViewById<TextView>(R.id.seatetxt)
+        val sleepertxt = dialog.findViewById<TextView>(R.id.sleepertxt)
+        val operatorgst = dialog.findViewById<TextView>(R.id.operatorgst)
+
+        if(forServiceChargeSeatType[0].seater>0) {
+            seaterlayout.visibility= View.VISIBLE
+            seattxt.text= "Seater Fare (${forServiceChargeSeatType[0].seater})"
+        }
+        else {
+            seaterlayout.visibility= View.GONE
+        }
+
+        if(forServiceChargeSeatType[0].sleeper>0) {
+            sleeperlayout.visibility= View.VISIBLE
+            sleepertxt.text= "Sleeper Fare (${forServiceChargeSeatType[0].sleeper})"
+        }
+        else {
+            sleeperlayout.visibility= View.GONE
+        }
+
+        seateramount.text = forServiceChargeSeatType[0].busfare
+            .filter { it.length.equals("1")  }
+            .sumOf { it.basicamount ?: 0.0 }
+            .toString()
+
+        sleeperamount.text = forServiceChargeSeatType[0].busfare
+            .filter { it.length.equals("2") }
+            .sumOf { it.basicamount ?: 0.0 }
+            .toString()
+
+        operatorgst.text = "${forServiceChargeSeatType[0].busfare.sumOf { it.otheramount ?: 0.0  }}"
+
+
         if (msg.isNotEmpty()) {
             warningmsg.visibility = View.VISIBLE
             warningmsg.text = msg
@@ -720,20 +734,23 @@ class BusSeating : AppCompatActivity() {
             warningmsg.visibility = View.GONE
         }
 
+
         val gst = mStash!!.getStringValue(Constants.gst, "")
 
         mStash!!.setStringValue(Constants.serviceChargewithgst, String.format("%.2f", servicechargeGst)).toString()
         mStash!!.setStringValue(Constants.actualbusticketamt, String.format("%.2f", transferAmount)).toString()
 
+
         transferamttxt.text = "$transferAmount"
         servicechargewithgst.text = String.format("%.2f", servicechargeGst)
         retailercommission.text = String.format("%.2f", retailerCommission)
+
         serviceChargeamount.text = mStash!!.getStringValue(Constants.serviceCharge, "").toString()
         gstamount.text = "$gst"
 
         var totalcount = forServiceChargeSeatType[0].seater + forServiceChargeSeatType[0].sleeper
 
-        basefaretxt.text = "Base Fare (${totalcount})"
+        basefaretxt.text = "Service Charge (${totalcount})"
         transferamt.text = String.format("%.2f", totalRechargeAmount)
 
         if(servicechargeGst==0.0){
@@ -778,9 +795,10 @@ class BusSeating : AppCompatActivity() {
         }
 
         cancel.setOnClickListener {
-            if (dialog != null && dialog.isShowing) {
-                dialog.dismiss()
+            if (Constants.dialog != null && Constants.dialog.isShowing) {
+                Constants.dialog.dismiss()
             }
+            dialog.dismiss()
 
         }
 
@@ -789,6 +807,7 @@ class BusSeating : AppCompatActivity() {
         }
 
         dialog.show() // ✅ REQUIRED
+
     }
 
 
@@ -849,6 +868,7 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getMerchantBalance(mainBalance: Double) {
         val getMerchantBalanceReq = GetMerchantBalanceReq(
@@ -882,6 +902,7 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllMerchantBalanceRes(response: GetMerchantBalanceRes, mainBalance: Double) {
         if (response.isSuccess == true) {
@@ -895,7 +916,8 @@ class BusSeating : AppCompatActivity() {
 
             if (totalAmount <= mainBalance && totalAmount <= merchantBalance) {
                  getAllBusAddMoney(mStash.getStringValue(Constants.booking_RefNo, "").toString())
-            } else {
+            }
+            else {
                 if(Constants.dialog!=null && Constants.dialog.isShowing){
                     Constants.dialog.dismiss()
                 }
@@ -910,116 +932,51 @@ class BusSeating : AppCompatActivity() {
     }
 
 
+
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun getAllBusRequaryTicketRes(response: BusRequeryRes?) {
-        if (response?.responseHeader?.errorCode == "0000") {
-            bin.fullLayout.visibility = View.GONE
-            bin.reviewLayout.visibility = View.GONE
-            bin.confirmBookingLayoutList.visibility = View.VISIBLE
+        val ticketStatus = when {
 
-            passengerList.clear()
-            data.clear()
-            ticketDetails.clear()
+            response!!.paXDetails.all { it.status.equals("Confirmed", true) } ->
+                "Confirmed"
 
-            response.paXDetails.forEach { passengerData ->
-                passengerList.add(passengerData)
-            }
+            response.paXDetails.any { it.status.equals("Confirmed", true) } ||
+                    response.paXDetails.any { it.status.equals("Payment Pending", true) } ->
+                "Partial Cancelled"
 
-            userPassengerDetailsAdapter.notifyDataSetChanged()
+            response.paXDetails.all { it.status.equals("Cancelled", true) } ->
+                "Cancelled"
 
+            response.paXDetails.any { it.status.equals("Cancelled", true) } &&
+                    response.paXDetails.any { it.status.equals("Confirmed", true) } ->
+                "Partial Cancelled"
 
-            // for ticket generation in pdf format....................................
-            for(passenger in passengerList){
-                if(passenger.gender==0){
-                    data.add(mutableListOf(passenger.paXName,"Male",passenger.seatNumber,passenger.ticketNumber))
-                }else{
-                    data.add(mutableListOf(passenger.paXName,"Female",passenger.seatNumber,passenger.ticketNumber))
-                }
-
-            }
-
-
-            qrText=  buildQrDataWithPassengers(response.transportPNR,response.bookingRefNo ,response.busDetail?.fromCity,response.busDetail?.toCity,response.busDetail?.travelDate, response.busDetail?.busType,passengerList)
-
-            Log.d("qrData", qrText.toString())
-
-            qrBitmap = generateQrCode(qrText!!)
-
-            qrBitmap?.let { bin.confirmBookingLayout.ticketQRCode.setImageBitmap(it) }
-
-            bin.confirmBookingLayout.fromLocation.text = response.busDetail?.fromCity.toString()
-            bin.confirmBookingLayout.toLocation.text = response.busDetail?.toCity.toString() + " at " + response.busDetail?.droppingDetails?.droppingTime.toString()
-            bin.confirmBookingLayout.departureTime.text = response.busDetail?.departureTime.toString() + " " + response.busDetail?.travelDate.toString()
-
-            bin.confirmBookingLayout.ticketStatus.text = response.ticketStatusDesc.toString()
-            bin.confirmBookingLayout.referenceNumber.text = response.bookingRefNo.toString()
-            bin.confirmBookingLayout.supplierRefNo.text = response.busDetail?.supplierRefNo.toString()
-            bin.confirmBookingLayout.transportPNR.text = response.transportPNR.toString()
-            bin.confirmBookingLayout.busOperatorName.text = response.busDetail?.operatorName.toString()
-            bin.confirmBookingLayout.boardingAddress.text = response.busDetail?.boardingDetails?.boardingAddress.toString()
-            bin.confirmBookingLayout.droppingAddress.text = response.busDetail?.droppingDetails?.droppingAddress.toString()
-            bin.confirmBookingLayout.boardingTime.text = response.busDetail?.boardingDetails?.boardingTime.toString()
-            bin.confirmBookingLayout.droppingingTime.text = response.busDetail?.droppingDetails?.droppingTime.toString()
-            bin.confirmBookingLayout.busType.text = response.busDetail?.busType.toString()
-
-            response.paXDetails.forEach { fareDetails ->
-
-                // Extract and parse individual amounts safely
-                val basicAmount = fareDetails.fare?.basicAmount ?: 0
-                val gst = fareDetails.fare?.gst ?: 0
-                val otherAmount = fareDetails.fare?.otherAmount ?: 0
-
-// Extract convenience fee from the TextView (e.g., "₹ 50"), remove non-digits
-                val convenienceFeeText = bin.confirmBookingLayout.conveniencesFees.text.toString().trim()
-                val convenienceFee = convenienceFeeText.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0
-
-// Add all values
-                val totalAmount = basicAmount.toDouble() + gst.toDouble() + otherAmount.toDouble() + convenienceFee.toDouble()
-
-// Set values to TextViews
-                bin.confirmBookingLayout.baseFare.text = "₹ $basicAmount"
-                bin.confirmBookingLayout.gstCharge.text = "₹ $gst"
-                bin.confirmBookingLayout.otherCharge.text = "₹ $otherAmount"
-                bin.confirmBookingLayout.conveniencesFees.text = bin.confirmBookingLayout.conveniencesFees.text.toString().trim()
-                bin.confirmBookingLayout.totalAmount.text = "₹ $totalAmount"
-
-
-
-                ticketDetails.add(TicketDetailsForGenerateTicket(response.cancellationPolicy,response.transportPNR.toString(), response.bookingRefNo.toString(),response.busDetail?.fromCity.toString(),response.busDetail?.toCity.toString(),
-                                                    response.busDetail?.departureTime.toString() , response.busDetail?.travelDate.toString() , response.busDetail?.arrivalTime.toString(),"",response.busDetail?.operatorName.toString(),
-                    "You will get the driver contact number and vehicle number 30 mins to 1 hours before departure",response.busDetail?.boardingDetails?.boardingAddress.toString(),response.busDetail?.droppingDetails?.droppingAddress.toString() ,"",response.busDetail?.boardingDetails?.boardingTime.toString(),
-                    response.busDetail?.busType.toString(),"₹ $basicAmount", "₹ $gst","₹ $otherAmount","₹ " + bin.confirmBookingLayout.conveniencesFees.text.toString().trim(),"₹ $totalAmount"))
-           }
-
-            var PaxRequeryResponseReq = BusPaxRequeryResponseReq(
-                loginId = mStash!!.getStringValue(Constants.RegistrationId, ""),
-                bookingRefNo = response.bookingRefNo,
-                ipAddress =mStash?.getStringValue(Constants.deviceIPAddress, "") ,
-                requestId = mStash!!.getStringValue(Constants.requestId, ""),
-                imeINumber = "0054748569",
-                registrationId = mStash?.getStringValue(Constants.MerchantId, ""),
-                transportPNR =response.transportPNR ,
-                ticketStatusId =response.ticketStatusId ,
-                ticketStatusDesc = response.ticketStatusDesc ,
-                apiResponse = Gson().toJson(response),
-                paramUser =mStash!!.getStringValue(Constants.RegistrationId, "")
-            )
-
-            hitApiforPassDetailsListResponse(PaxRequeryResponseReq)
-
-
+            else ->
+                "Unknown"
         }
 
-        else {
-            if(Constants.dialog!=null && Constants.dialog.isShowing){
-                Constants.dialog.dismiss()
-            }
-            Toast.makeText(this, response?.responseHeader?.errorInnerException.toString(), Toast.LENGTH_SHORT).show()
-         }
+        var PaxRequeryResponseReq = BusPaxRequeryResponseReq(
+            loginId = mStash!!.getStringValue(Constants.RegistrationId, ""),
+            bookingRefNo = response.bookingRefNo,
+            ipAddress =mStash?.getStringValue(Constants.deviceIPAddress, "") ,
+            requestId = mStash!!.getStringValue(Constants.requestId, ""),
+            imeINumber = "0054748569",
+            registrationId = mStash?.getStringValue(Constants.MerchantId, ""),
+            transportPNR =response.transportPNR ,
+            ticketStatusId =response.ticketStatusId ,
+            ticketStatusDesc = response.ticketStatusDesc ,
+            apiResponse = Gson().toJson(response),
+            paramUser =mStash!!.getStringValue(Constants.RegistrationId, ""),
+            ticketcancelstatus= "Confirmed"
+        )
+
+        hitApiforPassDetailsListResponse(PaxRequeryResponseReq,response)
+
+
     }
 
 
-    fun hitApiforPassDetailsListResponse(PaxRequeryResponseReq: BusPaxRequeryResponseReq){
+    fun hitApiforPassDetailsListResponse(PaxRequeryResponseReq: BusPaxRequeryResponseReq,requeryResponse: BusRequeryRes?){
         Log.d("BusRequeryRequest", Gson().toJson(PaxRequeryResponseReq))
 
         viewModel.getPassangerDetailsRequest(PaxRequeryResponseReq).observe(this) { resource ->
@@ -1029,6 +986,102 @@ class BusSeating : AppCompatActivity() {
 
                         it.data?.let { users ->
                             users.body()?.let { response ->
+
+                                Log.d("PassDetailsListResp",Gson().toJson(response))
+
+                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                    Constants.dialog.dismiss()
+                                }
+
+                                if (requeryResponse?.responseHeader?.errorCode == "0000") {
+                                    bin.fullLayout.visibility = View.GONE
+                                    bin.reviewLayout.visibility = View.GONE
+                                    bin.confirmBookingLayoutList.visibility = View.VISIBLE
+
+                                    passengerList.clear()
+                                    data.clear()
+                                    ticketDetails.clear()
+
+                                    requeryResponse.paXDetails.forEach { passengerData ->
+                                        passengerList.add(passengerData)
+                                    }
+
+                                    userPassengerDetailsAdapter.notifyDataSetChanged()
+
+
+                                    // for ticket generation in pdf format....................................
+                                    for(passenger in passengerList){
+                                        if(passenger.gender==0){
+                                            data.add(mutableListOf(passenger.paXName,"Male",passenger.seatNumber,passenger.ticketNumber))
+                                        }else{
+                                            data.add(mutableListOf(passenger.paXName,"Female",passenger.seatNumber,passenger.ticketNumber))
+                                        }
+
+                                    }
+
+
+                                    qrText=  buildQrDataWithPassengers(requeryResponse.transportPNR,requeryResponse.bookingRefNo ,requeryResponse.busDetail?.fromCity,requeryResponse.busDetail?.toCity,requeryResponse.busDetail?.travelDate, requeryResponse.busDetail?.busType,passengerList)
+
+                                    Log.d("qrData", qrText.toString())
+
+                                    qrBitmap = generateQrCode(qrText!!)
+
+                                    qrBitmap?.let { bin.confirmBookingLayout.ticketQRCode.setImageBitmap(it) }
+
+                                    bin.confirmBookingLayout.fromLocation.text = requeryResponse.busDetail?.fromCity.toString()
+                                    bin.confirmBookingLayout.toLocation.text = requeryResponse.busDetail?.toCity.toString() + " at " + requeryResponse.busDetail?.droppingDetails?.droppingTime.toString()
+                                    bin.confirmBookingLayout.departureTime.text = requeryResponse.busDetail?.departureTime.toString() + " " + requeryResponse.busDetail?.travelDate.toString()
+
+                                    bin.confirmBookingLayout.ticketStatus.text = requeryResponse.ticketStatusDesc.toString()
+                                    bin.confirmBookingLayout.referenceNumber.text = requeryResponse.bookingRefNo.toString()
+                                    bin.confirmBookingLayout.supplierRefNo.text = requeryResponse.busDetail?.supplierRefNo.toString()
+                                    bin.confirmBookingLayout.transportPNR.text = requeryResponse.transportPNR.toString()
+                                    bin.confirmBookingLayout.busOperatorName.text = requeryResponse.busDetail?.operatorName.toString()
+                                    bin.confirmBookingLayout.boardingAddress.text = requeryResponse.busDetail?.boardingDetails?.boardingAddress.toString()
+                                    bin.confirmBookingLayout.droppingAddress.text = requeryResponse.busDetail?.droppingDetails?.droppingAddress.toString()
+                                    bin.confirmBookingLayout.boardingTime.text = requeryResponse.busDetail?.boardingDetails?.boardingTime.toString()
+                                    bin.confirmBookingLayout.droppingingTime.text = requeryResponse.busDetail?.droppingDetails?.droppingTime.toString()
+                                    bin.confirmBookingLayout.busType.text = requeryResponse.busDetail?.busType.toString()
+
+                                    requeryResponse.paXDetails.forEach { fareDetails ->
+
+                                        // Extract and parse individual amounts safely
+                                        val basicAmount = fareDetails.fare?.basicAmount ?: 0
+                                        val gst = fareDetails.fare?.gst ?: 0
+                                        val otherAmount = fareDetails.fare?.otherAmount ?: 0
+
+                                        // Extract convenience fee from the TextView (e.g., "₹ 50"), remove non-digits
+                                        val convenienceFeeText = bin.confirmBookingLayout.conveniencesFees.text.toString().trim()
+                                        val convenienceFee = convenienceFeeText.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0
+
+                                        // Add all values
+                                        val totalAmount = basicAmount.toDouble() + gst.toDouble() + otherAmount.toDouble() + convenienceFee.toDouble()
+
+                                        // Set values to TextViews
+                                        bin.confirmBookingLayout.baseFare.text = "₹ $basicAmount"
+                                        bin.confirmBookingLayout.gstCharge.text = "₹ $gst"
+                                        bin.confirmBookingLayout.otherCharge.text = "₹ $otherAmount"
+                                        bin.confirmBookingLayout.conveniencesFees.text = bin.confirmBookingLayout.conveniencesFees.text.toString().trim()
+                                        bin.confirmBookingLayout.totalAmount.text = "₹ $totalAmount"
+
+
+
+                                        ticketDetails.add(TicketDetailsForGenerateTicket(requeryResponse.cancellationPolicy,requeryResponse.transportPNR.toString(), requeryResponse.bookingRefNo.toString(),requeryResponse.busDetail?.fromCity.toString(),requeryResponse.busDetail?.toCity.toString(),
+                                            requeryResponse.busDetail?.departureTime.toString() , requeryResponse.busDetail?.travelDate.toString() , requeryResponse.busDetail?.arrivalTime.toString(),"",requeryResponse.busDetail?.operatorName.toString(),
+                                            "You will get the driver contact number and vehicle number 30 mins to 1 hours before departure",requeryResponse.busDetail?.boardingDetails?.boardingAddress.toString(),requeryResponse.busDetail?.droppingDetails?.droppingAddress.toString() ,"",requeryResponse.busDetail?.boardingDetails?.boardingTime.toString(),
+                                            requeryResponse.busDetail?.busType.toString(),"₹ $basicAmount", "₹ $gst","₹ $otherAmount","₹ " + bin.confirmBookingLayout.conveniencesFees.text.toString().trim(),"₹ $totalAmount"))
+                                    }
+
+
+                                }
+
+                                else {
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
+                                    Toast.makeText(this, requeryResponse?.responseHeader?.errorInnerException.toString(), Toast.LENGTH_SHORT).show()
+                                }
+
                                 if(Constants.dialog!=null && Constants.dialog.isShowing){
                                     Constants.dialog.dismiss()
                                 }
@@ -1144,6 +1197,7 @@ class BusSeating : AppCompatActivity() {
         }
     }
 
+
     private fun validationBoarding() {
         val boardingTextPos = bin.boardingPointSp.selectedItemPosition
         val droppingTextPos = bin.droppingPointSp.selectedItemPosition
@@ -1164,17 +1218,20 @@ class BusSeating : AppCompatActivity() {
         }
     }
 
+
     private fun validationSeat() {
         if (selectedSeats.isEmpty()) {
             toast("Choose your seat")
         } else {
             bin.seatBookingLayout.visibility = View.GONE
             bin.boardingPointLayout.visibility = View.VISIBLE
+            bin.boradingdroplayout.visibility=View.VISIBLE
             bin.NextBtn.visibility = View.GONE
             bin.proceedBtn.visibility = View.VISIBLE
             bin.proceedToBookBtn.visibility = View.GONE
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllDetailsBusBooking() {
@@ -1207,6 +1264,7 @@ class BusSeating : AppCompatActivity() {
         )
 
         Log.d("busTempBookingReq", Gson().toJson(busTempBookingReq))
+        hitApiForGetTampBookingRequest( Gson().toJson(busTempBookingReq))
 
         viewModel.getAllBusTempBooking(busTempBookingReq).observe(this) { resource ->
             resource?.let {
@@ -1214,7 +1272,6 @@ class BusSeating : AppCompatActivity() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let { response ->
-                                hitApiForGetTampBookingRequest( Gson().toJson(busTempBookingReq))
                                 getAllDetailsBusBookingRes(response)
                             }
                         }
@@ -1363,8 +1420,7 @@ class BusSeating : AppCompatActivity() {
                 mStash.getStringValue(Constants.boardingPoint, "")
             bin.reviewBookingInclude.droppingPoint.text =
                 mStash.getStringValue(Constants.droppingPoint, "")
-            bin.reviewBookingInclude.arrivalTime.text =
-                intent.getStringExtra(Constants.arrivalTime).orEmpty()
+            bin.reviewBookingInclude.arrivalTime.text = intent.getStringExtra(Constants.arrivalTime).orEmpty()
             bin.reviewBookingInclude.totalTime.text =
                 intent.getStringExtra(Constants.travelTime).orEmpty()
             mStash.setStringValue(Constants.booking_RefNo, response.bookingRefNo.toString())
@@ -1430,6 +1486,7 @@ class BusSeating : AppCompatActivity() {
         if(Constants.dialog!=null && Constants.dialog.isShowing){
             Constants.dialog.dismiss()
         }
+
         if (response?.responseHeader?.errorCode == "0000") {
             getAllBusTicketing(mStash.getStringValue(Constants.booking_RefNo, "").toString())
         }
@@ -1445,48 +1502,22 @@ class BusSeating : AppCompatActivity() {
             iPAddress = mStash.getStringValue(Constants.deviceIPAddress, ""),
             requestId = mStash.getStringValue(Constants.requestId, ""),
             imeINumber = "125424463",
-            registrationID = mStash.getStringValue(Constants.MerchantId, ""))
+            registrationID = mStash.getStringValue(Constants.MerchantId, "")
+        )
 
-        Log.d("busTempBookingReq", Gson().toJson(busTicketingReq))
-        AppLog.d("busTempBookingReq",Gson().toJson(busTicketingReq))
+           Log.d("BusTicketReq", Gson().toJson(busTicketingReq))
+           AppLog.d("busTempBookingReq",Gson().toJson(busTicketingReq))
 
-        viewModel.getAllBusTicketing(busTicketingReq).observe(this) { resource ->
-            resource?.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        it.data?.let { users ->
-                            users.body()?.let { response ->
-                                AppLog.d("busTempBookingRes",Gson().toJson(response))
-                                if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                    Constants.dialog.dismiss()
-                                }
-                                mStash.setStringValue(Constants.ForPayoutBookingRefId, response.bookingRefNo.toString())
-                                getAllBusTicketingRes(response)
-                                getAddBusTicketRequest(mStash.getStringValue(Constants.booking_RefNo, "").toString(),Gson().toJson(busTicketingReq))
-                            }
-                        }
-                    }
-
-                    ApiStatus.ERROR -> {
-                        if(Constants.dialog!=null && Constants.dialog.isShowing){
-                            Constants.dialog.dismiss()
-                        }
-                        getAddBusTicketRequest(mStash.getStringValue(Constants.booking_RefNo, "").toString(),Gson().toJson(busTicketingReq))
-                    }
-
-                    ApiStatus.LOADING -> {
-                        Constants.OpenPopUpForVeryfyOTP(this)
-                    }
-                }
-            }
-        }
+           getAddBusTicketRequest(mStash.getStringValue(Constants.booking_RefNo, "").toString(),busTicketingReq)
 
     }
 
 
     // hit api for add bus ticket request.............................................................................................
-    private fun getAddBusTicketRequest(referenceId: String,apirequest:String) {
-        val busTicketingReq = AddTicketReq(
+    private fun getAddBusTicketRequest(referenceId: String,busTicketingReq:BusTicketingReq) {
+      var  apirequest = Gson().toJson(busTicketingReq)
+
+        val addTicketReq = AddTicketReq(
             requestId =mStash.getStringValue(Constants.requestId, "") ,
             iPAddress = mStash.getStringValue(Constants.deviceIPAddress, ""),
             imeINumber = "125424463",
@@ -1496,14 +1527,44 @@ class BusSeating : AppCompatActivity() {
             loginID = mStash.getStringValue(Constants.RegistrationId, ""),
             apiRequest = apirequest)
 
-    Log.d("busAddTicketRequest", Gson().toJson(busTicketingReq))
+    Log.d("busAddTicketRequest", Gson().toJson(addTicketReq))
 
-    viewModel.getAddBusTicketRequest(busTicketingReq).observe(this) { resource ->
+    viewModel.getAddBusTicketRequest(addTicketReq).observe(this) { resource ->
             resource?.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-                        Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketRequest",this@BusSeating)
-                        Log.d("AddBusTicketRequest",resource.data.toString())
+                       /* Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketRequest",this@BusSeating)
+                        Log.d("AddBusTicketRequest",resource.data.toString())*/
+
+                        viewModel.getAllBusTicketing(busTicketingReq).observe(this) { resource ->
+                            resource?.let {
+                                when (it.apiStatus) {
+                                    ApiStatus.SUCCESS -> {
+                                        it.data?.let { users ->
+                                            users.body()?.let { response ->
+                                               /* AppLog.d("BusTicketResp",Gson().toJson(response))
+                                                Log.d("BusTicketResp",Gson().toJson(response))*/
+                                                if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                                    Constants.dialog.dismiss()
+                                                }
+                                                mStash.setStringValue(Constants.ForPayoutBookingRefId, response.bookingRefNo.toString())
+                                                getAllBusTicketingRes(response)
+                                            }
+                                        }
+                                    }
+
+                                    ApiStatus.ERROR -> {
+                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                            Constants.dialog.dismiss()
+                                        }
+                                    }
+
+                                    ApiStatus.LOADING -> {
+                                        Constants.OpenPopUpForVeryfyOTP(this)
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     ApiStatus.ERROR -> {
@@ -1517,6 +1578,7 @@ class BusSeating : AppCompatActivity() {
 
 
     }
+
 
     private fun hitApiForBusTicketResponse(response: BusTicketingRes){
         val busTicketingReq = AddTicketResponseReq(
@@ -1536,7 +1598,7 @@ class BusSeating : AppCompatActivity() {
             apiResponse  =  Gson().toJson(response)
         )
 
-        Log.d("busAddTicketRequest", Gson().toJson(busTicketingReq))
+        Log.d("BusticketResponseRequest", Gson().toJson(busTicketingReq))
         Log.d("apiResponse", Gson().toJson(response))
 
         viewModel.getAddBusTicketResponse(busTicketingReq).observe(this) { resource ->
@@ -1546,8 +1608,9 @@ class BusSeating : AppCompatActivity() {
                         if(Constants.dialog!=null && Constants.dialog.isShowing){
                             Constants.dialog.dismiss()
                         }
+                        Log.d("BusticketResponseResponse", resource.data.toString())
                         getTransferAmountToAgentWithCal()
-                        Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketResponse",this@BusSeating)
+                       // Constants.uploadDataOnFirebaseConsole(Gson().toJson(resource.data),"BusSeatingAddBusTicketResponse",this@BusSeating)
                         Log.d("AddBusTicketResponse",resource.data.toString())
                     }
 
@@ -1601,7 +1664,7 @@ class BusSeating : AppCompatActivity() {
                 flag = "Y"
             )
 
-            Log.d("getAllGsonFromAPI", Gson().toJson(transferAmountToAgentsReq))
+            Log.d("TransferAmountToAgentReq", Gson().toJson(transferAmountToAgentsReq))
             getAllApiServiceViewModel.getTransferAmountToAgents(transferAmountToAgentsReq)
                 .observe(this) { resource ->
                     resource?.let {
@@ -1612,7 +1675,7 @@ class BusSeating : AppCompatActivity() {
                                         if(Constants.dialog!=null && Constants.dialog.isShowing){
                                             Constants.dialog.dismiss()
                                         }
-                                        Log.d("BosPayoutTransaction", response.toString())
+                                        Log.d("TransferAmountToAgentReqResp", response.toString())
 
                                         val commission = mStash!!.getStringValue(Constants.retailerCommission, "0.00")?.trim()?.toDoubleOrNull() ?: 0.0
 
@@ -1651,8 +1714,11 @@ class BusSeating : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun getAllBusTicketingRes(response: BusTicketingRes) {
-        hitApiForBusTicketResponse(response)
+
         if (response.responseHeader?.errorCode == "0000") {
+            if(dialog!=null && dialog.isShowing){
+                dialog.dismiss()
+            }
             bin.reviewBookingInclude.finalSeatLayout.visibility = View.GONE
             bin.reviewBookingInclude.reviewBookingDetailsLayout.visibility = View.VISIBLE
             bin.reviewBookingInclude.showTicketLayout.visibility = View.GONE
@@ -1661,6 +1727,8 @@ class BusSeating : AppCompatActivity() {
             bin.reviewBookingInclude.supplierRefNo.text = response.supplierRefno.toString()
             bin.reviewBookingInclude.transportPNR.text = response.transportPNR.toString()
             getAllBusRequaryTicket()
+            hitApiForBusTicketResponse(response)
+
            // toast("Your seat booking is successful")
         }
         else {
@@ -1678,12 +1746,7 @@ class BusSeating : AppCompatActivity() {
             bin.boardingPointSp.adapter = Constants.getAllBoardingPointAdapter
             bin.boardingPointSp.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>,
-                        view: View?,
-                        pos: Int,
-                        id: Long
-                    ) {
+                    override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
                         if (pos >= 0) {
                             try {
                                 boardingPointText = parent.getItemAtPosition(pos).toString()
@@ -1914,7 +1977,7 @@ class BusSeating : AppCompatActivity() {
         bin.busName.text = intent.getStringExtra(Constants.busName).orEmpty()
         bin.arrivalTime.text = intent.getStringExtra(Constants.arrivalTime).orEmpty()
         bin.travelAmount.text = "₹" + intent.getStringExtra(Constants.travelAmount).orEmpty()
-        bin.totalTime.text = intent.getStringExtra(Constants.travelTime).orEmpty()
+       // bin.totalTime.text = intent.getStringExtra(Constants.travelTime).orEmpty()
 
         Constants.boardingPointName = ArrayList()
         Constants.droppingPointName = ArrayList()
@@ -1950,6 +2013,7 @@ class BusSeating : AppCompatActivity() {
 
                     resource.data?.body()?.
                     let {
+                        Log.d("SeatData",Gson().toJson(it))
                         setupSeatGrid(it)
                     }
                 }
@@ -2018,6 +2082,9 @@ class BusSeating : AppCompatActivity() {
 
 
         response.seatMap.forEach { seat ->
+
+           //mStash.setStringValue(Constants.seatNumber, seat.seatNumber.toString())
+
             val apiRow = seat.row?.toIntOrNull() ?: 0
             val apiCol = seat.column ?: 0
 
@@ -2025,19 +2092,14 @@ class BusSeating : AppCompatActivity() {
             val col = apiRow     // <-- column takes row
 
             val zIndex = seat.zIndex?.toIntOrNull() ?: 0
-            val length = seat.length?.toIntOrNull() ?: 0
+            val length = seat.length?.toIntOrNull() ?: 1
             val amount = seat.fareMaster?.basicAmount ?: 0.0
+            val otheramount = seat.fareMaster?.otherAmount ?: 0.0
+
            //val seatName = "₹" + String.format("%.2f", amount)
            //val seatamount = String.format("%.2f", amount)
 
-            val formatted = if (amount % 1 == 0.0)
-                amount.toInt().toString()
-            else
-                String.format("%.2f", amount)
-
-            mStash.setStringValue(Constants.seatNumber, seat.seatNumber.toString())
-
-            val seatView = createSeatView(formatted.toString(), this, row, col, length, seat)
+            val seatView = createSeatView(amount, otheramount,this, row, col, length, seat)
 
             if (zIndex == 1) {
                 upperGrid.addView(seatView)
@@ -2052,7 +2114,8 @@ class BusSeating : AppCompatActivity() {
 
 
     @SuppressLint("InflateParams", "SetTextI18n")
-    private fun createSeatView(seatAmountText: String, context: Context, row: Int, column: Int, length: Int, seat: SeatMap): View {
+
+    private fun createSeatView(seatAmountText: Double,otheramount: Double, context: Context, row: Int, column: Int, length: Int, seat: SeatMap): View {
         val seatView = LayoutInflater.from(context).inflate(R.layout.seat_item, null)
 
         val tvPrice = seatView.findViewById<TextView>(R.id.tvPrice)
@@ -2062,25 +2125,29 @@ class BusSeating : AppCompatActivity() {
         val bottomHandle = seatView.findViewById<View>(R.id.bottomHandle)
         val seatContainer = seatView.findViewById<FrameLayout>(R.id.seatContainer)
 
-         try{
-             tvPrice.text = "₹$seatAmountText"
-         }
-         catch (e:Exception){
-             e.message
-         }
+        try{
+            // tvPrice.text = "₹$seatAmountText"
+            tvPrice.text = "₹${seatAmountText.toInt()}"
+        }
+        catch (e:Exception){
+            e.message
+        }
 
         tvPrice.textSize = 8f
 
         val isSleeper = length == 2
 
-        val seatWidth = if (isSleeper) 60 else 75
-        val seatHeight = if (isSleeper) 160 else 90
+        val widthh = if (isSleeper) 60 else 60
+        val heightt = if (isSleeper) 150 else 100
 
         val params = GridLayout.LayoutParams().apply {
-            width = seatWidth
-            height = seatHeight
+            width = widthh
+            height = heightt
             setMargins(10, 10, 10, 10)
-            rowSpec = if (isSleeper) GridLayout.spec(row, 2) else GridLayout.spec(row)
+
+
+            // ⭐ dynamic row / column position from API ⭐
+            rowSpec = GridLayout.spec(row)
             columnSpec = GridLayout.spec(column)
             setGravity(Gravity.CENTER)
         }
@@ -2161,8 +2228,8 @@ class BusSeating : AppCompatActivity() {
 
             val lengthCount = selectedSeats.groupingBy { it.length }.eachCount()
 
-            val countLen1 = lengthCount["1"] ?: 0   // for seater
-            val countLen2 = lengthCount["2"] ?: 0  // for sleeper
+            val countLen1 = lengthCount["1"] ?: 0   // for seater length 1
+            val countLen2 = lengthCount["2"] ?: 0  // for sleeper length 2
 
             Log.d("count1","$countLen1")
             Log.d("count2","$countLen2")
@@ -2170,32 +2237,41 @@ class BusSeating : AppCompatActivity() {
 
             var busType: String
 
-            if(intent.getStringExtra(Constants.busName)!!.contains("NON A/C Sleeper"))
+            if(intent.getStringExtra(Constants.busName)!!.contains("NON A/C"))
             {
                 busType="NON-AC"
-            }else{
+            }
+            else{
                 busType="AC"
             }
-
-            forServiceChargeSeatType.add(SeattypeModel(
-                countLen2,countLen1,busType.trim()
-            ))
-
-            Log.d("servicetypelist",Gson().toJson(forServiceChargeSeatType))
 
             bin.selectedSeat.text = seatLabels.joinToString(" ")
 
             val totalAmount = selectedSeats.sumOf { it.fareMaster?.basicAmount ?: 0.0 }
+
+            val totalOtherAmount = selectedSeats.sumOf { it.fareMaster?.otherAmount ?: 0.0 }
+
             bin.finalAmount.text = "₹ $totalAmount"
             bin.reviewBookingInclude.totalprice.text = "₹ $totalAmount"
-            rechargeAmount = totalAmount.toString()
+
+            rechargeAmount = (totalAmount+totalOtherAmount).toString()
+
+            val seatAmountList = selectedSeats.map { seat ->
+                SeatFair(
+                    seat.fareMaster?.basicAmount ?: 0.0,
+                     seat.fareMaster?.otherAmount ?: 0.0,
+                      seat.length)
+                   }
+
+            forServiceChargeSeatType.add(SeattypeModel(countLen2,countLen1,busType.trim(),seatAmountList))
+
+            Log.d("servicetypelist",Gson().toJson(forServiceChargeSeatType))
             Log.d("Total Amount", " $totalAmount")
+            Log.d("rechargeamount", " $rechargeAmount")
         }
 
         return seatView
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getPassengerDetailsList(): List<PaXDetails> {
@@ -2303,6 +2379,7 @@ class BusSeating : AppCompatActivity() {
                                     if(Constants.dialog!=null && Constants.dialog.isShowing){
                                         Constants.dialog.dismiss()
                                     }
+                                    Log.d("transferAmountToAgentcommissionresp", commissionresp.toString())
                                 }
                             }
                         }
@@ -2321,7 +2398,7 @@ class BusSeating : AppCompatActivity() {
                     }
                 }
             }
-    }
+        }
 
 
 }

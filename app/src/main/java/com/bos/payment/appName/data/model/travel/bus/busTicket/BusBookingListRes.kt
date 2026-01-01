@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class BusBookingListRes(@SerializedName("returnCode")
                              val returnCode: String = "",
                              @SerializedName("data")
-                             val data: List<DataItem>?,
+                             val data: MutableList<DataItem>?,
                              @SerializedName("returnMessage")
                              val returnMessage: String = "",
                              @SerializedName("isSuccess")

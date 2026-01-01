@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 
 data class Buses (
-
   @SerializedName("ac"                           ) var ac                         : Boolean?                   = null,
   @SerializedName("arrival_Time"                 ) var arrivalTime                : String?                    = null,
   @SerializedName("available_Seats"              ) var availableSeats             : Int?                       = null,

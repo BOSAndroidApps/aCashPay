@@ -25,6 +25,7 @@ public class SearchableSpinner extends AppCompatSpinner implements View.OnTouchL
     private final Context _context;
     private List _items;
     private SearchableListDialog _searchableListDialog;
+    private BusCitySelectListener busCitySelectListener;
 
     private boolean _isDirty;
     private ArrayAdapter _arrayAdapter;
@@ -74,6 +75,13 @@ public class SearchableSpinner extends AppCompatSpinner implements View.OnTouchL
     }
 
 
+    public void setBusCitySelectListener(BusCitySelectListener listener) {
+        this.busCitySelectListener = listener;
+    }
+
+    public interface BusCitySelectListener {
+        void onCitySelected(Object item, int position);
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -124,6 +132,30 @@ public class SearchableSpinner extends AppCompatSpinner implements View.OnTouchL
             _isDirty = true;
             setAdapter(_arrayAdapter);
             setSelection(_items.indexOf(item));
+        }
+
+        if (busCitySelectListener != null) {
+            busCitySelectListener.onCitySelected(item, position);
+        }
+
+
+    }
+
+
+    public void showDialog() {
+        if (_arrayAdapter != null) {
+            _items.clear();
+            for (int i = 0; i < _arrayAdapter.getCount(); i++) {
+                _items.add(_arrayAdapter.getItem(i));
+            }
+
+            FragmentActivity activity = scanForActivity(_context);
+
+            if (activity != null && !_searchableListDialog.isAdded()) {
+                _searchableListDialog.show(activity.getFragmentManager(), "TAG");
+            }
+
+
         }
     }
 

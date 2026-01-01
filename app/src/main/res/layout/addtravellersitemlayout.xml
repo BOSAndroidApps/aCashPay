@@ -170,6 +170,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/firstname"
             android:textSize="@dimen/dimen_14sp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:background="@drawable/outerborder"
             android:layout_marginTop="@dimen/dimen_10dp"
             android:padding="@dimen/dimen_10dp"/>
@@ -180,6 +182,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/lastname"
             android:textSize="@dimen/dimen_14sp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:background="@drawable/outerborder"
             android:layout_marginTop="@dimen/dimen_10dp"
             android:padding="@dimen/dimen_10dp"/>
@@ -221,6 +225,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/passportno"
             android:textSize="@dimen/dimen_14sp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:background="@drawable/outerborder"
             android:layout_marginTop="@dimen/dimen_10dp"
             android:padding="@dimen/dimen_10dp"/>
@@ -231,6 +237,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/passportcountryname"
             android:textSize="@dimen/dimen_14sp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:background="@drawable/outerborder"
             android:layout_marginTop="@dimen/dimen_10dp"
             android:padding="@dimen/dimen_10dp"/>
@@ -252,6 +260,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/passportexpiredate"
                 android:textSize="@dimen/dimen_14sp"
+                android:inputType="text"
+                android:imeOptions="actionDone"
                 android:background="@null"
                 android:padding="@dimen/dimen_10dp"/>
 

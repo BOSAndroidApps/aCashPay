@@ -32,5 +32,8 @@ data class SendMoneyToMobileReqModel(
 	val transferAmt: Double? = null,
 
 	@field:SerializedName("parmUserName")
-	val parmUserName: String? = null
+	val parmUserName: String? = null,
+
+	@field:SerializedName("merchantCode")
+	val merchantCode: String? = null
 )

@@ -26,6 +26,11 @@
         <item>Female</item>
     </string-array>
 
+    <string-array name="status">
+        <item>Active</item>
+        <item>Inactive</item>
+    </string-array>
+
     <string-array name="recharge_array">
         <item>Select Type</item>
         <item>All</item>
@@ -678,6 +683,12 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="user_partially_verified">User Partially Verified</string>
+    <string name="boarding_and_dropping_points">Pick &amp; Drop Points</string>
+    <string name="amentities_you_will_get">Amentities</string>
+    <string name="bus_type">Bus Type</string>
+    <string name="bus_operator">Bus Operator</string>
+    <string name="filter_your_bus">Filter Your Bus</string>
+    <string name="boarding_point">Boarding Point</string>
 
 
 </resources>

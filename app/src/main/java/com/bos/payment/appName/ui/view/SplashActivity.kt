@@ -44,6 +44,7 @@ class SplashActivity : AppCompatActivity() {
         // Initialize binding before calling setContentView
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initView()
         btnListener()
     }

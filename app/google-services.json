@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "891814927365",
-    "project_id": "justpe-fb2fc",
-    "storage_bucket": "justpe-fb2fc.firebasestorage.app"
+    "project_number": "645765838332",
+    "project_id": "justpe-27a51",
+    "storage_bucket": "justpe-27a51.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:891814927365:android:1c1dc1d1cf24fe6062d06c",
+        "mobilesdk_app_id": "1:645765838332:android:d2d70d7d6b426c3bc9ee79",
         "android_client_info": {
           "package_name": "com.justpe.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD5mv5dFpfzruUIsGRidHmvGaHr_TCDOPA"
+          "current_key": "AIzaSyB-h2yNrEQA6P-DTTyhw-Bh9rq9mlG33ts"
         }
       ],
       "services": {

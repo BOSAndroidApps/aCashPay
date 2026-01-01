@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.CountDownTimer
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
@@ -22,7 +23,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.justpedashboard.RetailerWiseServicesDataItem
 import com.bos.payment.appName.data.model.recharge.operator.Data
@@ -30,7 +30,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.gson.internal.bind.ArrayTypeAdapter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -38,10 +37,10 @@ import java.io.OutputStream
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
+import kotlin.random.Random
 
 object Constants {
 
@@ -227,6 +226,8 @@ object Constants {
     var FlightSearchKey = "search_Key"
     var FlightKey = "flight_key"
     var AirTotalTicketPrice = "flight_ticket_price"
+    var AirTotalOperatorPrice = "flight_ticket_operator"
+    var AirTotalBasicPrice = "flight_ticket_Basic"
     var BookingRefNo = "bookingRefNo"
 
     //.................... Bank deatils data for side navigation QR Process .....................................................
@@ -247,6 +248,8 @@ object Constants {
    var BranchNamee =  "branchname"
    var CashDeposit =  "Cash Deposit"
    var DateSelectionHint =  "Select Date"
+   var Active =  "Active"
+   var Inactive =  "Inactive"
 
     lateinit var  dialog : Dialog
 
@@ -305,10 +308,12 @@ object Constants {
     var municipalityName: ArrayList<String>? = null
     var fastTagName: ArrayList<String>? = null
     var stateName: ArrayList<String>? = null
-    var bankListName: ArrayList<String>? = null
+    var bankListName: ArrayList<String>? = arrayListOf()
     var bankListId: ArrayList<String>? = null
-    var busListName: ArrayList<String>? = null
-    var toLocationName: ArrayList<String>? = null
+    var busListName: ArrayList<String>? = arrayListOf()
+    var toLocationName: ArrayList<String>? = arrayListOf()
+
+
     var boardingPointName: ArrayList<String>? = null
     var droppingPointName: ArrayList<String>? = null
     var titleName: ArrayList<String>? = null
@@ -331,8 +336,8 @@ object Constants {
     var municipalityNameMap: HashMap<String, Int>? = null
     var fastTagNameMap: HashMap<String, Int>? = null
     var bankListNameMap: HashMap<String, Int>? = null
-    var busListNameMap: HashMap<String, Int>? = null
-    var toLocationNameMap: HashMap<String, Int>? = null
+    var busListNameMap : HashMap<String, Int>? = hashMapOf()
+    var toLocationNameMap: HashMap<String, Int>? = hashMapOf()
 //    var beneficiaryIdMap: HashMap<String, Int>? = null
 
 
@@ -371,6 +376,7 @@ object Constants {
         }
 
     }
+
 
 
     fun uploadDataOnFirebaseConsole(data:String, collectionPath:String,context: Context){
@@ -438,13 +444,11 @@ object Constants {
     }
 
 
-
     fun maskWithEllipsis(account: String ?, visibleDigits: Int = 4): String {
         val digits = account!!.filter { it.isDigit() }
         if (digits.length <= visibleDigits) return digits
         return "xxxxxx " + digits.takeLast(visibleDigits) // or "…${digits.takeLast(visibleDigits)}"
     }
-
 
 
     fun scanForActivity(cont: Context?): FragmentActivity? {
@@ -507,7 +511,6 @@ object Constants {
         return dateFormat.format(currentDate).lowercase()  // to get "pm" instead of "PM"
     }
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun getCurrentIsoDate(): String {
         return Instant.now().toString()
@@ -534,26 +537,7 @@ object Constants {
 
     }
 
-    fun convertToIconicsName(apiIcon: String?): String? {
-        if (apiIcon.isNullOrBlank()) return null
 
-        // Remove multiple blank spaces
-        val clean = apiIcon.trim().replace("\\s+".toRegex(), " ")
-
-        // Split by space (e.g., ["fa", "fa-home"])
-        val parts = clean.split(" ")
-
-        if (parts.size < 2) return null
-
-        // extract final icon name only
-        val iconName = parts[1] // fa-home or fa-user-cog etc.
-
-        // remove "fa-" or "fas-"
-        val name = iconName.replace("fa-", "").replace("fas-", "")
-
-        // return formatted Iconics name
-        return "faw-$name"
-    }
 
     fun isValidPAN(pan: String): Boolean {
         val regex = Regex("[A-Z]{5}[0-9]{4}[A-Z]{1}")
@@ -561,55 +545,107 @@ object Constants {
     }
 
 
-    object AadhaarUtils {
 
-        fun isValidAadhaar(aadhaar: String): Boolean {
-            val trimmed = aadhaar.trim()
-            if (!Regex("^\\d{12}\$").matches(trimmed)) return false
-            return verhoeffValidate(trimmed)
-        }
+    @Throws(java.lang.Exception::class)
+    fun convertDate(input: String?): String {
+        val inputFormat = SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH)
+        val outputFormat = SimpleDateFormat("dd MMM, EEE", Locale.ENGLISH)
 
-        // Verhoeff checksum
-        private val d = arrayOf(
-            intArrayOf(0,1,2,3,4,5,6,7,8,9),
-            intArrayOf(1,2,3,4,0,6,7,8,9,5),
-            intArrayOf(2,3,4,0,1,7,8,9,5,6),
-            intArrayOf(3,4,0,1,2,8,9,5,6,7),
-            intArrayOf(4,0,1,2,3,9,5,6,7,8),
-            intArrayOf(5,9,8,7,6,0,4,3,2,1),
-            intArrayOf(6,5,9,8,7,1,0,4,3,2),
-            intArrayOf(7,6,5,9,8,2,1,0,4,3),
-            intArrayOf(8,7,6,5,9,3,2,1,0,4),
-            intArrayOf(9,8,7,6,5,4,3,2,1,0)
-        )
+        val date = inputFormat.parse(input)
+        return outputFormat.format(date)
+    }
 
-        private val p = arrayOf(
-            intArrayOf(0,1,2,3,4,5,6,7,8,9),
-            intArrayOf(1,5,7,6,2,8,3,0,9,4),
-            intArrayOf(5,8,0,3,7,9,6,1,4,2),
-            intArrayOf(8,9,1,6,0,4,3,5,2,7),
-            intArrayOf(9,4,5,3,1,2,6,8,7,0),
-            intArrayOf(4,2,8,6,5,7,3,9,0,1),
-            intArrayOf(2,7,9,3,8,0,6,4,1,5),
-            intArrayOf(7,0,4,6,9,1,3,2,5,8)
-        )
 
-        private val inv = intArrayOf(0,4,3,2,1,5,6,7,8,9)
-
-        private fun verhoeffValidate(num: String): Boolean {
-            var c = 0
-            val len = num.length
-            for (i in 0 until len) {
-                val digit = Character.getNumericValue(num[len - 1 - i])
-                c = d[c][p[i % 8][digit]]
-            }
-            return c == 0
+    fun getExpiryMillis(endDate: String?): Long? {
+        if (endDate.isNullOrEmpty()) return null
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            sdf.timeZone = TimeZone.getDefault()
+            sdf.parse(endDate)?.time
+        } catch (e: Exception) {
+            null
         }
     }
 
 
+    fun shouldStartTimer(expiryMillis: Long): Boolean {
+        val now = System.currentTimeMillis()
+        val diff = expiryMillis - now
+        val hours48 = 48 * 60 * 60 * 1000L
+        return diff in 1..hours48
+    }
 
 
+    fun formatRemainingTime(millis: Long): String {
+        val totalSeconds = millis / 1000
+
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        val seconds = totalSeconds % 60
+
+        return "Expires in ${hours}h ${minutes}m ${seconds}s"
+    }
+
+
+
+    fun startExpiryTimer(endDate: String, onTick: (String) -> Unit, onExpire: () -> Unit): CountDownTimer? {
+
+        val expiryMillis = getExpiryMillis(endDate) ?: return null
+        val remainingMillis = expiryMillis - System.currentTimeMillis()
+
+        if (!shouldStartTimer(expiryMillis)) return null
+
+        return object : CountDownTimer(remainingMillis, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                onTick(formatRemainingTime(millisUntilFinished))
+            }
+
+            override fun onFinish() {
+                onExpire()
+            }
+
+        }.start()
+    }
+
+
+
+    fun formatDateTime(date: String?): String {
+        if (date.isNullOrEmpty()) return "-"
+
+        return try {
+            val inputFormat = SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss",
+                Locale.US
+            )
+
+            val outputFormat = SimpleDateFormat(
+                "dd MMM yyyy, hh:mm a",
+                Locale.US
+            )
+
+            val parsedDate = inputFormat.parse(date)
+            outputFormat.format(parsedDate!!)
+                .lowercase() // am / pm in lowercase
+        } catch (e: Exception) {
+            "-"
+        }
+    }
+
+
+    fun generateRequestId(): String {
+        val sdf = SimpleDateFormat("ddHHmmss", Locale.getDefault())
+        val datePart = sdf.format(Date())
+        val randomPart = Random.nextInt(100, 999) // 3-digit random
+        return "ClientRef$datePart$randomPart"
+    }
+
+    fun generateTransactionId(): String {
+        val sdf = SimpleDateFormat("ddHHmmss", Locale.getDefault())
+        val datePart = sdf.format(Date())
+        val randomPart = Random.nextInt(100, 999) // 3-digit random
+        return "TXN$datePart$randomPart"
+    }
 
 
 

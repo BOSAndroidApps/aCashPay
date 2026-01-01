@@ -181,6 +181,7 @@ class RechargeFragment : Fragment() {
     // for successful Page after Mobile Recharge................................
 
     lateinit var operatorlogo: Drawable
+    private var activestatus: String = ""
 
 
     @SuppressLint("SetTextI18n")
@@ -190,26 +191,37 @@ class RechargeFragment : Fragment() {
         context = requireContext()
         rechargeType = arguments?.getString("RechargeType").toString()
         featureCode = arguments?.getString("FeatureCode").toString()
+        activestatus = arguments?.getString("ActiveStatus").toString()
 
         getFuseLocation()
-
-        /*if (rechargeType == "FastTag") {
-            getFastTagList()
-        }
-        else {*/
         initView()
+
         if (rechargeType == "mobile" || rechargeType == "dth") {
             // new changes.............................................
-            val apiName = "Recharge Api"
-            getAllOperatorList(apiName)
-            setOperatorNameForDTH()
-            hitApiForRechargeCategory()
+
+            if(activestatus.equals("N")){
+                binding.inactiveservicelayout.visibility=View.VISIBLE
+            }else {
+                binding.inactiveservicelayout.visibility=View.GONE
+                val apiName = "Recharge Api"
+                getAllOperatorList(apiName)
+                setOperatorNameForDTH()
+                hitApiForRechargeCategory()
+            }
+
         }
         else {
-            val apiName = "Bill Payment Api"
-            getOperatorList(apiName)
+
+            if(activestatus.equals("N")){
+                binding.inactiveservicelayout.visibility=View.VISIBLE
+            }
+            else {
+                binding.inactiveservicelayout.visibility=View.GONE
+                val apiName = "Bill Payment Api"
+                getOperatorList(apiName)
+            }
+
         }
-        /* }*/
 
         if (!isUserLoggedIn()) {
             startActivity(Intent(requireContext(), LoginActivity::class.java))
@@ -514,6 +526,7 @@ class RechargeFragment : Fragment() {
             }
         }
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.M)

@@ -57,6 +57,7 @@ class FlightConstant {
 
         @kotlin.jvm.JvmField
         var checkFrom: Boolean = false
+        var checkFromBus: Boolean = false
 
         @kotlin.jvm.JvmField
         var checkTo: Boolean = false

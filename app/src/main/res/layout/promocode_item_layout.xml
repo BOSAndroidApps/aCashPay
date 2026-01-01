@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/dimen_2dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/redeemlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        android:layout_marginTop="@dimen/dimen_2dp"
+        android:layout_marginBottom="-10dp"
+        android:visibility="gone"
+        android:layout_marginHorizontal="@dimen/dimen_4dp"
+        app:cardBackgroundColor="@color/light_dark_green"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/dimen_6dp"
+                android:layout_gravity="center"
+                app:cardUseCompatPadding="true"
+                app:cardBackgroundColor="@color/light_green">
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_20dp"
+                    android:layout_height="@dimen/dimen_20dp"
+                    android:src="@drawable/checkiconn"
+                    app:tint="@color/green"
+                    android:padding="@dimen/dimen_4dp"
+                    android:layout_gravity="center"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Eligible for Redemption"
+                    android:textSize="@dimen/dimen_14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/green"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Cashback unlocked and ready to redeem"
+                    android:textSize="@dimen/dimen_12sp"
+                    android:paddingVertical="@dimen/dimen_2dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@color/text_color"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dimen_4dp"
+        app:cardCornerRadius="@dimen/dimen_8dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@+id/redeemlayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statuscard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="@dimen/dimen_4dp"
+                android:layout_marginRight="@dimen/dimen_6dp"
+                android:layout_alignParentRight="true"
+                app:cardBackgroundColor="@color/green"
+                app:cardCornerRadius="@dimen/dimen_8dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Active"
+                        android:textSize="@dimen/dimen_12sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:paddingVertical="@dimen/dimen_4dp"
+                        android:paddingHorizontal="@dimen/dimen_10dp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/promocode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="WINSALE"
+                android:layout_marginTop="@dimen/dimen_4dp"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:textSize="@dimen/dimen_16sp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/roboto_bold" />
+
+            <TextView
+                android:id="@+id/promoname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/promocode"
+                android:text="B2B WINTER SALE"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:textColor="@color/edittext_color"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="@dimen/dimen_12sp"/>
+
+            <View
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/moregreylight"
+                android:layout_below="@+id/promoname"/>
+
+            <TextView
+                android:id="@+id/offeramount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/view1"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:text="Upto ₹ 500 Cashback"
+                android:textColor="@color/blue"
+                android:paddingVertical="@dimen/dimen_4dp"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="@dimen/dimen_16sp"/>
+
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2dp"
+                android:background="@color/moregreylight"
+                android:layout_below="@+id/offeramount"/>
+
+            <LinearLayout
+                android:id="@+id/offerdatelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="@dimen/dimen_6dp"
+                android:layout_below="@+id/view2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dimen_4dp">
+
+                    <TextView
+                        android:layout_weight=".3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Min Txn"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/edittext_color"/>
+
+                    <TextView
+                        android:layout_weight=".1"
+                        android:layout_width="0dp"
+                        android:text=":"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/maxtxnamount"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="₹ 10,000"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_bold"/>
+
+
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_2dp"
+                    android:background="@color/moregreylight"
+                    android:layout_below="@+id/offeramount"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dimen_4dp">
+
+                    <TextView
+                        android:layout_weight=".3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Valid till"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/edittext_color"/>
+
+                    <TextView
+                        android:layout_weight=".1"
+                        android:layout_width="0dp"
+                        android:text=":"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:id="@+id/timealertlayout"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tilldate"
+                        android:layout_weight="0.5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="30 Dec 2025"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_bold"/>
+
+
+                        <LinearLayout
+                            android:layout_weight=".5"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/expriedate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expires in 15h 10m 30s"
+                                android:layout_gravity="center"
+                                android:textColor="@color/red"
+                                android:textSize="@dimen/dimen_12sp"
+
+                                android:fontFamily="@font/roboto_medium"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_2dp"
+                    android:background="@color/moregreylight"
+                    android:layout_below="@+id/offeramount"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/dimen_4dp">
+
+                    <TextView
+                        android:layout_weight=".3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Services"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="@color/edittext_color"/>
+
+                    <TextView
+                        android:layout_weight=".1"
+                        android:layout_width="0dp"
+                        android:text=":"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/servicesname"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Flights,Bus"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/dimen_14sp"
+                        android:fontFamily="@font/roboto_bold"/>
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:paddingBottom="@dimen/dimen_4dp"
+                android:layout_marginRight="@dimen/dimen_6dp"
+                android:paddingVertical="@dimen/dimen_4dp"
+                android:layout_below="@+id/offerdatelayout">
+
+                <LinearLayout
+                    android:id="@+id/details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+
+                    android:layout_marginRight="@dimen/dimen_6dp"
+                    android:background="@drawable/promobuttonborder">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Details"
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:paddingVertical="@dimen/dimen_4dp"
+                            android:paddingHorizontal="@dimen/dimen_16dp"
+                            android:textColor="@color/blue"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/applybutton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/blue"
+                    app:cardCornerRadius="@dimen/dimen_8dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Apply"
+
+                            android:textSize="@dimen/dimen_12sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:paddingVertical="@dimen/dimen_4dp"
+                            android:paddingHorizontal="@dimen/dimen_14dp"
+                            android:textColor="@color/white"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+
+            </LinearLayout>
+
+
+
+
+
+        </RelativeLayout>
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

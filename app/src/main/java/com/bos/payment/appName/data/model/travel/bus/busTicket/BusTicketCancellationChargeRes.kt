@@ -14,7 +14,7 @@ data class BusTicketCancellationChargeRes(
 	val responseHeader: ResponseHeaderr? = null,
 
 	@field:SerializedName("cancellationPenaltyValues")
-	val cancellationPenaltyValues: List<Any?>? = null,
+	val cancellationPenaltyValues: MutableList<CancellationPenaltyValue?>? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null,
@@ -28,6 +28,18 @@ data class BusTicketCancellationChargeRes(
 	@field:SerializedName("value")
 	val value: String? = null
 )
+
+data class CancellationPenaltyValue(
+	@SerializedName("cancellation_Penalty")
+	val cancellationPenalty: String,
+
+	@SerializedName("seat_Number")
+	val seatNumber: String,
+
+	@SerializedName("ticket_Number")
+	val ticketNumber: String
+)
+
 
 data class ResponseHeaderr(
 

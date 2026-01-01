@@ -98,6 +98,12 @@ import com.bos.payment.appName.data.model.pinChange.ChangePasswordReq
 import com.bos.payment.appName.data.model.pinChange.ChangePasswordRes
 import com.bos.payment.appName.data.model.pinChange.PinChangeReq
 import com.bos.payment.appName.data.model.pinChange.PinChangeRes
+import com.bos.payment.appName.data.model.promocode.GetEligibleReq
+import com.bos.payment.appName.data.model.promocode.GetEligibleResp
+import com.bos.payment.appName.data.model.promocode.GetPromotionListReq
+import com.bos.payment.appName.data.model.promocode.GetPromotionListResp
+import com.bos.payment.appName.data.model.promocode.ManagePromoUsageReq
+import com.bos.payment.appName.data.model.promocode.ManagePromoUsageResp
 import com.bos.payment.appName.data.model.recharge.plan.MobileBrowserPlanReq
 import com.bos.payment.appName.data.model.recharge.plan.MobileBrowserPlanRes
 import com.bos.payment.appName.data.model.recharge.BillOperationPaymentReq
@@ -137,7 +143,19 @@ import com.bos.payment.appName.data.model.serviceWiseTrans.ServiceWiseTransactio
 import com.bos.payment.appName.data.model.serviceWiseTrans.ServiceWiseTransactionRes
 import com.bos.payment.appName.data.model.serviceWiseTrans.TransactionReportReq
 import com.bos.payment.appName.data.model.serviceWiseTrans.TransactionReportRes
+import com.bos.payment.appName.data.model.servicesbasednotification.NotificationReq
+import com.bos.payment.appName.data.model.servicesbasednotification.NotificationResp
 import com.bos.payment.appName.data.model.stateDistrict.GetStateRes
+import com.bos.payment.appName.data.model.subscription.BillingCostReq
+import com.bos.payment.appName.data.model.subscription.BillingCostResp
+import com.bos.payment.appName.data.model.subscription.DurationReq
+import com.bos.payment.appName.data.model.subscription.DurationResponse
+import com.bos.payment.appName.data.model.subscription.FeatureLinkReq
+import com.bos.payment.appName.data.model.subscription.FeatureLinkResp
+import com.bos.payment.appName.data.model.subscription.FeatureListReq
+import com.bos.payment.appName.data.model.subscription.FeatureListResp
+import com.bos.payment.appName.data.model.subscription.SubscriptionUserDeatilsReq
+import com.bos.payment.appName.data.model.subscription.SubscriptionUserDeatilsResp
 import com.bos.payment.appName.data.model.supportmanagement.AddCommentReq
 import com.bos.payment.appName.data.model.supportmanagement.AddCommentResp
 import com.bos.payment.appName.data.model.supportmanagement.ChatCommentResp
@@ -162,6 +180,8 @@ import com.bos.payment.appName.data.model.travel.bus.busTicket.AddTicketResponse
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusBookingListReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusBookingListRes
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusCancelTicketListRespo
+import com.bos.payment.appName.data.model.travel.bus.busTicket.BusManageCancelTicketReq
+import com.bos.payment.appName.data.model.travel.bus.busTicket.BusManageCancelTicketResp
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPassangerDetailsRes
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPassengerDetailsReq
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusPaxRequeryResponseReq
@@ -172,6 +192,8 @@ import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketCancelRe
 import com.bos.payment.appName.data.model.travel.bus.busTicket.BusTicketCancelResponseReq
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionReq
 import com.bos.payment.appName.data.model.travel.bus.forservicecharge.BusCommissionResp
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeReq
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeResp
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionResp
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingRequest
@@ -515,6 +537,10 @@ interface ApiInterface {
     suspend fun getBusCancelList(@Body req: BusBookingListReq): Response<BusCancelTicketListRespo>?
 
 
+    @POST("api/Cancellation/ManageCancell")
+    suspend fun getManageBusCancelList(@Body req: BusManageCancelTicketReq): Response<BusManageCancelTicketResp>?
+
+
     @POST("api/Airport/Airportlist")
     suspend fun getAirPortList(@Body req: AirportListReq): Response<AirportListResp>?
 
@@ -676,8 +702,8 @@ interface ApiInterface {
     suspend fun uploadCustomerProfile(
         @Part("UserID") mode: RequestBody,
         @Part("TaskType") rid: RequestBody,
-        @Part profilePic: MultipartBody.Part
-    ): Response<ProfileResponse>
+        @Part profilePic: MultipartBody.Part)
+    : Response<ProfileResponse>
 
 
     @POST("api/Reports/vpaTransactionReport")
@@ -696,6 +722,47 @@ interface ApiInterface {
 
     @POST("api/Customer/UpdateKyc")
     suspend fun updateKycReq(@Body req: UpdateKycReq): Response<UpdateKycResp>?
+
+
+    // subscription........
+
+    @POST("api/ManageUser/GetUserDetailsforManagelink")
+    suspend fun subscriptionDetailsReq(@Body req: SubscriptionUserDeatilsReq): Response<SubscriptionUserDeatilsResp>?
+
+
+    @POST("api/Feature/GetUserFeatureList")
+    suspend fun featureListReq(@Body req: FeatureListReq): Response<FeatureListResp>?
+
+
+    @POST("api/Feature/GetBillingCosts")
+    suspend fun billingCostReq(@Body req: BillingCostReq): Response<BillingCostResp>?
+
+
+    @POST("api/Feature/UserFeatureLink")
+    suspend fun FeatureLinkReq(@Body req: FeatureLinkReq): Response<FeatureLinkResp>?
+
+
+    @POST("api/Notification/ManageServiceExpiryNotification")
+    suspend fun GetNotificationReq(@Body req: NotificationReq): Response<NotificationResp>?
+
+
+    @POST("api/UserSetting/ManageUserSetting")
+    suspend fun GetServiceChargeReq(@Body req: ServiceChargeReq): Response<ServiceChargeResp>?
+
+
+
+    // for promocode
+
+    @POST("api/PromoCode/PromotionResult")
+    suspend fun GetPromotionListReq(@Body req: GetPromotionListReq): Response<GetPromotionListResp>?
+
+
+    @POST("api/promo/transaction/GetEligibleTransactionTotal")
+    suspend fun GetEligibleReq(@Body req: GetEligibleReq): Response<GetEligibleResp>?
+
+
+    @POST("api/promo/transaction/ManagePromoUsage")
+    suspend fun GetManagePromoUsageReq(@Body req: ManagePromoUsageReq): Response<ManagePromoUsageResp>?
 
 
 }

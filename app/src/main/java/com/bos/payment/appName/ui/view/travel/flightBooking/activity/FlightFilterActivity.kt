@@ -8,7 +8,9 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.travel.flight.FlightsItem
 import com.bos.payment.appName.data.repository.TravelRepository
@@ -24,6 +27,7 @@ import com.bos.payment.appName.data.viewModelFactory.TravelViewModelFactory
 import com.bos.payment.appName.databinding.FilterFlightItemLayoutBinding
 import com.bos.payment.appName.network.RetrofitClient
 import com.bos.payment.appName.ui.view.travel.adapter.AirlinesAdapter
+import com.bos.payment.appName.ui.view.travel.busactivity.BusConstant.Companion.busBoardingPointList
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.AllAirNameList
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.AllFlightList
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.DepartureDateAndTime
@@ -46,7 +50,7 @@ import java.util.Date
 import java.util.Locale
 
 
-class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner {
+class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListener {
     private lateinit var binding : FilterFlightItemLayoutBinding
     lateinit var viewModel : TravelViewModel
     private var mStash: MStash? = null
@@ -58,6 +62,7 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
     companion object {
         const val TAG = "FlightFilterBottomSheet"
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -95,7 +100,8 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
 
         val departureTime: Date? = try {
             formatter.parse(DepartureDateAndTime)
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             null
         }
 
@@ -192,12 +198,63 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
     }
 
 
-
     private fun setDataOnView(){
         binding.flightcount.text= FlightListForFilter.size.toString().plus(" Flights Found")
-        binding.showairlinelist.isNestedScrollingEnabled = false
         var adapter = AirlinesAdapter(this,airportNameList,this)
         binding.showairlinelist.adapter=adapter
+
+
+        binding.showairlinelist.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+
+                    if (binding.showairlinelist.childCount == 0) return
+
+                    val itemHeight = binding.showairlinelist.getChildAt(0).measuredHeight
+                    val visibleItems = minOf(airportNameList.size, 6)
+
+                    val params = binding.showairlinelist.layoutParams
+                    params.height = itemHeight * visibleItems
+                    binding.showairlinelist.layoutParams = params
+
+                    binding.showairlinelist.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            }
+        )
+
+        binding.showairlinelist.apply {
+            isNestedScrollingEnabled = false
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
+
+        binding.showairlinelist.addOnItemTouchListener(
+            object : RecyclerView.OnItemTouchListener {
+
+                override fun onInterceptTouchEvent(
+                    rv: RecyclerView,
+                    e: MotionEvent
+                ): Boolean {
+
+                    when (e.action) {
+                        MotionEvent.ACTION_DOWN,
+                        MotionEvent.ACTION_MOVE -> {
+                            rv.parent.requestDisallowInterceptTouchEvent(true)
+                        }
+
+                        MotionEvent.ACTION_UP,
+                        MotionEvent.ACTION_CANCEL -> {
+                            rv.parent.requestDisallowInterceptTouchEvent(false)
+                        }
+                    }
+                    return false
+                }
+
+                override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+
+                override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+            }
+        )
+
 
     }
 
@@ -247,6 +304,7 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
             binding.nonstoptxt.setTextColor(resources.getColor(R.color.blue))
 
         }
+
 
         binding.stopslayout.setOnClickListener {
             nonStops= false
@@ -357,6 +415,7 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
 
 
 
+
     fun selectedFlightType()
     {
         binding.nonstoplayout.background=resources.getDrawable(R.drawable.outerborder)
@@ -368,6 +427,7 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
         binding.stopstext.setTextColor(resources.getColor(R.color.edittext_color))
 
     }
+
 
 
 
@@ -411,10 +471,8 @@ class FlightFilterActivity: AppCompatActivity() , AirlinesAdapter.OnClickListner
 
 
     override fun setonclicklistner(airlineNames: List<String>) {
-        // airlineNames will have all selected airlines
         airlinesNameList = airlineNames
         applyFilters()
-
     }
 
 

@@ -49,7 +49,6 @@ import com.bos.payment.appName.ui.view.Dashboard.activity.RechargeHistory
 import com.bos.payment.appName.ui.view.Dashboard.dmt.DMTMobileActivity
 import com.bos.payment.appName.ui.view.idfcPayout.Payout
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
-import com.bos.payment.appName.ui.view.travel.busactivity.BookingTravel
 import com.bos.payment.appName.ui.viewmodel.GetAllApiServiceViewModel
 import com.bos.payment.appName.ui.viewmodel.GetAllMobileRechargeViewModel
 import com.bos.payment.appName.ui.viewmodel.MoneyTransferViewModel
@@ -767,7 +766,7 @@ class DashboardFragment : Fragment() {
            /* if (merchantList!!.contains("F0133")){*/
                // Log.d("merchantlist",merchantList)
                 binding.flightAndBusLayout.setOnClickListener {
-                    startActivity(Intent(requireContext(), BookingTravel::class.java))
+                   // startActivity(Intent(requireContext(), BookingTravel::class.java))
                 }
            /* }else {
                 binding.flightAndBusLayout.setOnClickListener {

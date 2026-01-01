@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,13 +29,22 @@ import com.bos.payment.appName.data.viewModelFactory.TravelViewModelFactory
 import com.bos.payment.appName.databinding.ActivityBookingTravelBinding
 import com.bos.payment.appName.databinding.ActivityFlightSearchBinding
 import com.bos.payment.appName.network.RetrofitClient
+import com.bos.payment.appName.ui.view.travel.busactivity.BusConstant.Companion.BusDepartureDateAndTime
+import com.bos.payment.appName.ui.view.travel.busactivity.BusConstant.Companion.fromBusCityName
+import com.bos.payment.appName.ui.view.travel.busactivity.BusConstant.Companion.toBusCityName
 import com.bos.payment.appName.ui.view.travel.busactivity.BusSearchDetails
 import com.bos.payment.appName.ui.view.travel.busactivity.BusTicketConsListClass
 import com.bos.payment.appName.ui.view.travel.busactivity.MyBookingBusActivity
+import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.DepartureDateAndTime
+import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.checkFromBus
+import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.travelDate
 import com.bos.payment.appName.ui.view.travel.model.DateModel
 import com.bos.payment.appName.ui.viewmodel.TravelViewModel
 import com.bos.payment.appName.utils.ApiStatus
 import com.bos.payment.appName.utils.Constants
+import com.bos.payment.appName.utils.Constants.busListName
+import com.bos.payment.appName.utils.Constants.toLocationName
+import com.bos.payment.appName.utils.Constants.toLocationNameMap
 import com.bos.payment.appName.utils.MStash
 import com.bos.payment.appName.utils.Utils
 import com.bos.payment.appName.utils.Utils.PD
@@ -52,35 +62,41 @@ class BusBookingMainFragment : Fragment() {
     private lateinit var busList: ArrayList<CityDetails>
     private val myCalender = Calendar.getInstance()
     private var fromDesignation: String? = null
-    private var fromDesignationName: String? = null
     private var toDesignation: String? = null
-    private var toDesignationName: String? = null
-    private var isSeaterBus: Boolean? = false
-    private var isSleeperBus: Boolean? = false
-    private var isAcBus: Boolean? = false
-    private  var passengerList: MutableList<com.bos.payment.appName.data.model.travel.bus.busRequery.PaXDetails> = mutableListOf()
-
+    private var checkReverse = false
     private val bookingDate = DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+
         myCalender.set(Calendar.YEAR, year)
         myCalender.set(Calendar.MONTH, monthOfYear)
         myCalender.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-        val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()) // you can format it as needed
-        val selectedDate = sdf.format(myCalender.time)
+        // For API / storage
+        val apiSdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val selectedDate = apiSdf.format(myCalender.time)
 
-        bin.date.setText(selectedDate) // set selected date in EditText
-        mStash?.setStringValue(Constants.dateAndTime, selectedDate) // save date in shared prefs
-        Log.d("SelectedDate", selectedDate) // for debug
+        // For UI display
+        val displaySdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formattedDate = displaySdf.format(myCalender.time)
+
+        bin.datemonthdeparture.text = formatDate1(formattedDate)
+        bin.dayyear.text = formatDate2(formattedDate)
+
+        mStash?.setStringValue(Constants.dateAndTime, selectedDate)
+
+        Log.d("SelectedDate", selectedDate)
     }
 
     val dateList = mutableListOf<DateModel>()
     val calendar = Calendar.getInstance()
     val dateFormatDayNumber = SimpleDateFormat("dd", Locale.getDefault())
     val dateFormatDayName = SimpleDateFormat("EEE", Locale.getDefault())
+    private var activestatus: String = ""
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View {
         bin = ActivityBookingTravelBinding.inflate(inflater, container, false)
+        activestatus = arguments?.getString("ActiveStatus").toString()
+
         return bin.root
     }
 
@@ -93,71 +109,56 @@ class BusBookingMainFragment : Fragment() {
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
 
         initView()
-        getAllTravelBusList()
-        setDropDown()
+
+        if(activestatus.equals("N")){
+            bin.inactiveservicelayout.visibility=View.VISIBLE
+        }else {
+            bin.inactiveservicelayout.visibility=View.GONE
+            getAllTravelBusList()
+        }
+        setCurrentDate()
         btnListener()
     }
 
 
-    private fun setDropDown() {
-        /**************************************** Get All from location ***************************/
-        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.busListName!!)
-        Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
-        bin.fromDestinationSp.adapter = Constants.getAllBusListAdapter
-        bin.fromDestinationSp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-                if (pos > 0) {
-                    try {
-                        fromDesignation = Constants.busListNameMap?.get(parent?.getItemAtPosition(pos)).toString()
-                        fromDesignationName = parent?.getItemAtPosition(pos).toString()
-                        mStash?.setStringValue(Constants.fromDesignationName, fromDesignationName)
-                        mStash?.setStringValue(Constants.fromDesignationId, fromDesignation)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                } else {
-                    fromDesignation = ""
-                }
-            }
+    private fun setCurrentDate() {
+        val calendar = Calendar.getInstance()
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
+        // For UI display
+        val displaySdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formattedDate = displaySdf.format(myCalender.time)
 
-            }
-        }
-        Constants.getAllBusListAdapter!!.notifyDataSetChanged()
+        bin.datemonthdeparture.text = formatDate1(formattedDate)
+        bin.dayyear.text = formatDate2(formattedDate)
 
-        /**************************************** Get All to location ***************************/
-        Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.toLocationName!!)
+        val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        val selectedDate = sdf.format(calendar.time)
+        mStash?.setStringValue(Constants.dateAndTime, selectedDate)
 
-        Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
-
-        bin.toDestinationSp.adapter = Constants.getAllBusListAdapter
-
-        bin.toDestinationSp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, pos: Int, id: Long) {
-                if (pos > 0) {
-                    try {
-                        toDesignation = Constants.toLocationNameMap?.get(parent?.getItemAtPosition(pos)).toString()
-                        toDesignationName = parent?.getItemAtPosition(pos).toString()
-
-                        mStash?.setStringValue(Constants.toDesignationId, toDesignation)
-                        mStash?.setStringValue(Constants.toDesignationName, toDesignationName)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                } else {
-                    toDesignation = ""
-                }
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
-        }
-        Constants.getAllBusListAdapter!!.notifyDataSetChanged()
 
     }
 
+    private fun setDropDown() {
+        /**************************************** Get All from location ***************************/
+        if(!Constants.busListName!!.isNullOrEmpty()){
+            Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.busListName!!)
+            Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
+            bin.fromDestinationSp.adapter = Constants.getAllBusListAdapter
+
+            Constants.getAllBusListAdapter!!.notifyDataSetChanged()
+
+            /**************************************** Get All to location ***************************/
+            Constants.getAllBusListAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_right_aligned, Constants.toLocationName!!)
+
+            Constants.getAllBusListAdapter!!.setDropDownViewResource(R.layout.spinner_right_aligned)
+
+            bin.toDestinationSp.adapter = Constants.getAllBusListAdapter
+
+            Constants.getAllBusListAdapter!!.notifyDataSetChanged()
+        }
+
+
+    }
 
     private fun getAllTravelBusList() {
         val requestId = generateRandomNumber()
@@ -204,13 +205,18 @@ class BusBookingMainFragment : Fragment() {
             Constants.toLocationName?.clear()
             Constants.busListName?.add("Select from location")
             Constants.toLocationName?.add("Select to location")
+            Log.d("response",Gson().toJson(response.cityDetails))
+
             response.cityDetails.forEach { busListData ->
                 Constants.busListName?.add(busListData.cityName!!)
                 Constants.toLocationName?.add(busListData.cityName!!)
                 Constants.busListNameMap?.put(busListData.cityName!!, busListData.cityID!!)
                 Constants.toLocationNameMap?.put(busListData.cityName!!, busListData.cityID!!)
             }
-            Constants.getAllBusListAdapter?.notifyDataSetChanged()
+
+            setDropDown()
+
+
         }
         else {
             toast("Error Message")
@@ -238,94 +244,87 @@ class BusBookingMainFragment : Fragment() {
             return@setOnItemSelectedListener true
         }
 
-        bin.busLayout.setOnClickListener {
-            bin.cardView.visibility = View.VISIBLE
-            setHoverSelection()
-            bin.buscard.setCardBackgroundColor(resources.getColor(R.color.white))
-            bin.busicon.imageTintList= resources.getColorStateList(R.color.blue)
-            bin.bus.setTextColor(resources.getColor(R.color.blue))
+        bin.todaylayout.setOnClickListener {
+            val calendar = Calendar.getInstance()
+
+            val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+            val selectedDate = sdf.format(calendar.time)
+            mStash?.setStringValue(Constants.dateAndTime, selectedDate)
+            setSelectionTodayTomorrow()
+            bin.todaylayout.background = resources.getDrawable(R.drawable.selectedbutton)
+            bin.todaytxt.setTextColor(resources.getColor(R.color.blue))
+            bin.todaylayout.backgroundTintList=null
         }
 
-        bin.flightsLayout.setOnClickListener {
-           /* //toast("Available Soon")
-           // bin.cardView.visibility = View.GONE
-            setHoverSelection()
-            bin.flightcard.setCardBackgroundColor(resources.getColor(R.color.white))
-            bin.flighticon.imageTintList= resources.getColorStateList(R.color.blue)
-            bin.flights.setTextColor(resources.getColor(R.color.blue))*/
-           // startActivity(Intent(requireContext(), FlightMainActivity::class.java))
+        bin.tomorrowlayout.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.DAY_OF_MONTH, 1) // ➜ tomorrow
+
+            val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+            val tomorrowDate = sdf.format(calendar.time)
+
+            mStash?.setStringValue(Constants.dateAndTime, tomorrowDate)
+
+            setSelectionTodayTomorrow()
+
+            bin.tomorrowlayout.background = resources.getDrawable(R.drawable.selectedbutton)
+            bin.tomorrowtxt.setTextColor(resources.getColor(R.color.blue))
+            bin.tomorrowlayout.backgroundTintList=null
+
         }
 
-        bin.trainsLayout.setOnClickListener {
-            toast("Available Soon")
-            bin.cardView.visibility = View.GONE
-            setHoverSelection()
-            bin.traincard.setCardBackgroundColor(resources.getColor(R.color.white))
-            bin.trainicon.imageTintList= resources.getColorStateList(R.color.blue)
-            bin.trains.setTextColor(resources.getColor(R.color.blue))
+        bin.fromcityLayout.setOnClickListener {
+            checkFromBus = true
+            bin.fromlayout.visibility = View.GONE
+            bin.fromDestinationSp.visibility = View.VISIBLE
+            bin.fromcityLayout.background = resources.getDrawable(R.drawable.selectedbutton)
+            bin.fromDestinationSp.showDialog()
         }
 
-        bin.hotelsLayout.setOnClickListener {
-            toast("Available Soon")
-            bin.cardView.visibility = View.GONE
-            setHoverSelection()
-            bin.hotelcard.setCardBackgroundColor(resources.getColor(R.color.white))
-            bin.hotelicon.imageTintList= resources.getColorStateList(R.color.blue)
-            bin.hotels.setTextColor(resources.getColor(R.color.blue))
+        bin.tocityLayout.setOnClickListener {
+            checkFromBus = false
+            bin.tolayout.visibility = View.GONE
+            bin.toDestinationSp.visibility = View.VISIBLE
+            bin.tocityLayout.background = resources.getDrawable(R.drawable.selectedbutton)
+            bin.toDestinationSp.showDialog()
         }
 
-
-        bin.backBtn.setOnClickListener {
-            //onBackPressed()
+        bin.fromDestinationSp.setBusCitySelectListener { item, _ ->
+            fromBusCityName = item as String // your bus model
+            setData()
         }
 
-        bin.searchBuses.setOnClickListener {
-            validationCity()
+        bin.toDestinationSp.setBusCitySelectListener { item, _ ->
+            toBusCityName = item as String // your bus model
+            setData()
+
+
         }
-        bin.seaterBusCard.setOnClickListener {
-            if (isSeaterBus == true){
-                isSeaterBus = false
-                bin.seaterBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
-                bin.seater.setTextColor(resources.getColor(R.color.blue))
-            }else {
-                isSeaterBus = true
-                isSleeperBus = false
-                isAcBus = false
-                bin.seaterBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.blue))
-                bin.seater.setTextColor(resources.getColor(R.color.white))
+
+        bin.reversetrip.setOnClickListener {
+
+            fromBusCityName = bin.fromcityname.text.toString()
+
+            toBusCityName = bin.tocityname.text.toString()
+
+            if (checkReverse) {
+                bin.fromcityname.text = toBusCityName
+                bin.tocityname.text = fromBusCityName
+                checkReverse = false
             }
-        }
-        bin.sleeperBusCard.setOnClickListener {
-            if (isSleeperBus == true){
-                isSleeperBus = false
-                bin.sleeperBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
-                bin.sleeper.setTextColor(resources.getColor(R.color.blue))
-            }else {
-                isSeaterBus = false
-                isSleeperBus = true
-                isAcBus = false
-                bin.sleeperBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.blue))
-                bin.sleeper.setTextColor(resources.getColor(R.color.white))
+            else {
+                bin.tocityname.text = fromBusCityName
+                bin.fromcityname.text = toBusCityName
+                checkReverse = true
             }
-        }
-        bin.acBusCard.setOnClickListener {
-            if (isAcBus == true) {
-                isAcBus = false
-                bin.acBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.white))
-                bin.acBus.setTextColor(resources.getColor(R.color.blue))
-            } else {
-                isSeaterBus = false
-                isSleeperBus = false
-                isAcBus = true
-                bin.acBusCard.background?.setTint(ContextCompat.getColor(requireContext(), R.color.blue))
-                bin.acBus.setTextColor(resources.getColor(R.color.white))
-            }
+
+
         }
 
-        bin.date.setOnClickListener {
+        bin.departureDatelayout.setOnClickListener {
             Utils.hideKeyboard(requireActivity())
             DatePickerDialog(
-                requireContext(),
+                requireActivity(),
                 bookingDate,
                 myCalender[Calendar.YEAR],
                 myCalender[Calendar.MONTH],
@@ -333,41 +332,55 @@ class BusBookingMainFragment : Fragment() {
             ).show()
         }
 
+        bin.searchbuseslayout.setOnClickListener {
+            validationCity()
+        }
+
+    }
+
+
+    public fun setData() {
+
+        bin.fromlayout.visibility = View.VISIBLE
+        bin.fromDestinationSp.visibility = View.GONE
+
+        bin.toDestinationSp.visibility = View.GONE
+        bin.tolayout.visibility = View.VISIBLE
+
+
+        if (checkFromBus) {
+            bin.fromcityname.text = fromBusCityName
+            bin.fromcityLayout.background = resources.getDrawable(R.drawable.fromtoback)
+        }
+        else {
+            bin.tocityname.text = toBusCityName
+            bin.tocityLayout.background = resources.getDrawable(R.drawable.fromtoback)
+        }
+
     }
 
 
     private fun validationCity() {
         val errorMessage: String? = when{
-            fromDesignation.isNullOrBlank() -> "Please select from location"
-            toDesignation.isNullOrBlank() -> "Please select to location"
-            bin.date.text?.trim().isNullOrEmpty() -> "Please select date"
-
+            fromBusCityName.isNullOrBlank() -> "Please select from location"
+            toBusCityName.isNullOrBlank() -> "Please select to location"
             else -> null
         }
         if (errorMessage != null){
             toast(errorMessage)
-        } else {
-            startActivity(Intent(requireContext(), BusSearchDetails::class.java))
         }
-    }
+        else {
+            fromDesignation = Constants.toLocationNameMap?.get(bin.fromcityname.text.toString()).toString()
+            mStash?.setStringValue(Constants.fromDesignationId, fromDesignation)
+            mStash?.setStringValue(Constants.fromDesignationName, bin.fromcityname.text.toString())
 
+            toDesignation = Constants.toLocationNameMap?.get(bin.tocityname.text.toString()).toString()
+            mStash?.setStringValue(Constants.toDesignationId, toDesignation)
+            mStash?.setStringValue(Constants.toDesignationName, bin.tocityname.text.toString())
 
-    private fun setHoverSelection(){
-        bin.flightcard.setCardBackgroundColor(resources.getColor(R.color.blue))
-        bin.buscard.setCardBackgroundColor(resources.getColor(R.color.blue))
-        bin.traincard.setCardBackgroundColor(resources.getColor(R.color.blue))
-        bin.hotelcard.setCardBackgroundColor(resources.getColor(R.color.blue))
+            startActivity(Intent(requireContext(), BusSearchDetails::class.java))
 
-        bin.flighticon.imageTintList= resources.getColorStateList(R.color.white)
-        bin.busicon.imageTintList= resources.getColorStateList(R.color.white)
-        bin.trainicon.imageTintList= resources.getColorStateList(R.color.white)
-        bin.hotelicon.imageTintList= resources.getColorStateList(R.color.white)
-
-        bin.flights.setTextColor(resources.getColor(R.color.white))
-        bin.bus.setTextColor(resources.getColor(R.color.white))
-        bin.trains.setTextColor(resources.getColor(R.color.white))
-        bin.hotels.setTextColor(resources.getColor(R.color.white))
-
+        }
     }
 
 
@@ -375,20 +388,10 @@ class BusBookingMainFragment : Fragment() {
     private fun initView() {
         busList = ArrayList()
         mStash = MStash.getInstance(requireContext())
-        bin.bus.requestFocus()
-
-        Constants.busListName = ArrayList()
-        Constants.toLocationName = ArrayList()
-        Constants.busListName?.add("Select from location")
-        Constants.toLocationName?.add("Select to location")
-
-        Constants.busListNameMap = HashMap()
-        Constants.toLocationNameMap = HashMap()
-
-        Constants.busListNameMapForGettingBusListName = HashMap()
-        Constants.toLocationNameMapForGettingToLocationName = HashMap()
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI,RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
+
+       // mStash!!.setStringValue(Constants.MerchantId, "AOP-554") // only for testing
 
         for (i in 0..3) { // Today + next 3 days
             if (i == 0) {
@@ -400,24 +403,61 @@ class BusBookingMainFragment : Fragment() {
         }
 
         dateList.add(DateModel("", "Calendar"))
-        bin.headerlayout.visibility=View.GONE
+
+        setSelectionTodayTomorrow()
+        bin.todaylayout.background = resources.getDrawable(R.drawable.selectedbutton)
+        bin.todaytxt.setTextColor(resources.getColor(R.color.blue))
+        bin.todaylayout.backgroundTintList=null
+
+        fromBusCityName =  mStash?.getStringValue(Constants.fromDesignationName, "")!!
+        toBusCityName =    mStash?.getStringValue(Constants.toDesignationName, "")!!
+
+        bin.fromcityname.text = fromBusCityName
+        bin.tocityname.text   = toBusCityName
+
+        fromDesignation = Constants.toLocationNameMap?.get(fromBusCityName).toString()
+        mStash?.setStringValue(Constants.fromDesignationId, fromDesignation)
+        mStash?.setStringValue(Constants.fromDesignationName, fromBusCityName)
+
+        toDesignation = Constants.toLocationNameMap?.get(toBusCityName).toString()
+        mStash?.setStringValue(Constants.toDesignationId, toDesignation)
+        mStash?.setStringValue(Constants.toDesignationName, toBusCityName)
+
 
     }
 
 
-    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
-    private fun getAllBusRequaryTicketRes(response: BusRequeryRes?) {
-        if (response?.responseHeader?.errorCode == "0000") {
-            passengerList.clear()
+    fun setSelectionTodayTomorrow(){
+        bin.tomorrowlayout.background = resources.getDrawable(R.drawable.fromtoback)
+        bin.tomorrowlayout.backgroundTintList =   ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+        bin.tomorrowtxt.setTextColor(resources.getColor(R.color.mode_color))
 
-            response.paXDetails.forEach { passengerData ->
-                passengerList.add(passengerData)
-            }
+        bin.todaylayout.background = resources.getDrawable(R.drawable.fromtoback)
+        bin.todaylayout.backgroundTintList =   ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.white))
+        bin.todaytxt.setTextColor(resources.getColor(R.color.mode_color))
+    }
 
-            BusTicketConsListClass.RequeryResponse = response
 
-        } else {
-            Toast.makeText(requireContext(), response?.responseHeader?.errorInnerException.toString(), Toast.LENGTH_SHORT).show()
+    private fun formatDate1(inputDate: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMMM ", Locale.getDefault())
+            val date = inputFormat.parse(inputDate)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            "Invalid Date"
+        }
+    }
+
+
+    private fun formatDate2(inputDate: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("EEE, yyyy", Locale.getDefault())
+            val date = inputFormat.parse(inputDate)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            "Invalid Date"
         }
     }
 

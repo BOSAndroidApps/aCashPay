@@ -7,72 +7,51 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bos.payment.appName.databinding.AirlineslistitemlayotBinding
 import com.bos.payment.appName.ui.view.travel.adapter.AirPortListAdapter.Companion
 import com.bos.payment.appName.ui.view.travel.adapter.AirPortListAdapter.setClickListner
+import com.bos.payment.appName.ui.view.travel.busactivity.BusFilterActivity
 
 
-class AirlinesAdapter(private val context: Context, private val FlightList: MutableList<Pair<String,Boolean>> = mutableListOf(), val btnlistener: OnClickListner) : RecyclerView.Adapter<AirlinesAdapter.CustomViewHolder>() {
+class AirlinesAdapter(
+    private val context: Context,
+    private val flightList: MutableList<Pair<String, Boolean>>,
+    private val listener: OnClickListener
+) : RecyclerView.Adapter<AirlinesAdapter.CustomViewHolder>() {
 
-
-    companion object {
-        var mClickListener: OnClickListner? = null
-        var check: Boolean = false
-        var selectedPosition = -1
-    }
-
-
-
-    inner class CustomViewHolder(val bin: AirlineslistitemlayotBinding) :
-        RecyclerView.ViewHolder(bin.root) {
-        var check = bin.airlinecheck
-    }
-
-
+    inner class CustomViewHolder(val binding: AirlineslistitemlayotBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
-        val bin = AirlineslistitemlayotBinding.inflate(LayoutInflater.from(context), parent, false)
-        return CustomViewHolder(bin)
+        val binding = AirlineslistitemlayotBinding.inflate(
+            LayoutInflater.from(context),
+            parent,
+            false
+        )
+        return CustomViewHolder(binding)
     }
 
-
-
-    override fun getItemCount(): Int {
-        return FlightList.size
-    }
-
-
+    override fun getItemCount(): Int = flightList.size
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-        mClickListener = btnlistener
-        holder.check.text = FlightList[position].first
-        holder.check.setOnCheckedChangeListener(null)
+        val (name, isChecked) = flightList[position]
 
-        holder.check.isChecked = FlightList[position].second
-        val selectedAirlines = FlightList.filter { it.second }.map { it.first }
-        mClickListener?.setonclicklistner(selectedAirlines)
+        holder.binding.airlinecheck.apply {
+            text = name
 
-        holder.check.setOnCheckedChangeListener { _,checked->
+            // Prevent unwanted callbacks
+            setOnCheckedChangeListener(null)
+            this.isChecked = isChecked
 
-            FlightList[position] = FlightList[position].copy(second = checked)
+            setOnCheckedChangeListener { _, checked ->
+                flightList[position] = name to checked
 
-            // Get selected airline names
-            val selectedAirlines = FlightList.filter { it.second }.map { it.first }
-
-            // Callback with updated list
-            mClickListener?.setonclicklistner(selectedAirlines)
-
-            holder.itemView.post {
-                notifyItemChanged(position)
+                // Send selected list only on user action
+                listener.setonclicklistner(
+                    flightList.filter { it.second }.map { it.first }
+                )
             }
-
         }
-
     }
 
-
-
-
-    open interface OnClickListner {
-        fun setonclicklistner(AirlineName: List<String>)
+    interface OnClickListener {
+        fun setonclicklistner(selectedNames: List<String>)
     }
-
-
 }

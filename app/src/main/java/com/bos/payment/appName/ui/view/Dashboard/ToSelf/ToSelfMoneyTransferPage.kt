@@ -1013,7 +1013,6 @@ class ToSelfMoneyTransferPage : AppCompatActivity() {
     }
 
 
-
     private fun sendAllPayoutAmountRes(response: AOPPayOutRes) {
         getTransferAmountToAgentWithCal(binding.etAmount.text.toString(), response)  // payout api
 

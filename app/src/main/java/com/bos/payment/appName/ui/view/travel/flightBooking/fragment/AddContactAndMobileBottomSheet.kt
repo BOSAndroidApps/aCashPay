@@ -97,6 +97,7 @@ class AddContactAndMobileBottomSheet:BottomSheetDialogFragment() {
 
 
 
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // used to show the bottom sheet dialog
         dialog?.setOnShowListener { it ->
@@ -115,9 +116,6 @@ class AddContactAndMobileBottomSheet:BottomSheetDialogFragment() {
         }
         return super.onCreateDialog(savedInstanceState)
     }
-
-
-
 
 
     override fun onDismiss(dialog: DialogInterface) {

@@ -338,7 +338,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-               android:layout_marginTop="@dimen/dimen_30sp"
+                android:layout_marginTop="@dimen/dimen_30sp"
                 app:layout_constraintTop_toBottomOf="@+id/prioritylayout">
 
                 <androidx.cardview.widget.CardView

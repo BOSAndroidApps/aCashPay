@@ -17,6 +17,7 @@ android {
         versionCode 2
         versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     
     dataBinding {
@@ -52,11 +53,23 @@ android {
         viewBinding true
     }
 
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+    }
+
 
 }
 
 
 dependencies {
+
+    implementation  fileTree(dir: 'libs', include: ['*.jar'])
+    implementation  'com.android.support:multidex:1.0.1'
+
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "com.google.android.material:material:1.11.0"
@@ -78,11 +91,11 @@ dependencies {
     // Compatible with SDK 33
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'androidx.datastore:datastore-core-android:1.1.1'
-
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
+
 
     // Retrofit and GSON
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -117,7 +130,7 @@ dependencies {
     // Retrofit Scalars Converter
     implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
 
-//   Compose UI test dependencies
+//  Compose UI test dependencies
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.3'
     debugImplementation 'androidx.compose.ui:ui-tooling:1.4.3'
     debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.3'
@@ -135,8 +148,10 @@ dependencies {
     implementation 'io.github.chaosleung:pinview:1.4.4'
     implementation "androidx.biometric:biometric:1.2.0-alpha05"
 
-    implementation 'org.apache.poi:poi:4.0.0'
-    implementation 'org.apache.poi:poi-ooxml:4.0.0'
+
+
+ /* implementation 'org.apache.poi:poi:4.0.0'
+    implementation 'org.apache.poi:poi-ooxml:4.0.0'*/
 
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
@@ -163,5 +178,12 @@ dependencies {
     implementation "com.mikepenz:iconics-core:5.3.3"
     implementation "com.mikepenz:iconics-views:5.3.3"
     implementation 'com.mikepenz:fontawesome-typeface:5.9.0.0-kotlin'
+
+
+
+
+
+
+
 
 }

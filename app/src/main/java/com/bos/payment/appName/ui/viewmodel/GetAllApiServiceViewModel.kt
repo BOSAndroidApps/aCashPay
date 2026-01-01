@@ -23,6 +23,9 @@ import com.bos.payment.appName.data.model.managekyc.UpdateKycReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.GetPayoutCommercialReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.mobileCharge.GetCommercialReq
+import com.bos.payment.appName.data.model.promocode.GetEligibleReq
+import com.bos.payment.appName.data.model.promocode.GetPromotionListReq
+import com.bos.payment.appName.data.model.promocode.ManagePromoUsageReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.MobileWiseRechargeReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.RechargeCategoryReq
 import com.bos.payment.appName.data.model.recharge.newapiflowforrecharge.RechargeOperatorsReq
@@ -32,6 +35,11 @@ import com.bos.payment.appName.data.model.recharge.recharge.TransferToAgentReq
 import com.bos.payment.appName.data.model.recharge.recharge.UploadRechargeMobileRespReq
 import com.bos.payment.appName.data.model.recharge.recharge.UploadRechargeMobileRespRespReq
 import com.bos.payment.appName.data.model.serviceWiseTrans.TransactionReportReq
+import com.bos.payment.appName.data.model.servicesbasednotification.NotificationReq
+import com.bos.payment.appName.data.model.subscription.BillingCostReq
+import com.bos.payment.appName.data.model.subscription.FeatureLinkReq
+import com.bos.payment.appName.data.model.subscription.FeatureListReq
+import com.bos.payment.appName.data.model.subscription.SubscriptionUserDeatilsReq
 import com.bos.payment.appName.data.model.supportmanagement.AddCommentReq
 import com.bos.payment.appName.data.model.supportmanagement.TicketStatusReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.CheckRaiseTicketExistReq
@@ -40,6 +48,7 @@ import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionReq
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsReq
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingRequest
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingResponseRequest
@@ -331,8 +340,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     // services request for retailerwise
     fun getRetailerWiseServicesReq(req: RetailerWiseServicesRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -344,12 +351,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             }
 
     }
-
-
-
-
-
-
 
     fun getBankDetails(req: CheckBankDetailsModel) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -380,8 +381,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun updateBankDetails(req: UpdateBankDetailsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -410,8 +409,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             )
         }
     }
-
-
 
     fun getRetailerContactList(req: RetailerContactListRequestModel) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -442,8 +439,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun sendMoneyToMobileReqModel(req: SendMoneyToMobileReqModel) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -467,8 +462,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             emit(ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}"))
         }
     }
-
-
 
     fun sendForReportListReq(req: ReportListReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -494,8 +487,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun sendTransactionReportsReq(req: TransactionReportsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -520,7 +511,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
     fun sendTransactionRaiseTicketExitsReq(req: CheckRaiseTicketExistReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -544,8 +534,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun uploadRaiseTicketReq(req: RaiseTicketReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -555,7 +543,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
     }
-
 
     fun sendTicketStatusReq(req: TicketStatusReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -646,7 +633,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
     fun putRechargemobileResponseReq(req: UploadRechargeMobileRespRespReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -675,7 +661,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             )
         }
     }
-
 
     fun putRechargeapiresponseReq(req: RechargeapiresponseReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -706,7 +691,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
     fun transferToAgentReq(req: TransferToAgentReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -735,7 +719,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
             )
         }
     }
-
 
     fun vpaTransactionReq(req: VPATransactionReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -824,9 +807,6 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
-
     fun countryStateDistrictListReq(req: CountryStateDistrictReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -856,13 +836,213 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
-
-
     fun UpdateKycReq(req: UpdateKycReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             val response = withTimeout(10_0000) { // 10 seconds timeout
                 repository.UpdateKycReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun subscriptionDetailsReq(req: SubscriptionUserDeatilsReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.subscriptionDetailsReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun featureListReq(req: FeatureListReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.featureListReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun billingCostReq(req: BillingCostReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.billingCostReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun featureLinkReq(req: FeatureLinkReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.featureLinkReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun GetNotificationReq(req: NotificationReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.GetNotificationReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun GetPromotionListReq(req: GetPromotionListReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.GetPromotionListReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+    fun GetEligibleReq(req: GetEligibleReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.GetEligibleReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
+
+
+
+    fun GetManagePromoUsageReq(req: ManagePromoUsageReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.GetManagePromoUsageReq(req)
             }
             emit(ApiResponse.success(response))
         }

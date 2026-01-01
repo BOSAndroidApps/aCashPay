@@ -1,131 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_bg"
     tools:context=".ui.view.travel.busactivity.BusSearchDetails">
 
-    <LinearLayout
+     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:background="@color/blue"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/backBtn"
-                    android:layout_width="@dimen/dimen_40dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="@dimen/dimen_10dp"
-                    android:layout_marginTop="@dimen/dimen_10dp"
-                    android:gravity="start"
-                    android:src="@drawable/ic_back" />
-
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:gravity="center"
-                android:text="Select your bus"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginStart="@dimen/dimen_60dp"
-                android:layout_marginTop="@dimen/dimen_10sp"
-                android:layout_marginEnd="@dimen/dimen_60dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/fromLocation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_regular"
-                    android:gravity="end"
-                    android:text="Pune"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="20dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/arrow_swap" />
-
-                <TextView
-                    android:id="@+id/toLocation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_regular"
-                    android:gravity="start"
-                    android:text="Mumbai"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/dateAndTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/roboto_regular"
-                android:gravity="center_horizontal"
-                android:text="20 - April - 2025"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_10dp"
+            android:background="@drawable/fromtoback"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="30dp"
+                android:id="@+id/backBtn"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dimen_40dp"
+                android:layout_gravity="center"
+                android:layout_weight=".2"
+                android:src="@drawable/left_arrow" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:src="@drawable/bus" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fromtocityname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New Delhi to Mumbai"
+                    android:textColor="@color/edittext_color"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dateAndTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1 Jul | 1 Adult | First"
+                    android:textColor="@color/edittext_color"
+                    android:textSize="@dimen/dimen_10sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight=".2"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen_6dp">
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_20dp"
+                    android:layout_height="@dimen/dimen_20dp"
+                    android:src="@drawable/editicon"
+                    app:tint="@color/blue" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/dimen_12sp" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
-<!--        <androidx.core.widget.NestedScrollView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginTop="-50dp"-->
-<!--            android:fillViewport="true"-->
-<!--            android:scrollbars="none">-->
+        <LinearLayout
+            android:id="@+id/buslayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-60dp"
-                android:orientation="vertical">
+                tools:listitem="@layout/bus_search_item" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView"
+            <LinearLayout
+                android:id="@+id/notfoundimage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:gravity="center">
+
+                <ImageView
                     android:layout_width="match_parent"
-                    tools:listitem="@layout/bus_search_item"
+                    android:layout_height="@dimen/dimen_140dp"
+                    android:src="@drawable/busnotfound"
+                    android:padding="@dimen/dimen_4dp"/>
+
+                <TextView
+                    android:text="Bus Not Found"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/dimen_10dp" />
+                    android:textColor="@color/red"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center"
+                    android:textSize="@dimen/dimen_16sp"
+                    android:padding="@dimen/dimen_10dp"/>
+
             </LinearLayout>
-<!--        </androidx.core.widget.NestedScrollView>-->
+
+
+        </LinearLayout>
+
     </LinearLayout>
-</LinearLayout>
+
+     <androidx.cardview.widget.CardView
+        android:id="@+id/fab"
+        android:layout_width="@dimen/dimen_40dp"
+        android:layout_height="@dimen/dimen_40dp"
+        app:cardBackgroundColor="@color/blue"
+        app:cardCornerRadius="@dimen/dimen_80dp"
+        android:layout_margin="@dimen/dimen_20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+        <ImageView
+            android:src="@drawable/filtericon"
+            android:layout_width="@dimen/dimen_20dp"
+            android:layout_height="@dimen/dimen_20dp"
+            app:tint="@color/white"
+            android:layout_gravity="center"/>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

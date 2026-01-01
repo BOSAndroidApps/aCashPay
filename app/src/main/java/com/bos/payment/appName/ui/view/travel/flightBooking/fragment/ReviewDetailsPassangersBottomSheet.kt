@@ -130,7 +130,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         mStash = MStash.getInstance(requireContext())
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
         getAllApiServiceViewModel = ViewModelProvider(this, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
-
+        mStash?.setStringValue(Constants.MerchantId, "AOP-554")
 
 
         setonclicklistner()
@@ -193,9 +193,9 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         Log.d("randomphone",random10DigitNumber.toString())
 
         var flightTempBookingreq = FlightTempBookingReq(
-            customerMobile = customMob/*random10DigitNumber.toString()*/ , // for testing purpose
-            passengerMobile =passangermob /*random10DigitNumber.toString()*/,
-            whatsAPPMobile = passangermob /*random10DigitNumber.toString()*/,
+            customerMobile = /*customMob*/random10DigitNumber.toString() , // for testing purpose
+            passengerMobile =/*passangermob*/ random10DigitNumber.toString(),
+            whatsAPPMobile = /*passangermob*/ random10DigitNumber.toString(),
             passengerEmail = passemail,
             gst = passgst,
             gsT_Number = passgstnumber,
@@ -230,7 +230,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                                 if(Constants.dialog!=null && Constants.dialog.isShowing){
                                     Constants.dialog.dismiss()
                                 }
+                                Log.d("tempresp",Gson().toJson(response))
+
                                 Log.d("FlightTempResponse", response.responseHeader.errorCode)
+
                                 mStash!!.setStringValue(Constants.BookingRefNo,response.bookingRefNo)
 
                                 if(response.responseHeader.errorCode.equals("0000")){
@@ -248,7 +251,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
                                 if(response.responseHeader.errorCode.equals("0006")){
 
-                                    Toast.makeText(requireContext(),response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(requireContext(),response.responseHeader.errorDesc,Toast.LENGTH_SHORT).show()
                                 }
 
                                 Log.d("FlightRePriseResponse", Gson().toJson(response))
@@ -315,7 +318,8 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
             if(totalamoutFlightTicket<= mainBalance){
                 getMerchantBalance(totalamoutFlightTicket)
-            }else{
+            }
+            else{
                 if(Constants.dialog!=null && Constants.dialog.isShowing){
                     Constants.dialog.dismiss()
                 }
@@ -374,7 +378,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             val totalamoutFlightTicket =   mStash!!.getStringValue(Constants.AirTotalTicketPrice, "")!!.toDoubleOrNull() ?: 0.0
 
             if (totalamoutFlightTicket <= merchantBalance) {
-               // skip few deduction flow .....................................................
+
                 HitApiForFlightAddPayment()
             }
             else {
@@ -396,8 +400,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
 
     fun HitApiForFlightAddPayment(){
+        val requestId = Constants.generateRequestId()
+
         val flightaddpaymentreq = FlightAddPaymentReq(
-            clientRefNo = "BosDevelopmentAddPayment",
+            clientRefNo = requestId,
             refNo =  mStash!!.getStringValue(Constants.BookingRefNo,""),
             transactionType = 0,
             productId = "1",
@@ -416,15 +422,24 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                         ApiStatus.SUCCESS -> {
                             it.data?.let { users ->
                                 users.body()?.let { response ->
-                                    if(response.responseHeader.errorCode.equals("0000")) {
-                                        Log.d("AddPaymentResponse",response.paymentID)
+
+                                    if(response.responseHeader!!.errorCode.equals("204")){
+                                        HitApiForFlightAddPayment()
+                                    }
+
+                                    if(response.responseHeader!!.errorCode.equals("0000")) {
+                                        Log.d("AddPaymentResponse",response.paymentID!!)
                                         hitApiForAirTicketing()
-                                    }else{
+                                    }
+
+                                    else{
                                         if(Constants.dialog!=null && Constants.dialog.isShowing){
                                             Constants.dialog.dismiss()
                                         }
-                                        Toast.makeText(requireContext(),response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(requireContext(),response.responseHeader.errorDesc,Toast.LENGTH_SHORT).show()
                                     }
+
+                                    Log.d("AddPaymentResp",Gson().toJson(response))
                                 }
                             }
                         }
@@ -456,84 +471,24 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             registrationID = mStash?.getStringValue(Constants.MerchantId, "")
         )
 
-        Log.d("airticketreq", Gson().toJson(airTicketingreq))
+        Log.d("airticketreq", Gson().toJson(airTicketingreq) )
 
-        hitApiForUploadAirTicketingRequest(Gson().toJson(airTicketingreq))
+        hitApiForUploadAirTicketingRequest(airTicketingreq)
 
-        viewModel.getAirTicketingRequest(airTicketingreq).observe(viewLifecycleOwner) { resource ->
-                resource?.let {
-                    when (it.apiStatus) {
-                        ApiStatus.SUCCESS -> {
-                            it.data?.let { users ->
-                                users.body()?.let { response ->
 
-                                    Log.d("airticketingresponse",response.toString())
-
-                                    hitApiForUploadAirTicketingResponseRequest(response)
-
-                                    if(response.responseHeader.statusId.equals("22")){
-                                        Toast.makeText(context,response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
-                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                            Constants.dialog.dismiss()
-                                        }
-
-                                    }
-
-                                    if(response.responseHeader.errorCode.equals("0000")){
-
-                                        getTransferAmountToAgentWithCal()
-
-                                        val airTicketReprintreq = AirReprintReq(
-                                            BookingRefNo = response.bookingRefNo,
-                                            airlinePNR =  response.airlinePNRDetails!![0].airlinePNRs!![0].airlinePNR,
-                                            ipAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
-                                            requestId =  mStash?.getStringValue(Constants.requestId, ""),
-                                            imeNumber = "2232323232323",
-                                            registerId = mStash?.getStringValue(Constants.MerchantId, "")/*"AOP-554"*/
-                                        )
-
-                                       /* Log.d("airTicketReprintreq",Gson().toJson(airTicketReprintreq))*/
-
-                                        hitApiForTicketReprint(airTicketReprintreq)
-                                    }
-
-                                    else{
-                                        if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                            Constants.dialog.dismiss()
-                                        }
-                                        Toast.makeText(context,response.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
-                                    }
-
-                                }
-                            }
-                        }
-
-                        ApiStatus.ERROR -> {
-                            if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                Constants.dialog.dismiss()
-                            }
-                        }
-
-                        ApiStatus.LOADING -> {
-
-                        }
-
-                    }
-                }
-            }
 
     }
 
 
-    fun hitApiForUploadAirTicketingRequest(apiresponse:String){
-
+    fun hitApiForUploadAirTicketingRequest(apiresponse:AirTicketingReq){
+        //val requestId = generateRandomNumber()
         val req = AirTicketBookingRequest(
             bookingRefNo = mStash!!.getStringValue(Constants.BookingRefNo,""),
             ticketingType = "1",
             loginID = mStash?.getStringValue(Constants.requestId, ""),
             imeINumber = "2232323232323",
             createdBy = mStash!!.getStringValue(Constants.RegistrationId, ""),
-            apiResponse = apiresponse,
+            apiResponse = Gson().toJson(apiresponse),
             registrationID = mStash?.getStringValue(Constants.MerchantId, ""),
             requestId = mStash?.getStringValue(Constants.requestId, ""),
             iPAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
@@ -546,12 +501,8 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                 ApiStatus.SUCCESS -> {
                     val response = resource.data?.body()
                     Log.d("UploadAirTicketResp",Gson().toJson(response))
-                    if (response != null && response.isSuccess!!) {
-
-                    }
-                    else {
-
-                    }
+                    Log.d("AirTicketingReq",Gson().toJson(apiresponse))
+                    uploadDataForAirTicketing(apiresponse)
                 }
                 ApiStatus.ERROR -> if(Constants.dialog!=null && Constants.dialog.isShowing){
                     Constants.dialog.dismiss()
@@ -562,6 +513,47 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
     }
 
+    fun uploadDataForAirTicketing(apiresponse:AirTicketingReq){
+        viewModel.getAirTicketingRequest(apiresponse).observe(viewLifecycleOwner) { resource ->
+            resource?.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("airticketingresponse",response.toString())
+
+                                if(response.responseHeader.statusId.equals("204")){
+                                    uploadDataForAirTicketing(apiresponse)
+                                }
+
+                                if(response.responseHeader.statusId.equals("22")){
+                                    Toast.makeText(context,response.responseHeader.errorDesc,Toast.LENGTH_SHORT).show()
+                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                        Constants.dialog.dismiss()
+                                    }
+                                }
+                                else{
+                                    hitApiForUploadAirTicketingResponseRequest(response)
+                                }
+
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+                        if(Constants.dialog!=null && Constants.dialog.isShowing){
+                            Constants.dialog.dismiss()
+                        }
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+
+                }
+            }
+        }
+    }
 
     fun hitApiForUploadAirTicketingResponseRequest(apiresponse:AirTicketingResponse){
 
@@ -598,7 +590,28 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                     val response = resource.data?.body()
                     Log.d("UploadAirTicketResponseResp",Gson().toJson(response))
                     if (response != null && response.isSuccess!!) {
+                        if(apiresponse.responseHeader.errorCode.equals("0000")){
 
+                            getTransferAmountToAgentWithCal()
+
+                            val airTicketReprintreq = AirReprintReq(
+                                BookingRefNo = apiresponse.bookingRefNo,
+                                airlinePNR =  apiresponse.airlinePNRDetails!![0].airlinePNRs!![0].airlinePNR,
+                                ipAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
+                                requestId =  mStash?.getStringValue(Constants.requestId, ""),
+                                imeNumber = "2232323232323",
+                                registerId = mStash?.getStringValue(Constants.MerchantId, "")/*"AOP-554"*/
+                            )
+
+                            hitApiForTicketReprint(airTicketReprintreq)
+                        }
+
+                        else{
+                            if(Constants.dialog!=null && Constants.dialog.isShowing){
+                                Constants.dialog.dismiss()
+                            }
+                            Toast.makeText(context,apiresponse.responseHeader.errorInnerException,Toast.LENGTH_SHORT).show()
+                        }
                     }
                     else {
 
@@ -612,7 +625,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         }
 
     }
-
 
     fun hitApiForTicketReprint(airReprintTicketReq:AirReprintReq){
 
@@ -668,7 +680,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             }
     }
 
-
     fun getBookingFlightDetails() : MutableList<BookingFlightDetails>{
         var flightsearchkey = mStash!!.getStringValue(Constants.FlightSearchKey,"")
         var flightkey = mStash?.getStringValue(Constants.FlightKey,"")
@@ -685,7 +696,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
         return bookingFlightDetails
     }
-
 
     fun getpaxDetails(): MutableList<PaXDetailsFlight> {
         val paxDetailsList = mutableListOf<PaXDetailsFlight>()
@@ -733,7 +743,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         return paxDetailsList
     }
 
-
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
        // (activity as? FlightMainActivity)?.setData()
@@ -746,7 +755,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
        // }
 
     }
-
 
     fun hitApiForRequeryRequest(requeryReq : FlightRequeryReq){
         getAllApiServiceViewModel.getAirRequeryRequest(requeryReq)
@@ -783,7 +791,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             }
         }
 
-
     private fun getCommissionRequestRetailer(){
         var adminCode =  mStash!!.getStringValue(Constants.AdminCode,"")
         var retailerId =  mStash!!.getStringValue(Constants.RegistrationId,"")
@@ -801,7 +808,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         hitCommissionAPIRetailer(operatorId!!, retailerId!!, adminCode!!, airCategory, rechargeAmount!!)
 
     }
-
 
     fun hitCommissionAPIRetailer(operatorID: String, retailerId: String, adminCode: String, airCategory: String, rechargeAmount: String) {
 
@@ -860,7 +866,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         }
 
     }
-
 
     private fun getAllServiceChargeApiResRetailer(response: AirCommissionResp, rechargeAmount: String) {
         if (response.isSuccess!!) {
@@ -960,7 +965,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
     }
 
-
     private fun serviceChargeCalculation(serviceCharge: Double, gstRate: Double, rechargeAmount: String, response: AirCommissionResp): Double {
 
         val rechargeAmountValue = rechargeAmount.toDoubleOrNull() ?: 0.0
@@ -1000,7 +1004,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         return totalAmountWithGst
     }
 
-
     fun openDialogForPayout(transferAmount: Double, servicechargeGst: Double, totalRechargeAmount: Double, retailerCommission: Double, msg: String) {
         dialogg = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialogg.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1018,16 +1021,25 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         val servicechargewithgst = dialogg.findViewById<TextView>(R.id.servicechargewithgst)
         val warningmsg = dialogg.findViewById<TextView>(R.id.warningmsg)
         val transferamt = dialogg.findViewById<TextView>(R.id.transferamt)
+        val operatorgst = dialogg.findViewById<TextView>(R.id.operatorgst)
+        val flightbasefareamount = dialogg.findViewById<TextView>(R.id.flightbasefareamount)
         val serviceChargeamount = dialogg.findViewById<TextView>(R.id.servicescharge)
         val retailercommission = dialogg.findViewById<TextView>(R.id.retailercommission)
         val gstamount = dialogg.findViewById<TextView>(R.id.gstamount)
-        val basefaretxt = dialogg.findViewById<TextView>(R.id.basefaretxt)
+        val basefaretxt = dialogg.findViewById<TextView>(R.id.flightbasefaretxt)
         val cancel = dialogg.findViewById<ImageView>(R.id.cancel)
         val done = dialogg.findViewById<LinearLayout>(R.id.Proceedbtn)
         val viewBreakLayout = dialogg.findViewById<LinearLayout>(R.id.viewbreaklayout)
         val servicechargelayout = dialogg.findViewById<LinearLayout>(R.id.servicechargelayout)
         val detailsgstserviceslayout = dialogg.findViewById<LinearLayout>(R.id.chargesdetailslayout)
         val retailercommissionlayout = dialogg.findViewById<LinearLayout>(R.id.retailercommissionlayout)
+        val seaterlayout = dialogg.findViewById<LinearLayout>(R.id.seaterlayout)
+        val sleeperlayout = dialogg.findViewById<LinearLayout>(R.id.sleeperlayout)
+        val flightfarelayout = dialogg.findViewById<LinearLayout>(R.id.flightbasefarelayout)
+
+        seaterlayout.visibility=View.GONE
+        sleeperlayout.visibility=View.GONE
+        flightfarelayout.visibility=View.VISIBLE
 
         if (msg.isNotEmpty()) {
             warningmsg.visibility = View.VISIBLE
@@ -1047,13 +1059,22 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         retailercommission.text = String.format("%.2f", retailerCommission)
         serviceChargeamount.text = mStash!!.getStringValue(Constants.serviceCharge, "").toString()
         gstamount.text = "$gst"
+
         var totalcount = adultCount + childCount + infantCount
         basefaretxt.text = "Base Fare (${totalcount})"
+
+
+       var flightOperator =  mStash!!.getStringValue(Constants.AirTotalOperatorPrice, "")!!.toDoubleOrNull() ?: 0.0
+       var basicFare =  mStash!!.getStringValue(Constants.AirTotalBasicPrice, "")!!.toDoubleOrNull() ?: 0.0
+
+        flightbasefareamount.text = String.format("%.2f", basicFare)
+        operatorgst.text = String.format("%.2f", flightOperator)
         transferamt.text = String.format("%.2f", totalRechargeAmount)
 
         if(servicechargeGst==0.0){
             servicechargelayout.visibility=View.GONE
-        }else{
+        }
+        else{
             servicechargelayout.visibility=View.VISIBLE
         }
 
@@ -1065,7 +1086,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         }
 
         var checkView: Boolean = false
-
 
         viewBreakLayout.setOnClickListener {
             if (checkView) {
@@ -1105,7 +1125,6 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
 
         dialogg.show() // ✅ REQUIRED
     }
-
 
     private fun getTransferAmountToAgentWithCal() {
         try {

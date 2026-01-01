@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    android:layout_gravity="center"
+    app:cardBackgroundColor="@android:color/white">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
+
+        <!-- Success Icon -->
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/doneicon"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="success" />
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ticket Cancelled Successfully"
+            android:textSize="@dimen/dimen_16sp"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your ticket has been successfully cancelled."
+            android:textSize="@dimen/dimen_12sp"
+            android:textColor="@color/text_color"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Booking Ref -->
+        <TextView
+            android:id="@+id/bookingrefnumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Booking Reference: BBB7E6ZT"
+            android:textSize="@dimen/dimen_14sp"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="@color/black" />
+
+
+        <!-- Info -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="The refund amount will be credited to your wallet within 5–7 working days."
+            android:textSize="@dimen/dimen_12sp"
+            android:textColor="@color/text_color"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_marginTop="@dimen/dimen_10dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- OK Button -->
+        <Button
+            android:id="@+id/btnOk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

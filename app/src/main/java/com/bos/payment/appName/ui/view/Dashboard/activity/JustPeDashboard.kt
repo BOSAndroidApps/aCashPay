@@ -11,8 +11,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Geocoder
 import android.location.LocationManager
-import android.media.audiofx.BassBoost
-import android.media.audiofx.BassBoost.Settings
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -25,7 +23,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -35,7 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.bos.payment.appName.R
 import com.bos.payment.appName.adapter.MenuListAdapter
-import com.bos.payment.appName.constant.ConstantClass
 import com.bos.payment.appName.constant.CustomFuseLocationActivity
 import com.bos.payment.appName.data.model.justpaymodel.CheckBankDetailsModel
 import com.bos.payment.appName.data.model.justpaymodel.MoneyTransferServicesModel
@@ -57,6 +53,7 @@ import com.bos.payment.appName.data.viewModelFactory.GetAllApiServiceViewModelFa
 import com.bos.payment.appName.data.viewModelFactory.MoneyTransferViewModelFactory
 import com.bos.payment.appName.databinding.ActivityJustPeDashboardBinding
 import com.bos.payment.appName.network.RetrofitClient
+import com.bos.payment.appName.notification.NotificationPage
 import com.bos.payment.appName.ui.adapter.DashboardServicesAdapter
 import com.bos.payment.appName.ui.adapter.ImageSliderAdapter
 import com.bos.payment.appName.ui.adapter.NavAdapter
@@ -70,14 +67,9 @@ import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet
 import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.Address
 import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.cityName
 import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.district
-import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.latt
-import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.long
 import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.pincode
 import com.bos.payment.appName.ui.view.fragment.SideNavigationBankDetailsSheet.Companion.statecode
-import com.bos.payment.appName.ui.view.makepayment.AdminBankListActivity
-import com.bos.payment.appName.ui.view.makepayment.MakePaymentActivity
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
-import com.bos.payment.appName.ui.view.supportmanagement.TicketStatus
 import com.bos.payment.appName.ui.view.travel.flightBooking.activity.FlightFilterActivity.Companion.TAG
 import com.bos.payment.appName.ui.viewmodel.GetAllApiServiceViewModel
 import com.bos.payment.appName.ui.viewmodel.MoneyTransferViewModel
@@ -95,7 +87,6 @@ import com.bos.payment.appName.utils.Constants.maskWithEllipsis
 import com.bos.payment.appName.utils.Constants.uploadDataOnFirebaseConsole
 import com.bos.payment.appName.utils.LocationPermissionHelper
 import com.bos.payment.appName.utils.MStash
-import com.bos.payment.appName.utils.Utils.PD
 import com.bos.payment.appName.utils.Utils.generateQrBitmap
 import com.bos.payment.appName.utils.Utils.getScreenshotFromView
 import com.bos.payment.appName.utils.Utils.getStateCode
@@ -103,8 +94,6 @@ import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.bos.payment.appName.utils.Utils.toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
@@ -126,6 +115,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 
@@ -186,8 +176,11 @@ class JustPeDashboard : AppCompatActivity() {
             getCurrentLocation()
         }
 
+
         init()
+        buttonCreateExcelFile()
         getfirebasetoken()
+
         hitApiForBannerRetailer("retailer")
         startMerchantListPolling(mStash!!.getStringValue(Constants.MerchantId, "").toString())
         setMoneyTransferServices()
@@ -195,6 +188,37 @@ class JustPeDashboard : AppCompatActivity() {
         GetProfile()
 
     }
+
+
+
+    private fun buttonCreateExcelFile() {
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
+
+            }
+
+            else -> {
+                val PERMISSION_REQUEST_CODE_NOTIFICATION = 0
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    PERMISSION_REQUEST_CODE_NOTIFICATION
+                )
+            }
+        }
+    }
+
+
+    private fun convertDateToMillis(date: String): Long {
+        return try {
+            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            format.parse(date)?.time ?: 0L
+        } catch (e: Exception) {
+            Log.e("EMI_WORKER", "Invalid date format: $date", e)
+            0L
+        }
+    }
+
 
     private fun showGPSRequiredDialog() {
         val builder = AlertDialog.Builder(this)
@@ -406,6 +430,10 @@ class JustPeDashboard : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun setclickListner(){
 
+        binding.appBarDashBoard.deskdesign.notification.setOnClickListener {
+            startActivity(Intent(this, NotificationPage::class.java))
+        }
+
         binding.appBarDashBoard.deskdesign.swipeRefreshLayout.setOnRefreshListener {
             refreshData()
         }
@@ -448,13 +476,10 @@ class JustPeDashboard : AppCompatActivity() {
             finish()
         }
 
-
         binding.nav.switchButton.setOnClickListener {
             fingerPrint = !fingerPrint // Toggle the value
             mStash!!.setBooleanValue(Constants.fingerPrintAction.toString(), fingerPrint)
         }
-
-        //ProfileUpdated
 
         binding.nav.ownerPhoto.setOnClickListener {
            startActivity(Intent(this@JustPeDashboard,ProfileUpdated::class.java))
@@ -706,6 +731,11 @@ class JustPeDashboard : AppCompatActivity() {
         }
         val storage = FirebaseStorage.getInstance()
         storageRef = storage.reference
+
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                Log.d("FCM_TOKEN", token)
+            }
+
     }
 
 
@@ -787,8 +817,6 @@ class JustPeDashboard : AppCompatActivity() {
             when (resource.apiStatus) {
 
                 ApiStatus.SUCCESS -> {
-
-
                     val response = resource.data
                     if (response?.isSuccess == true) {
                         Log.d("BannerList", Gson().toJson(response))
@@ -883,10 +911,14 @@ class JustPeDashboard : AppCompatActivity() {
                                     val serviceMap = allServices.associateBy { it.featureCode }
 
 
-                                    val matchedServices = serviceslist
-                                        ?.filter { it!!.activeYN.equals("Y", ignoreCase = true) }   // only active services
-                                        ?.mapNotNull { apiItem -> serviceMap[apiItem!!.featureCode] }
+                                  /*  val matchedServices = serviceslist?.filter { it!!.activeYN.equals("Y", ignoreCase = true) }   // only active services
+                                        ?.mapNotNull { apiItem -> serviceMap[apiItem!!.featureCode] }*/
 
+
+                                    val matchedServices = serviceslist
+                                        ?.mapNotNull { apiItem ->
+                                            serviceMap[apiItem?.featureCode]
+                                        }
 
                                     // Check for specific card types by featureCode
                                     matchedServices?.forEach { item ->
@@ -896,7 +928,6 @@ class JustPeDashboard : AppCompatActivity() {
                                             "F0140", "F0116" -> BillRechargeCard = true
                                         }
                                     }
-
 
                                     if(TravelCard){
                                         binding.appBarDashBoard.deskdesign.travelimageview.visibility= View.VISIBLE

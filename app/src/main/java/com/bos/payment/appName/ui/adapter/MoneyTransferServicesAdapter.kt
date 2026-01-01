@@ -58,7 +58,7 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
            {
              // context.startActivity(Intent(context, FlightMainActivity::class.java))
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(FlightMainFragment(), "fight",servicesList[position].featurecode,"FlightMainFragment")
+                   activity.callFragment(FlightMainFragment(), "fight",servicesList[position].featurecode,servicesList[position].activeYN,"FlightMainFragment")
                }
            }
 
@@ -67,7 +67,7 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
             {
                 // context.startActivity(Intent(context, FlightMainActivity::class.java))
                 if (activity is AllServicesSelectionActivity) {
-                    activity.callFragment(Trainpage(), "fight",servicesList[position].featurecode,"FlightMainFragment")
+                    activity.callFragment(Trainpage(), "fight",servicesList[position].featurecode,servicesList[position].activeYN,"FlightMainFragment")
                 }
             }
 
@@ -76,73 +76,73 @@ class MoneyTransferServicesAdapter( var servicesList:List<MoneyTransferServicesM
                //context.startActivity(Intent(context, BookingTravel::class.java))
 
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(BusBookingMainFragment(), "bus",servicesList[position].featurecode,"BusMainFragment")
+                   activity.callFragment(BusBookingMainFragment(), "bus",servicesList[position].featurecode,servicesList[position].activeYN,"BusMainFragment")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.recharge))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "mobile",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "mobile",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.postpaid))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "postpaid",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "postpaid",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.dth))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "dth",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "dth",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.electricity))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "Electricity",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "Electricity",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.gas))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "Gas",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "Gas",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
 
            if(servicesList[position].name.equals(context.getString(R.string.waterbill))){
                if (activity is AllServicesSelectionActivity) {
-                   activity. callFragment(RechargeFragment(), "Water",servicesList[position].featurecode,"")
+                   activity. callFragment(RechargeFragment(), "Water",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
            if(servicesList[position].name.equals(context.getString(R.string.broadband))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "Broadband",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "Broadband",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
            if(servicesList[position].name.equals(context.getString(R.string.emi))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "EMI",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "EMI",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
            if(servicesList[position].name.equals(context.getString(R.string.creditcard))){
                if (activity is AllServicesSelectionActivity) {
-                   activity. callFragment(CreditCardDetailsFragment(), "CreditCard",servicesList[position].featurecode,"")
+                   activity. callFragment(CreditCardDetailsFragment(), "CreditCard",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 
            if(servicesList[position].name.equals(context.getString(R.string.muncipal))){
                if (activity is AllServicesSelectionActivity) {
-                   activity.callFragment(RechargeFragment(), "Municipality",servicesList[position].featurecode,"")
+                   activity.callFragment(RechargeFragment(), "Municipality",servicesList[position].featurecode,servicesList[position].activeYN,"")
                }
            }
 

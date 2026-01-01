@@ -49,7 +49,7 @@ import com.bos.payment.appName.utils.Utils.animateTextSize
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.bos.payment.appName.utils.Utils.toast
 import com.google.gson.Gson
-import org.apache.poi.sl.draw.geom.Context
+
 
 class SendWalletAmountPage : AppCompatActivity() {
     lateinit var binding: ActivitySendWalletAmountPageBinding

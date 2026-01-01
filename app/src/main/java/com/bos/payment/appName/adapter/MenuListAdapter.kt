@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.menuList.Data
+import com.bos.payment.appName.databinding.ActivityRenweServicesReportBinding
 import com.bos.payment.appName.databinding.DrawerSliderItemLayoutBinding
 import com.bos.payment.appName.ui.view.CreditCardDetailsFragment
 import com.bos.payment.appName.ui.view.Dashboard.activity.GenerateQRCodeActivity
@@ -27,6 +28,9 @@ import com.bos.payment.appName.ui.view.Dashboard.transactionreports.VPATransacti
 import com.bos.payment.appName.ui.view.makepayment.AdminBankListActivity
 import com.bos.payment.appName.ui.view.makepayment.MakepaymentReports
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
+import com.bos.payment.appName.ui.view.promocode.PromocodeListActivity
+import com.bos.payment.appName.ui.view.subscriptionservices.RenewServices
+import com.bos.payment.appName.ui.view.subscriptionservices.RenewServicesReport
 import com.bos.payment.appName.ui.view.supportmanagement.TicketStatus
 import com.google.gson.Gson
 import com.mikepenz.iconics.IconicsDrawable
@@ -63,7 +67,8 @@ class MenuListAdapter(
         if (menuItem.parentMenuCode.isNullOrEmpty()) {
             holder.binding.arrowIcon.visibility = View.VISIBLE
             holder.binding.iconImageView.visibility = View.VISIBLE
-        } else {
+        }
+        else {
             holder.binding.arrowIcon.visibility = View.GONE
             holder.binding.iconImageView.visibility = View.GONE
         }
@@ -116,6 +121,9 @@ class MenuListAdapter(
                     "M00009" -> context.startActivity(Intent(context,JustPeDashboard::class.java /*DashboardActivity::class.java*/))
                     "M00010" -> navigateToFragment(RechargeFragment(), "FastTag")
                     "M00098" -> context.startActivity(Intent(context,VPATransactionReports::class.java))
+                    "M00100" -> context.startActivity(Intent(context,RenewServices::class.java))
+                    "M00104" -> context.startActivity(Intent(context,RenewServicesReport::class.java))
+                    "M00106"->context.startActivity(Intent(context,PromocodeListActivity::class.java))
                     else -> { /* Handle other cases */ }
                 }
             }
@@ -179,11 +187,13 @@ class MenuListAdapter(
         if (icon.isNullOrEmpty()) return ""  // default icon
 
         return icon
-            .replace("fas ", "") // remove fas
-            .replace("fa ", "")  // remove fa
-            .replace("far ", "") // remove far
-            .replace("fab ", "") // remove fab
-            .replace("fa-", "faw-") // replace prefix
+            .replace("fas ", "")
+            .replace("far ", "")
+            .replace("fab ", "")
+            .replace("fa ", "")
+            .replace("fa-", "faw-")
+            .replace("faw-refresh", "faw-sync")
+            .replace(" ", "-")   // 👈 handles "fa refresh"
             .trim()
     }
 

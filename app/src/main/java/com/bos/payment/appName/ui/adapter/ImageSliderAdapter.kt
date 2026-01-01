@@ -8,12 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bos.payment.appName.R
+import com.bos.payment.appName.network.RetrofitClient
 import com.bos.payment.appName.ui.view.Dashboard.activity.JustPeDashboard
 import com.bumptech.glide.Glide
 
-class ImageSliderAdapter(
-    private val bannerList: List<JustPeDashboard.BannerItem>
-) : RecyclerView.Adapter<ImageSliderAdapter.ImageViewHolder>() {
+class ImageSliderAdapter(private val bannerList: List<JustPeDashboard.BannerItem>) : RecyclerView.Adapter<ImageSliderAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageSliderImage)
@@ -27,7 +26,7 @@ class ImageSliderAdapter(
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val item = bannerList[position]
-        val imagepath =  "https://bosapi.bos.center${item.imagePath}"
+        val imagepath =  "${RetrofitClient.IMAGE_BASE_URL}${item.imagePath}"
 
         // Load image from URL using Glide
         Glide.with(holder.itemView.context)

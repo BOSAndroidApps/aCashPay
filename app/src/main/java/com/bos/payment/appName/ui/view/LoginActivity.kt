@@ -87,6 +87,7 @@ class LoginActivity : AppCompatActivity() {
         } else {
         }
 
+
         initView()
 
         if (!mStash!!.getBoolanValue(Constants.isUpdate.toString(), false)) {
@@ -396,8 +397,8 @@ class LoginActivity : AppCompatActivity() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             users.body()?.let {
-
-                                it1 -> getAllMerchantListRes(it1, merchantId) }
+                                it1 -> getAllMerchantListRes(it1, merchantId)
+                            }
                         }
                     }
 
@@ -419,6 +420,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
     }
+
 
     private fun getAllMerchantListRes(response: GetApiListMarchentWiseRes, merchantId: String) {
         if(Constants.dialog!=null && Constants.dialog.isShowing){

@@ -90,22 +90,28 @@ class Payout : AppCompatActivity() {
             startActivity(Intent(this, DashboardActivity::class.java))
             finish()
         }
+
         bin.CancelBtn.setOnClickListener {
             startActivity(Intent(this, DashboardActivity::class.java))
         }
+
         bin.transactionCancelBtn.setOnClickListener {
             bin.serviceChargeLayout.visibility = View.GONE
         }
+
         bin.payBtn.setOnClickListener {
             getAllWalletBalance()
         }
+
         bin.proceedPayBtn.setOnClickListener {
             transactionValidation()
         }
+
         bin.amount.setOnClickListener {
             bin.proceedBtnLayout.visibility = View.VISIBLE
             bin.serviceChargeLayout.visibility = View.GONE
         }
+
     }
 
     private fun transactionValidation() {
@@ -332,6 +338,7 @@ class Payout : AppCompatActivity() {
             }
         }
     }
+
 
     private fun sendAllPayoutAmountRes(response: AOPPayOutRes) {
         if (response.statuss == "SUCCESS"){

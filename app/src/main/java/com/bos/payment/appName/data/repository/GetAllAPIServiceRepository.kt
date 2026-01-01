@@ -18,11 +18,20 @@ import com.bos.payment.appName.data.model.managekyc.UpdateKycReq
 import com.bos.payment.appName.data.model.menuList.GetAllMenuListReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.GetPayoutCommercialReq
 import com.bos.payment.appName.data.model.merchant.apiServiceCharge.mobileCharge.GetCommercialReq
+import com.bos.payment.appName.data.model.promocode.GetEligibleReq
+import com.bos.payment.appName.data.model.promocode.GetPromotionListReq
+import com.bos.payment.appName.data.model.promocode.ManagePromoUsageReq
 import com.bos.payment.appName.data.model.recharge.recharge.RechargeapiresponseReq
 import com.bos.payment.appName.data.model.recharge.recharge.TransferToAgentReq
 import com.bos.payment.appName.data.model.recharge.recharge.UploadRechargeMobileRespReq
 import com.bos.payment.appName.data.model.recharge.recharge.UploadRechargeMobileRespRespReq
 import com.bos.payment.appName.data.model.serviceWiseTrans.TransactionReportReq
+import com.bos.payment.appName.data.model.servicesbasednotification.NotificationReq
+import com.bos.payment.appName.data.model.subscription.BillingCostReq
+import com.bos.payment.appName.data.model.subscription.DurationReq
+import com.bos.payment.appName.data.model.subscription.FeatureLinkReq
+import com.bos.payment.appName.data.model.subscription.FeatureListReq
+import com.bos.payment.appName.data.model.subscription.SubscriptionUserDeatilsReq
 import com.bos.payment.appName.data.model.supportmanagement.AddCommentReq
 import com.bos.payment.appName.data.model.supportmanagement.ChatCommentResp
 import com.bos.payment.appName.data.model.supportmanagement.TicketStatusReq
@@ -34,6 +43,7 @@ import com.bos.payment.appName.data.model.transactionreportsmodel.ReportListReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.TransactionReportsReq
 import com.bos.payment.appName.data.model.transactionreportsmodel.VPATransactionReq
 import com.bos.payment.appName.data.model.transferAMountToAgent.TransferAmountToAgentsReq
+import com.bos.payment.appName.data.model.travel.bus.forservicecharge.ServiceChargeReq
 import com.bos.payment.appName.data.model.travel.flight.AirCommissionReq
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingRequest
 import com.bos.payment.appName.data.model.travel.flight.AirTicketBookingResponseRequest
@@ -88,7 +98,6 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
 
     suspend fun sendTransactionRaiseTicketExitsReq(req: CheckRaiseTicketExistReq)= apiInterface.getcheckTransactionExitsReq(req)
 
-
     suspend fun uploadRaiseTicketReq(req: RaiseTicketReq): retrofit2.Response<RaiseTicketResp> {
         val userCode = req.userCode.toRequestBody("text/plain".toMediaTypeOrNull())
         val serviceCode = req.serviceCode.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -134,7 +143,6 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
 
     }
 
-
     suspend fun sendTicketStatusReq(req: TicketStatusReq): retrofit2.Response<TicketStatusResp> {
         return apiInterface.getticketstatusreq(req.adminCode,req.userCode)
     }
@@ -145,11 +153,9 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
 
     suspend fun addcommentReq(commentreq: AddCommentReq)= apiInterface.addcommentReq(commentreq)
 
-
     suspend fun getReferenceID(commentreq: ReferenceIDGenerateReq)= apiInterface.getRandomReferenceID(commentreq)
 
     suspend fun getbanklistreq(banklistreq: BankDetailsReq)= apiInterface.getAdminBankList(banklistreq)
-
 
     suspend fun uploadDocumentForRaisAmountTransferAdminReq(req: RaiseMakePaymentReq): retrofit2.Response<MakePaymentReportResp> {
         val mode = req.Mode.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -195,7 +201,6 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
 
     }
 
-
     suspend fun putRechargemobileReq(req: UploadRechargeMobileRespReq)= apiInterface.putRechargemobileReq(req)
 
     suspend fun putRechargemobileResponseReq(req: UploadRechargeMobileRespRespReq)= apiInterface.putRechargemobileResponseReq(req)
@@ -211,6 +216,22 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
     suspend fun countryStateDistrictListReq(req: CountryStateDistrictReq)= apiInterface.getCountryStateDistrictListReq(req)
 
     suspend fun UpdateKycReq(req: UpdateKycReq)= apiInterface.updateKycReq(req)
+
+    suspend fun subscriptionDetailsReq(req: SubscriptionUserDeatilsReq)= apiInterface.subscriptionDetailsReq(req)
+
+    suspend fun featureListReq(req: FeatureListReq)= apiInterface.featureListReq(req)
+
+    suspend fun billingCostReq(req: BillingCostReq)= apiInterface.billingCostReq(req)
+
+    suspend fun featureLinkReq(req: FeatureLinkReq)= apiInterface.FeatureLinkReq(req)
+
+    suspend fun GetNotificationReq(req: NotificationReq)= apiInterface.GetNotificationReq(req)
+
+    suspend fun GetPromotionListReq(req: GetPromotionListReq)= apiInterface!!.GetPromotionListReq(req)
+
+    suspend fun GetEligibleReq(req: GetEligibleReq)= apiInterface!!.GetEligibleReq(req)
+
+    suspend fun GetManagePromoUsageReq(req: ManagePromoUsageReq)= apiInterface!!.GetManagePromoUsageReq(req)
 
     suspend fun uploadProfileImage(req : ProfileReq) : retrofit2.Response<ProfileResponse> {
         val userId = req.UserId.toRequestBody("text/plain".toMediaTypeOrNull())

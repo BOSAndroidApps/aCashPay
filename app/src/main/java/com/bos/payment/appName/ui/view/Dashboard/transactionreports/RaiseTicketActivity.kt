@@ -247,76 +247,78 @@ class RaiseTicketActivity : AppCompatActivity() {
 
 
     fun hitApiForRaiseTicket() {
+
         var userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
         var adminCode = mStash!!.getStringValue(Constants.AdminCode, "").toString()
-        val imageFile1 = saveImageToCache(this, selectedUris[0], "image1.jpg")
-        val imageFile2 = saveImageToCache(this, selectedUris[1], "image2.jpg")
-        val imageFile3 = saveImageToCache(this, selectedUris[2], "image3.jpg")
 
-        runIfConnected {
-            val request = RaiseTicketReq(
-                userCode = userCode,
-                serviceCode = binding.servicetype.text.toString(),
-                subject = binding.subjecttxt.text.toString().trim(),
-                description = binding.descriptiontxt.text.toString().trim(),
-                priority = binding.priorityspinner.selectedItem.toString().trim(),
-                adminCode = adminCode,
-                imagePath1 = "image1.jpg",
-                imagePath2 = "image2.jpg",
-                imagePath3 = "image3.jpg",
-                transactionID = binding.transactionNo.text.toString().trim(),
-                transactionSummary = binding.summery.text.toString().trim(),
-                imageFile1 = imageFile1,
-                imageFile2 = imageFile2,
-                imageFile3 = imageFile3
-            )
+        if (selectedUris.isNotEmpty()) {
 
-            Log.d("RaiseTicketReq", Gson().toJson(request))
+            val imageFile1 = selectedUris.getOrNull(0)?.let { saveImageToCache(this, it, "image1.jpg") }
+            val imageFile2 = selectedUris.getOrNull(1)?.let { saveImageToCache(this, it, "image2.jpg") }
+            val imageFile3 = selectedUris.getOrNull(2)?.let { saveImageToCache(this, it, "image3.jpg") }
 
-            getAllApiServiceViewModel.uploadRaiseTicketReq(request).observe(this) { resource ->
-                resource?.let {
-                    when (it.apiStatus) {
-                        ApiStatus.SUCCESS -> {
-                            it.data?.let { users ->
-                                users.body()?.let { response ->
-                                    Log.d("RaiseTicketResp", Gson().toJson(response))
-                                    if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                        Constants.dialog.dismiss()
-                                    }
-                                    if (response.isSuccess!!) {
+            runIfConnected {
+
+                val request = RaiseTicketReq(
+                    userCode = userCode,
+                    serviceCode = binding.servicetype.text.toString(),
+                    subject = binding.subjecttxt.text.toString().trim(),
+                    description = binding.descriptiontxt.text.toString().trim(),
+                    priority = binding.priorityspinner.selectedItem.toString().trim(),
+                    adminCode = adminCode,
+                    imagePath1 = "image1.jpg",
+                    imagePath2 = "image2.jpg",
+                    imagePath3 = "image3.jpg",
+                    transactionID = binding.transactionNo.text.toString().trim(),
+                    transactionSummary = binding.summery.text.toString().trim(),
+                    imageFile1 = imageFile1,
+                    imageFile2 = imageFile2,
+                    imageFile3 = imageFile3
+                )
+
+                Log.d("RaiseTicketReq", Gson().toJson(request))
+
+                getAllApiServiceViewModel.uploadRaiseTicketReq(request).observe(this) { resource ->
+                    resource?.let {
+                        when (it.apiStatus) {
+
+                            ApiStatus.SUCCESS -> {
+                                it.data?.let { users ->
+                                    users.body()?.let { response ->
+
+                                        Log.d("RaiseTicketResp", Gson().toJson(response))
+
+                                        if (Constants.dialog?.isShowing == true) {
+                                            Constants.dialog.dismiss()
+                                        }
+
                                         Toast.makeText(
                                             this,
                                             response.returnMessage,
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        finish()
-                                    } else {
-                                        Toast.makeText(
-                                            this,
-                                            response.returnMessage,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+
+                                        if (response.isSuccess == true) {
+                                            finish()
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        ApiStatus.ERROR -> {
-                            if(Constants.dialog!=null && Constants.dialog.isShowing){
-                                Constants.dialog.dismiss()
+                            ApiStatus.ERROR -> {
+                                if (Constants.dialog?.isShowing == true) {
+                                    Constants.dialog.dismiss()
+                                }
+                            }
+
+                            ApiStatus.LOADING -> {
+                                Constants.OpenPopUpForVeryfyOTP(this)
                             }
                         }
-
-                        ApiStatus.LOADING -> {
-                            Constants.OpenPopUpForVeryfyOTP(this)
-                        }
-
                     }
                 }
             }
-
         }
-
 
     }
 

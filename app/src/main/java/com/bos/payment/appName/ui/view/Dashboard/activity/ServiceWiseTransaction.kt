@@ -123,9 +123,7 @@ class ServiceWiseTransaction : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun buttonCreateExcelFile() {
         when {
-            ContextCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
                 checkAndRequestStoragePermissions()
             }
 

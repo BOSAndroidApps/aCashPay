@@ -39,6 +39,8 @@ import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Compa
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.childCount
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.className
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.classNumber
+import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.formatDate1
+import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.formatDate2
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.fromAirportCode
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.fromAirportName
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.fromCityName
@@ -86,10 +88,15 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
     private var AirportDataList: MutableList<DataItem> = mutableListOf()
     private var specialFareList: MutableList<Pair<String, Boolean>> = mutableListOf()
     private var checkReverse = false
+    private var activestatus: String = ""
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?, ): View {
         _binding = ActivityFlightSearchBinding.inflate(inflater, container, false)
+        activestatus = arguments?.getString("ActiveStatus").toString()
+
+
+
         return binding.root
     }
 
@@ -100,9 +107,16 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
 
         viewModel = ViewModelProvider(this, TravelViewModelFactory(TravelRepository(RetrofitClient.apiAllTravelAPI, RetrofitClient.apiBusAddRequestlAPI)))[TravelViewModel::class.java]
 
+
         setupUI()
         getFuseLocation()
-        hitApiForGetAirportList("")
+        if(activestatus.equals("N")){
+            binding.inactiveservicelayout.visibility=View.VISIBLE
+        }else {
+            binding.inactiveservicelayout.visibility=View.GONE
+            hitApiForGetAirportList("")
+        }
+
     }
 
 
@@ -119,6 +133,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         setCurrentDate()
         addDataInList()
     }
+
 
     private fun getFuseLocation() {
         customFuseLocation = CustomFuseLocationActivity(requireActivity(), requireContext()) { location ->
@@ -146,6 +161,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         super.onResume()
         setData()
     }
+
 
     private fun addDataInList() {
         specialFareList.apply {
@@ -536,6 +552,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         dpd.show()
     }
 
+
     private fun selectionHoverColor() {
         binding.onewaytxt.setTextColor(resources.getColor(R.color.text_color))
         binding.roundtriptxt.setTextColor(resources.getColor(R.color.text_color))
@@ -545,27 +562,6 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         binding.multicitytxt.background = null
     }
 
-    private fun formatDate1(inputDate: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("dd MMMM ", Locale.getDefault())
-            val date = inputFormat.parse(inputDate)
-            outputFormat.format(date!!)
-        } catch (e: Exception) {
-            "Invalid Date"
-        }
-    }
-
-    private fun formatDate2(inputDate: String): String {
-        return try {
-            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val outputFormat = SimpleDateFormat("EEE, yyyy", Locale.getDefault())
-            val date = inputFormat.parse(inputDate)
-            outputFormat.format(date!!)
-        } catch (e: Exception) {
-            "Invalid Date"
-        }
-    }
 
     override fun itemclickListner(position: Int) {
         when (specialFareList[position].first) {
@@ -629,7 +625,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         mStash.setStringValue(Constants.requestId, requestId)
 
         val req = FlightSearchReq(
-            requestId = requestId,
+            requestId = mStash.getStringValue(Constants.requestId, ""),
             imeInumber = "0054748569",
             travelType = FlightConstant.travelType,
             bookingType = FlightConstant.bookingType,
@@ -715,7 +711,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
                         }
                     }
                     else {
-                        toast(response?.responseHeader?.errorInnerException ?: "Error")
+                        toast(response?.responseHeader?.errorDesc ?: "Error")
                     }
                     if(Constants.dialog!=null && Constants.dialog.isShowing){
                         Constants.dialog.dismiss()
@@ -757,6 +753,29 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
             )
         )
         return airlinecodeList
+    }
+
+
+    private fun formatDate1(inputDate: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMMM ", Locale.getDefault())
+            val date = inputFormat.parse(inputDate)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            "Invalid Date"
+        }
+    }
+
+    private fun formatDate2(inputDate: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("EEE, yyyy", Locale.getDefault())
+            val date = inputFormat.parse(inputDate)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            "Invalid Date"
+        }
     }
 
 }

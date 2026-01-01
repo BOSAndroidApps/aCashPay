@@ -444,24 +444,24 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
                 }
 
                 if (it.paXType.equals("2")) {
-                    farebreakupList.add(
-                        fareBreakup(
-                            it.paXType,
-                            it.airportTaxAmount,
-                            it.basicAmount,
-                            infantcount
-                        )
-                    )
+                    farebreakupList.add(fareBreakup(it.paXType, it.airportTaxAmount, it.basicAmount, infantcount))
                 }
 
             }
 
             Log.d("FareList", "" + farebreakupList)
-            val total = calculateGrandTotalAmount(farebreakupList)
+            //val total = calculateGrandTotalAmount(farebreakupList)
 
-            mStash.setStringValue(Constants.AirTotalTicketPrice, total.toString())
+            val totals = calculateFareTotals(farebreakupList)
+            val basicTotal = totals.totalBasic
+            val taxTotal = totals.totalTax
+            val grandTotal = basicTotal + taxTotal
 
-            binding.price.text = " ₹ ".plus(total)
+            mStash.setStringValue(Constants.AirTotalTicketPrice, grandTotal.toString())
+            mStash.setStringValue(Constants.AirTotalOperatorPrice, taxTotal.toString())
+            mStash.setStringValue(Constants.AirTotalBasicPrice, basicTotal.toString())
+
+            binding.price.text = " ₹ ".plus(grandTotal)
 
             if (adultcount > 0 && childcount == 0 && infantcount == 0) {
                 binding.typePassanger.text = "FOR ".plus(adultcount).plus(" ADULT")
@@ -478,7 +478,7 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
     }
 
 
-    fun calculateGrandTotalAmount(fareList: List<fareBreakup>): Double {
+ /*   fun calculateGrandTotalAmount(fareList: List<fareBreakup>): Double {
         return fareList.sumOf { item ->
             val airportTax = item.airportTax_amount.toDoubleOrNull() ?: 0.0
             val basic = item.basic_amount.toDoubleOrNull() ?: 0.0
@@ -486,7 +486,35 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
 
             (airportTax + basic) * quantity
         }
+    }*/
+
+
+    fun calculateFareTotals(fareList: List<fareBreakup>): FareTotal {
+        var totalBasic = 0.0
+        var totalTax = 0.0
+
+        fareList.forEach { item ->
+            val basic = item.basic_amount.toDoubleOrNull() ?: 0.0
+            val tax = item.airportTax_amount.toDoubleOrNull() ?: 0.0
+            val quantity = item.quantity
+
+            totalBasic += basic * quantity
+            totalTax += tax * quantity
+        }
+
+        return FareTotal(
+            totalBasic = totalBasic,
+            totalTax = totalTax
+        )
     }
+
+
+    data class FareTotal(
+        val totalBasic: Double,
+        val totalTax: Double
+    )
+
+
 
 
     fun addValueForAirTicket(farebreakupList: MutableList<fareBreakup>){
