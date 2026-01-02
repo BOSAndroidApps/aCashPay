@@ -110,13 +110,38 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/excellayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_margin="@dimen/dimen_6dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/dateLayout">
+
+        <ImageView
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:src="@drawable/excel"
+            android:padding="@dimen/dimen_4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export Report"
+            android:layout_gravity="center"
+            android:textColor="@color/green"
+            android:fontFamily="@font/roboto_bold"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reportslayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateLayout"
+        app:layout_constraintTop_toBottomOf="@+id/excellayout"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_marginHorizontal="@dimen/dimen_4dp"
         android:layout_marginTop="@dimen/dimen_10dp"/>

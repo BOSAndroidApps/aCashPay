@@ -398,7 +398,7 @@ object Constants {
             .document(currentDateTime)
             .set(logData)
             .addOnSuccessListener {
-                Toast.makeText(context, "Log saved in Firestore", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Log saved in Firestore", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Log.d("Error", " $e.message")
@@ -543,6 +543,14 @@ object Constants {
         val regex = Regex("[A-Z]{5}[0-9]{4}[A-Z]{1}")
         return regex.matches(pan)
     }
+
+
+     fun generateReportFileName(filename:String): String {
+        val sdf = SimpleDateFormat("dd_MMM_yyyy_HH_mm_ss", Locale.getDefault())
+        val timestamp = sdf.format(Date())
+        return "$filename$timestamp.csv"   // or .xlsx
+    }
+
 
 
 

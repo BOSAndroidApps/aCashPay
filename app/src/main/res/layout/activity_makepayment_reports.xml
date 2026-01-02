@@ -128,13 +128,38 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/excellayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_margin="@dimen/dimen_6dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerlayout">
+
+        <ImageView
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:src="@drawable/excel"
+            android:padding="@dimen/dimen_4dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export Report"
+            android:layout_gravity="center"
+            android:textColor="@color/green"
+            android:fontFamily="@font/roboto_bold"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/makepaymentreports"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/makepaymentreport"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerlayout"
+        app:layout_constraintTop_toBottomOf="@+id/excellayout"
         android:layout_marginTop="@dimen/dimen_10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

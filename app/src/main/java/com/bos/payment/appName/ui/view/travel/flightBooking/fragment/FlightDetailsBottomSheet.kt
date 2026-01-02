@@ -105,7 +105,7 @@ class FlightDetailsBottomSheet:BottomSheetDialogFragment() {
             singlePricing = false,
             ipAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
             requestId = mStash?.getStringValue(Constants.requestId, ""),
-            imeiNumber = "2232323232323",
+            imeiNumber = "0054748569",
             registrationId = mStash?.getStringValue(Constants.MerchantId, ""),
             airRepriceRequests = getairRepriseRequests()
         )
@@ -122,6 +122,7 @@ class FlightDetailsBottomSheet:BottomSheetDialogFragment() {
                             users.body()?.let { response ->
                                 Log.d("repriceResponse", response.responseHeader.errorCode)
                                 Log.d("repriceResponse2", response.responseHeader.errorInnerException)
+                                Log.d("repriseamount",Gson().toJson(response))
 
                                 if(response.responseHeader.errorCode.equals("0000")){
                                     paxDetailsListFromReprice = response.airRepriceResponses!![0].requiredPAXDetails!!

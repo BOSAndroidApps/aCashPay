@@ -461,7 +461,7 @@ class AddDetailsPassangerActivity : AppCompatActivity() {
             mStash.setStringValue(Constants.AirTotalOperatorPrice, taxTotal.toString())
             mStash.setStringValue(Constants.AirTotalBasicPrice, basicTotal.toString())
 
-            binding.price.text = " ₹ ".plus(grandTotal)
+            binding.price.text = " ₹ %.2f  ".format(grandTotal.toDouble())
 
             if (adultcount > 0 && childcount == 0 && infantcount == 0) {
                 binding.typePassanger.text = "FOR ".plus(adultcount).plus(" ADULT")

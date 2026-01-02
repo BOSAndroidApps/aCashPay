@@ -1,12 +1,14 @@
 package com.bos.payment.appName.ui.view.Dashboard.transactionreports
 
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +33,7 @@ import com.bos.payment.appName.utils.Constants
 import com.bos.payment.appName.utils.MStash
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.google.gson.Gson
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -45,6 +48,7 @@ class VPATransactionReports : AppCompatActivity() {
     var FromDate: String= ""
     var ToDate: String =""
     lateinit var adapter : VPATransactionReportAdapter
+    var VPATransactionReports:String =""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +66,61 @@ class VPATransactionReports : AppCompatActivity() {
 
     }
 
+
+    private val createExcelLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) { uri ->
+
+        uri ?: return@registerForActivityResult
+
+        writeCsvToUri(uri,VPATransactionReports)
+    }
+
+
+    private fun writeCsvToUri(uri: Uri, reportsList: String) {
+        try {
+            val jsonArray = JSONArray(reportsList)
+
+            if (jsonArray.length() == 0) {
+                Toast.makeText(this, "No data to export", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // 🔹 Extract headers from first object
+            val firstObj = jsonArray.getJSONObject(0)
+            val headers = firstObj.keys().asSequence().toList()
+
+            contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { writer ->
+
+                // ✅ WRITE HEADER
+                writer.append(headers.joinToString(","))
+                writer.newLine()
+
+                // ✅ WRITE DATA ROWS
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+
+                    val row = headers.joinToString(",") { key ->
+                        "\"${obj.optString(key).replace("\"", "\"\"")}\""
+                    }
+
+                    writer.append(row)
+                    writer.newLine()
+                }
+            }
+
+            Toast.makeText(this, "CSV file saved successfully", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
     private fun setClickListner(){
+
+        binding.excellayout.setOnClickListener {
+            createExcelLauncher.launch(Constants.generateReportFileName("VPA_Transaction_Report_"))
+        }
 
         binding.back.setOnClickListener {
             finish()
@@ -87,10 +145,7 @@ class VPATransactionReports : AppCompatActivity() {
                     Log.d("FromDate", FromDate)
 
                     // If both dates are selected, validate and call API
-                    if (
-                         ToDate.isNotEmpty()
-                        && FromDate.isNotEmpty()
-                    ) {
+                    if (ToDate.isNotEmpty() && FromDate.isNotEmpty()) {
                         val from = sdf.parse(FromDate)
                         val to = sdf.parse(ToDate)
 
@@ -188,13 +243,16 @@ class VPATransactionReports : AppCompatActivity() {
                                                 if(response.data.size>0){
                                                     binding.notfoundlayout.visibility= View.GONE
                                                     binding.reportslayout.visibility = View.VISIBLE
+                                                    binding.excellayout.visibility= View.VISIBLE
                                                     var datalist = response.data
+                                                    VPATransactionReports= Gson().toJson(datalist)
                                                     adapter= VPATransactionReportAdapter(this,datalist)
                                                     binding.reportslayout.adapter=adapter
                                                     adapter.notifyDataSetChanged()
                                                 }
                                                 else{
                                                     binding.notfoundlayout.visibility= View.VISIBLE
+                                                    binding.excellayout.visibility= View.GONE
                                                     binding.reportslayout.visibility = View.GONE
                                                 }
 
@@ -202,6 +260,7 @@ class VPATransactionReports : AppCompatActivity() {
                                         }
                                         else{
                                             binding.notfoundlayout.visibility= View.VISIBLE
+                                            binding.excellayout.visibility= View.GONE
                                             binding.reportslayout.visibility = View.GONE
                                         }
                                     }

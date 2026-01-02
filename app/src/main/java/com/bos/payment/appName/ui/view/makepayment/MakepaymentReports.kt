@@ -2,6 +2,7 @@ package com.bos.payment.appName.ui.view.makepayment
 
 import android.app.DatePickerDialog
 import android.app.ProgressDialog
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -31,6 +33,7 @@ import com.bos.payment.appName.utils.ApiStatus
 import com.bos.payment.appName.utils.Constants
 import com.bos.payment.appName.utils.MStash
 import com.google.gson.Gson
+import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -45,6 +48,7 @@ class MakepaymentReports : AppCompatActivity() {
     var reportModeList: MutableList<String?> = arrayListOf()
     private val myCalender1 = Calendar.getInstance()
     var ToDate: String = ""
+    var PaymentReports:String =""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +66,54 @@ class MakepaymentReports : AppCompatActivity() {
 
     }
 
+    private val createExcelLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) { uri ->
+
+        uri ?: return@registerForActivityResult
+
+        writeCsvToUri(uri,PaymentReports)
+    }
+
+
+    private fun writeCsvToUri(uri: Uri, reportsList: String) {
+        try {
+            val jsonArray = JSONArray(reportsList)
+
+            if (jsonArray.length() == 0) {
+                Toast.makeText(this, "No data to export", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // 🔹 Extract headers from first object
+            val firstObj = jsonArray.getJSONObject(0)
+            val headers = firstObj.keys().asSequence().toList()
+
+            contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { writer ->
+
+                // ✅ WRITE HEADER
+                writer.append(headers.joinToString(","))
+                writer.newLine()
+
+                // ✅ WRITE DATA ROWS
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+
+                    val row = headers.joinToString(",") { key ->
+                        "\"${obj.optString(key).replace("\"", "\"\"")}\""
+                    }
+
+                    writer.append(row)
+                    writer.newLine()
+                }
+            }
+
+            Toast.makeText(this, "CSV file saved successfully", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun setReportModeInSpinner() {
         reportModeList.clear()
         reportModeList.add("All")
@@ -76,6 +128,10 @@ class MakepaymentReports : AppCompatActivity() {
 
 
     private fun setOnClickListner() {
+
+        binding.excellayout.setOnClickListener {
+            createExcelLauncher.launch(Constants.generateReportFileName("MakePayment_Report_"))
+        }
 
         binding.back.setOnClickListener {
             finish()
@@ -252,13 +308,16 @@ class MakepaymentReports : AppCompatActivity() {
         if (!getMakePaymentReportsList.isNullOrEmpty()) {
             binding.notfoundlayout.visibility = View.GONE
             binding.makepaymentreports.visibility = View.VISIBLE
-
+            binding.excellayout.visibility= View.VISIBLE
+            PaymentReports = Gson().toJson(getMakePaymentReportsList)
             val adapter = MakePaymentReportsAdapter(this, getMakePaymentReportsList)
             binding.makepaymentreports.adapter = adapter
             adapter.notifyDataSetChanged()
-        } else {
+        }
+        else {
             binding.notfoundlayout.visibility = View.VISIBLE
             binding.makepaymentreports.visibility = View.GONE
+            binding.excellayout.visibility= View.GONE
         }
     }
 }

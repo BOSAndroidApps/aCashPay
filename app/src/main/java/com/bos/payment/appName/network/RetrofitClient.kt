@@ -29,10 +29,10 @@ object RetrofitClient {
     const val IMAGE_BASE_URL: String = "https://bosapi.businessonlinesolution.in"*/
 
     /*Demo Api*/
-    private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
+   // private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
 
     /*Live Api*/
-   // private const val TRAVEL_URL: String = "https://travel.bospay.in/"
+    private const val TRAVEL_URL: String = "https://travel.bospay.in/"
 
     private const val PAYOUT_URL: String = "https://payout.aopay.in/"
 
@@ -120,6 +120,7 @@ object RetrofitClient {
     private fun getAllTravelInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(RetryOn204Interceptor(maxRetry = 2))
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
             .writeTimeout(60, TimeUnit.SECONDS)   // Write timeout

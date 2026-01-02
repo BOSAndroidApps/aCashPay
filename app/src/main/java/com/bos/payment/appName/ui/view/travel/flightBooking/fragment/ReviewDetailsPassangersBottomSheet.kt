@@ -189,13 +189,10 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
         var passgstholdername = tempBookingPassangerDetails[0].gsTHolderName
         var passgstaddress = tempBookingPassangerDetails[0].gsTAddress
 
-        val random10DigitNumber = (1000000000L..9999999999L).random() //random10DigitNumber.toString()
-        Log.d("randomphone",random10DigitNumber.toString())
-
         var flightTempBookingreq = FlightTempBookingReq(
-            customerMobile = /*customMob*/random10DigitNumber.toString() , // for testing purpose
-            passengerMobile =/*passangermob*/ random10DigitNumber.toString(),
-            whatsAPPMobile = /*passangermob*/ random10DigitNumber.toString(),
+            customerMobile = customMob , // for testing purpose
+            passengerMobile =passangermob ,
+            whatsAPPMobile = passangermob,
             passengerEmail = passemail,
             gst = passgst,
             gsT_Number = passgstnumber,
@@ -213,7 +210,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             bookingAlertIds = "",
             iPAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
             requestId =  mStash?.getStringValue(Constants.requestId, ""),
-            imeINumber = "2232323232323",
+            imeINumber = "0054748569",
             registrationID = mStash?.getStringValue(Constants.MerchantId, ""),
             bookingFlightDetails = getBookingFlightDetails(),
             paX_Details = getpaxDetails()
@@ -486,7 +483,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
             bookingRefNo = mStash!!.getStringValue(Constants.BookingRefNo,""),
             ticketingType = "1",
             loginID = mStash?.getStringValue(Constants.requestId, ""),
-            imeINumber = "2232323232323",
+            imeINumber = "0054748569",
             createdBy = mStash!!.getStringValue(Constants.RegistrationId, ""),
             apiResponse = Gson().toJson(apiresponse),
             registrationID = mStash?.getStringValue(Constants.MerchantId, ""),
@@ -522,12 +519,8 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                             users.body()?.let { response ->
                                 Log.d("airticketingresponse",response.toString())
 
-                                if(response.responseHeader.statusId.equals("204")){
-                                    uploadDataForAirTicketing(apiresponse)
-                                }
-
                                 if(response.responseHeader.statusId.equals("22")){
-                                    Toast.makeText(context,response.responseHeader.errorDesc,Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context,response.responseHeader.errorDesc,Toast.LENGTH_LONG).show()
                                     if(Constants.dialog!=null && Constants.dialog.isShowing){
                                         Constants.dialog.dismiss()
                                     }
@@ -599,7 +592,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                                 airlinePNR =  apiresponse.airlinePNRDetails!![0].airlinePNRs!![0].airlinePNR,
                                 ipAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
                                 requestId =  mStash?.getStringValue(Constants.requestId, ""),
-                                imeNumber = "2232323232323",
+                                imeNumber = "0054748569",
                                 registerId = mStash?.getStringValue(Constants.MerchantId, "")/*"AOP-554"*/
                             )
 
@@ -644,7 +637,7 @@ class ReviewDetailsPassangersBottomSheet:BottomSheetDialogFragment() {
                                         bookingRefNo = response.bookingRefNo,
                                         ipAddress = mStash?.getStringValue(Constants.deviceIPAddress, ""),
                                         requestId = mStash?.getStringValue(Constants.requestId, ""),
-                                        imeinumber = "2232323232323",
+                                        imeinumber = "0054748569",
                                         registrationID = mStash!!.getStringValue(Constants.RegistrationId, ""),
                                         airPnr = response.airPNRDetails!![0]?.airlinePNR,
                                         flightNumber = response.airPNRDetails[0]!!.flights!![0].flightId, //flight_Id

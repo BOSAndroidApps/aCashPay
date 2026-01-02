@@ -14,6 +14,9 @@ import com.bos.payment.appName.ui.view.travel.adapter.FlightDetailsAdapter
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.FlightListForFilter
 import com.bos.payment.appName.ui.view.travel.flightBooking.FlightConstant.Companion.TripDetailsList
+import com.bos.payment.appName.ui.view.travel.flightBooking.activity.AddDetailsPassangerActivity.Companion.adultList
+import com.bos.payment.appName.ui.view.travel.flightBooking.fragment.ReviewDetailsPassangersBottomSheet.Companion.passangerDetailsList
+import com.bos.payment.appName.ui.view.travel.flightBooking.fragment.ReviewDetailsPassangersBottomSheet.Companion.tempBookingPassangerDetails
 import java.lang.System.`in`
 
 class FlightDetailListActivity : AppCompatActivity() {
@@ -91,7 +94,12 @@ class FlightDetailListActivity : AppCompatActivity() {
         }
 
 
-
-
+    override fun onResume() {
+        super.onResume()
+        adultList.clear()
+        tempBookingPassangerDetails.clear()
+        passangerDetailsList.clear()
     }
+
+}
 

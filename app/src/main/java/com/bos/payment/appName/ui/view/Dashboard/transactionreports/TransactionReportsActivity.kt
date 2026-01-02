@@ -38,6 +38,7 @@ import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.google.gson.Gson
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.json.JSONArray
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -79,18 +80,19 @@ class TransactionReportsActivity : AppCompatActivity() {
 
     }
 
+
     private val createExcelLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) { uri ->
 
             uri ?: return@registerForActivityResult
 
-            writeExcelToUri(uri,transactionReports)
+            writeCsvToUri(uri,transactionReports)
         }
 
 
     private fun setClickListner(){
 
        binding.excellayout.setOnClickListener {
-           createExcelLauncher.launch("Transaction_Report.xlsx")
+           createExcelLauncher.launch(Constants.generateReportFileName("Transaction_Report_"))
        }
 
 
@@ -293,9 +295,11 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
-    private fun writeExcelToUri(uri: Uri, reportsList: String) {
+   /* private fun writeExcelToUri(uri: Uri, reportsList: String) {
         try {
+            // ✅ Parse directly as JSONArray
             val jsonArray = JSONArray(reportsList)
+
             if (jsonArray.length() == 0) {
                 Toast.makeText(this, "No data to write", Toast.LENGTH_SHORT).show()
                 return
@@ -304,8 +308,9 @@ class TransactionReportsActivity : AppCompatActivity() {
             val workbook = XSSFWorkbook()
             val sheet = workbook.createSheet("Transactions")
 
-            // Extract headers
-            val keys = jsonArray.getJSONObject(0).keys().asSequence().toList()
+            // ✅ Extract headers from first object
+            val firstObj = jsonArray.getJSONObject(0)
+            val keys = firstObj.keys().asSequence().toList()
 
             // Header row
             val headerRow = sheet.createRow(0)
@@ -317,6 +322,7 @@ class TransactionReportsActivity : AppCompatActivity() {
             for (i in 0 until jsonArray.length()) {
                 val row = sheet.createRow(i + 1)
                 val obj = jsonArray.getJSONObject(i)
+
                 keys.forEachIndexed { colIndex, key ->
                     row.createCell(colIndex).setCellValue(obj.optString(key, ""))
                 }
@@ -325,19 +331,64 @@ class TransactionReportsActivity : AppCompatActivity() {
             // Auto-size columns
             keys.indices.forEach { sheet.autoSizeColumn(it) }
 
-            // Write to file
-            contentResolver.openOutputStream(uri)?.use { outputStream ->
-                workbook.write(outputStream)
-                outputStream.flush()
+            // Write file
+            contentResolver.openOutputStream(uri)?.use {
+                workbook.write(it)
+                it.flush()
             }
 
             workbook.close()
-            Toast.makeText(this, "File saved successfully", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Excel file saved successfully", Toast.LENGTH_LONG).show()
+
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error saving file: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }*/
+
+
+    private fun writeCsvToUri(uri: Uri, reportsList: String) {
+        try {
+            val jsonArray = JSONArray(reportsList)
+
+            if (jsonArray.length() == 0) {
+                Toast.makeText(this, "No data to export", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // 🔹 Extract headers from first object
+            val firstObj = jsonArray.getJSONObject(0)
+            val headers = firstObj.keys().asSequence().toList()
+
+            contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { writer ->
+
+                // ✅ WRITE HEADER
+                writer.append(headers.joinToString(","))
+                writer.newLine()
+
+                // ✅ WRITE DATA ROWS
+                for (i in 0 until jsonArray.length()) {
+                    val obj = jsonArray.getJSONObject(i)
+
+                    val row = headers.joinToString(",") { key ->
+                        "\"${obj.optString(key).replace("\"", "\"\"")}\""
+                    }
+
+                    writer.append(row)
+                    writer.newLine()
+                }
+            }
+
+            Toast.makeText(this, "CSV file saved successfully", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
+
+
+
 
 
     private fun setReportInSpinner(){
@@ -385,7 +436,6 @@ class TransactionReportsActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.reportmode.adapter = adapter
     }
-
 
 
     private fun hitApiForGettingTransactionReports(){
@@ -457,7 +507,6 @@ class TransactionReportsActivity : AppCompatActivity() {
     }
 
 
-
     fun hitApiForCheckRaiseTicket(transactionID:String){
         runIfConnected {
             val reportReq = CheckRaiseTicketExistReq(
@@ -505,7 +554,6 @@ class TransactionReportsActivity : AppCompatActivity() {
                 }
         }
      }
-
 
 
     fun popupforshowingraiseticketstatus(transactionId : String){

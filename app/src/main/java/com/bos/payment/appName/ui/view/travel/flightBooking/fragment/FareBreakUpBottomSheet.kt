@@ -100,9 +100,9 @@ class FareBreakUpBottomSheet:BottomSheetDialogFragment() {
         val infantAmount = (infant?.quantity ?: 0) * (infant?.basic_amount?.toDoubleOrNull() ?: 0.0)
 
 
-        binding.totalamountofadult.text = "₹ " . plus(adultAmount.toString())
-        binding.totalamountofchild.text = "₹ " . plus(childAmount.toString())
-        binding.totalamountofinfant.text = "₹ " . plus(infantAmount.toString())
+        binding.totalamountofadult.text = "₹ %.2f" . format(adultAmount.toDouble())
+        binding.totalamountofchild.text = "₹ %.2f" . format(childAmount.toDouble())
+        binding.totalamountofinfant.text = "₹ %.2f" . format(infantAmount.toDouble())
 
 
         val airportTaxadultAmount = (adult?.quantity ?: 0) * (adult?.airportTax_amount?.toDoubleOrNull() ?: 0.0)
@@ -110,9 +110,9 @@ class FareBreakUpBottomSheet:BottomSheetDialogFragment() {
         val airportTaxinfantAmount = (infant?.quantity ?: 0) * (infant?.airportTax_amount?.toDoubleOrNull() ?: 0.0)
 
 
-        binding.totaltaxesofadult.text = "₹ " . plus(airportTaxadultAmount.toString())
-        binding.totaltaxesofchild.text ="₹ " . plus( airportTaxchildAmount.toString())
-        binding.totaltaxesofinfant.text = "₹ " . plus(airportTaxinfantAmount.toString())
+        binding.totaltaxesofadult.text = "₹ %.2f".format(airportTaxadultAmount.toDouble())
+        binding.totaltaxesofchild.text ="₹ %.2f " . format( airportTaxchildAmount.toDouble())
+        binding.totaltaxesofinfant.text = "₹ %.2f " . format(airportTaxinfantAmount.toDouble())
 
 
         // Ensure all are Double or Int before addition
@@ -121,9 +121,9 @@ class FareBreakUpBottomSheet:BottomSheetDialogFragment() {
         val overallTotalAmount = totalBaseFare + totalTaxFare
 
         // Set the text
-        binding.totalbasefare.text = "₹ " . plus( totalBaseFare.toString() )
-        binding.totaltaxesfare.text = "₹ " . plus( totalTaxFare.toString())
-        binding.overalltotalamount.text = "₹ " . plus(overallTotalAmount.toString())
+        binding.totalbasefare.text = "₹ %.2f".format(totalBaseFare.toDouble())
+        binding.totaltaxesfare.text = "₹ %.2f".format(totalTaxFare.toDouble())
+        binding.overalltotalamount.text = "₹ %.2f".format(overallTotalAmount.toDouble())
 
 
     }

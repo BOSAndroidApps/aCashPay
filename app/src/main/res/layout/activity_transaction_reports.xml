@@ -181,6 +181,7 @@
         android:layout_height="wrap_content"
         android:gravity="right"
         android:layout_margin="@dimen/dimen_6dp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/spinnerlayout">
 
         <ImageView

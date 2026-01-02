@@ -110,6 +110,8 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
 
         setupUI()
         getFuseLocation()
+
+        mStash.setStringValue(Constants.MerchantId, "AOP-554")
         if(activestatus.equals("N")){
             binding.inactiveservicelayout.visibility=View.VISIBLE
         }else {
@@ -664,6 +666,8 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
                         adultList.clear()
                         childList.clear()
                         infantList.clear()
+
+
                         passangerDetailsList.clear()
                         companyName = ""
                         registrationNo = ""
@@ -735,7 +739,6 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
     }
 
 
-
     fun getFilterAirLineList(): List<FilterAirLine> {
         var airlinecodeList: MutableList<FilterAirLine> = mutableListOf()
         airlinecodeList.add(FilterAirLine(airlineCode = ""))
@@ -767,6 +770,7 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
         }
     }
 
+
     private fun formatDate2(inputDate: String): String {
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -777,5 +781,6 @@ class FlightMainFragment : Fragment(), FlightSpecialOfferAdapter.setClickListner
             "Invalid Date"
         }
     }
+
 
 }
