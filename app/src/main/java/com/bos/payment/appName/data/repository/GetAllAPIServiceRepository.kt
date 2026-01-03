@@ -230,6 +230,7 @@ class GetAllAPIServiceRepository(private val apiInterface: ApiInterface) {
     suspend fun GetPromotionListReq(req: GetPromotionListReq)= apiInterface!!.GetPromotionListReq(req)
 
     suspend fun GetEligibleReq(req: GetEligibleReq)= apiInterface!!.GetEligibleReq(req)
+    suspend fun GetRetailerWalletEligibleReq(req: GetEligibleReq)= apiInterface!!.GetRetailerWalletEligibleReq(req)
 
     suspend fun GetManagePromoUsageReq(req: ManagePromoUsageReq)= apiInterface!!.GetManagePromoUsageReq(req)
 

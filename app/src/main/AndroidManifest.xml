@@ -58,147 +58,131 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
-            android:name=".ui.view.promocode.PromocodeDetailsPage"
+            android:name=".ui.view.promocode.RetailerWalletPromocodeListActivity"
             android:exported="false"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.view.promocode.PromocodeDetailsPage"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.view.promocode.RetailerPromocodeDetailsPage"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.view.promocode.PromocodeListActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".notification.NotificationPage"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.subscriptionservices.RenewServicesReport"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.subscriptionservices.RenewServices"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
         <activity
             android:name=".ui.view.travel.busactivity.BusFilterActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.Dashboard.activity.ManageKYC"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.activity.AadharCardWebViewDIGILockerPage"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.transactionreports.VPATransactionReports"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.makepayment.MakepaymentReports"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.makepayment.AdminBankListActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.makepayment.MakePaymentActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.supportmanagement.ChatToAdminActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.supportmanagement.TicketStatus"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.transactionreports.RaiseTicketActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.transactionreports.TransactionReportsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.Dashboard.ToSelf.ToSelfMoneyTransferPage"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-
         <activity
             android:name=".ui.view.Dashboard.tomobile.SendWalletAmountPage"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-
         <activity
             android:name=".ui.view.Dashboard.tomobile.ToMobileSendMoneyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.activity.AllServicesSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.activity.JustPeDashboard"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.BOS_App" />
-
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightBookingPage"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightBookedTicketActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.travel.flightBooking.activity.AddDetailsPassangerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightFilterActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.view.travel.flightBooking.activity.FlightDetailListActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.travel.busactivity.BusHistory"
             android:exported="false"
@@ -224,7 +208,6 @@
             android:name=".ui.view.travel.busactivity.BusSearchDetails"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.Dashboard.dmt.FingerCaptureActivity"
             android:exported="false"
@@ -368,7 +351,6 @@
             android:name=".ui.view.ForgotPasswordActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.view.LoginActivity"
             android:exported="false"
@@ -376,10 +358,7 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
-
         </activity>
-
-
         <activity
             android:name=".ui.view.SplashActivity"
             android:exported="true"
@@ -389,13 +368,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Alias for User Type 1 -->
+        </activity>
+
         <activity-alias
-            android:name=".ui.view.UserType1Alias"
+            android:name=".ui.view.UserType3Alias"
             android:enabled="false"
             android:exported="true"
-            android:icon="@drawable/pay_indialogo"
-            android:label="@string/Pay_india"
+            android:icon="@drawable/pic"
+            android:label="@string/Bos_Pay"
             android:targetActivity=".ui.view.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -416,14 +396,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
-
+        </activity-alias> <!-- Alias for User Type 1 -->
         <activity-alias
-            android:name=".ui.view.UserType3Alias"
+            android:name=".ui.view.UserType1Alias"
             android:enabled="false"
             android:exported="true"
-            android:icon="@drawable/pic"
-            android:label="@string/Bos_Pay"
+            android:icon="@drawable/pay_indialogo"
+            android:label="@string/Pay_india"
             android:targetActivity=".ui.view.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -442,15 +421,13 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-
         <service
             android:name=".notification.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

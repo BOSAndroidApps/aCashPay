@@ -19,6 +19,7 @@ import com.bos.payment.appName.data.model.promocode.PromoDataItem
 import com.bos.payment.appName.data.repository.GetAllAPIServiceRepository
 import com.bos.payment.appName.data.viewModelFactory.GetAllApiServiceViewModelFactory
 import com.bos.payment.appName.databinding.PromocodeItemLayoutBinding
+import com.bos.payment.appName.databinding.PromocodeWalletItemLayoutBinding
 import com.bos.payment.appName.network.RetrofitClient
 import com.bos.payment.appName.ui.view.promocode.PromocodeDetailsPage.Companion.promoDataItem
 import com.bos.payment.appName.ui.viewmodel.GetAllApiServiceViewModel
@@ -32,11 +33,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: GetAllApiServiceViewModel, val lifecycleOwner: LifecycleOwner, private var promoDataList: List<PromoDataItem?>?, private val onDetailsClick: (PromoDataItem) -> Unit, private val onApplyClick: (PromoDataItem) -> Unit) : RecyclerView.Adapter<PromocodeListAdapter.PromoViewHolder>() {
+class WalletPromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: GetAllApiServiceViewModel, val lifecycleOwner: LifecycleOwner, private var promoDataList: List<PromoDataItem?>?, private val onDetailsClick: (PromoDataItem) -> Unit, private val onApplyClick: (PromoDataItem) -> Unit) : RecyclerView.Adapter<WalletPromocodeListAdapter.PromoViewHolder>() {
     var countDownTimer: CountDownTimer? = null
     private var mStash: MStash? = null
 
-    inner class PromoViewHolder(private val binding: PromocodeItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class PromoViewHolder(private val binding: PromocodeWalletItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: PromoDataItem) {
 
@@ -46,12 +47,14 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
 
             // Offer Amount
             val offerText = when (item.discountType?.lowercase()) {
-                "flat" -> "₹ ${item.discountValue} Cashback"
-                "percentage" -> "${item.discountValue}% Cashback"
+                "flat" -> " ${item.discountValue}"
+                "percentage" -> "${item.discountValue}% "
                 else -> "-"
             }
 
-            binding.offeramount.text = "Upto $offerText"
+            binding.offeramount.text = "$offerText"
+
+            binding.maxdiscount.text = "Up to ₹${String.format("%.2f",item.maxDiscountAmount)}"
 
             // Min Transaction
             binding.offerdatelayout.findViewById<TextView>(R.id.maxtxnamount)?.text = "₹ ${String.format("%.2f",item.minTransactionAmount)}"
@@ -59,8 +62,6 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
             // Valid Till
             binding.offerdatelayout.findViewById<TextView>(R.id.tilldate)?.text = formatDate(item.endDate)
 
-            // Services
-            binding.offerdatelayout.findViewById<TextView>(R.id.servicesname)?.text = item.serviceName?.joinToString(", ") ?: "-"
 
             // Status
             binding.status.text = item.status ?: "Inactive"
@@ -72,7 +73,7 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
                     ContextCompat.getColor(binding.root.context, R.color.grey)
             )
 
-            binding.expriedate.visibility= View.INVISIBLE
+            binding.expriedate.visibility= View.GONE
 
             countDownTimer = startExpiryTimer(
                 endDate =item.endDate!!,
@@ -100,7 +101,7 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PromoViewHolder {
-        val binding = PromocodeItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = PromocodeWalletItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PromoViewHolder(binding)
     }
 
@@ -141,13 +142,13 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
 
 
 
-    fun hitApiForGetEligible(item: PromoDataItem,binding:PromocodeItemLayoutBinding) {
+    fun hitApiForGetEligible(item: PromoDataItem,binding:PromocodeWalletItemLayoutBinding) {
            var userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
 
             val request = GetEligibleReq(
                 fromDate = item.startDate,
                 toDate = item.endDate,
-                serviceCode = item.applicableServices?.joinToString(",") ?: "-",
+                serviceCode = "",
                 retailerId = userCode,
                 operatorCode = "",
                 subserviceCode = ""
@@ -155,7 +156,7 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
 
             Log.d("Eligiblereq", Gson().toJson(request))
 
-            getAllApiServiceViewModel.GetEligibleReq(request).observe(lifecycleOwner) { resource ->
+            getAllApiServiceViewModel.GetRetailerWalletEligibleReq(request).observe(lifecycleOwner) { resource ->
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
@@ -175,7 +176,7 @@ class PromocodeListAdapter(var context: Context, var getAllApiServiceViewModel: 
                                     }
                                     else {
 
-                                       // Toast.makeText(context, response.returnMessage, Toast.LENGTH_SHORT).show()
+
                                     }
                                 }
                             }

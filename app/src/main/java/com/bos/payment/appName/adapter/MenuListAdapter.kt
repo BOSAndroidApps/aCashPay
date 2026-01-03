@@ -28,7 +28,9 @@ import com.bos.payment.appName.ui.view.Dashboard.transactionreports.VPATransacti
 import com.bos.payment.appName.ui.view.makepayment.AdminBankListActivity
 import com.bos.payment.appName.ui.view.makepayment.MakepaymentReports
 import com.bos.payment.appName.ui.view.moneyTransfer.ScannerFragment
+import com.bos.payment.appName.ui.view.promocode.PromocodeDetailsPage
 import com.bos.payment.appName.ui.view.promocode.PromocodeListActivity
+import com.bos.payment.appName.ui.view.promocode.RetailerWalletPromocodeListActivity
 import com.bos.payment.appName.ui.view.subscriptionservices.RenewServices
 import com.bos.payment.appName.ui.view.subscriptionservices.RenewServicesReport
 import com.bos.payment.appName.ui.view.supportmanagement.TicketStatus
@@ -124,6 +126,7 @@ class MenuListAdapter(
                     "M00100" -> context.startActivity(Intent(context,RenewServices::class.java))
                     "M00104" -> context.startActivity(Intent(context,RenewServicesReport::class.java))
                     "M00106"->context.startActivity(Intent(context,PromocodeListActivity::class.java))
+                    "M00107"->context.startActivity(Intent(context, RetailerWalletPromocodeListActivity::class.java))
                     else -> { /* Handle other cases */ }
                 }
             }

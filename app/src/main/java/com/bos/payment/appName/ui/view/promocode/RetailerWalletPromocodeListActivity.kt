@@ -13,15 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.R
 import com.bos.payment.appName.data.model.promocode.GetPromotionListReq
 import com.bos.payment.appName.data.model.promocode.PromoDataItem
-import com.bos.payment.appName.data.model.servicesbasednotification.DataItem
-import com.bos.payment.appName.data.model.servicesbasednotification.NotificationReq
 import com.bos.payment.appName.data.repository.GetAllAPIServiceRepository
 import com.bos.payment.appName.data.viewModelFactory.GetAllApiServiceViewModelFactory
 import com.bos.payment.appName.databinding.ActivityPromocodeListBinding
+import com.bos.payment.appName.databinding.ActivityRetailerWalletPromocodeListBinding
 import com.bos.payment.appName.network.RetrofitClient
-import com.bos.payment.appName.ui.adapter.NotificationAdapter
 import com.bos.payment.appName.ui.adapter.PromocodeListAdapter
-import com.bos.payment.appName.ui.view.promocode.PromocodeDetailsPage.Companion.promoDataItem
+import com.bos.payment.appName.ui.adapter.WalletPromocodeListAdapter
+import com.bos.payment.appName.ui.view.promocode.RetailerPromocodeDetailsPage.Companion.retailerWalletPromoDataItem
 import com.bos.payment.appName.ui.viewmodel.GetAllApiServiceViewModel
 import com.bos.payment.appName.utils.ApiStatus
 import com.bos.payment.appName.utils.Constants
@@ -33,16 +32,18 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-class PromocodeListActivity : AppCompatActivity() {
-    lateinit var binding: ActivityPromocodeListBinding
+class RetailerWalletPromocodeListActivity : AppCompatActivity() {
+
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private var mStash: MStash? = null
-    var promodataList: List<PromoDataItem?>? = arrayListOf()
+    var promodataList: MutableList<PromoDataItem?>? = mutableListOf()
 
+
+    lateinit var binding: ActivityRetailerWalletPromocodeListBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding= ActivityPromocodeListBinding.inflate(layoutInflater)
+        binding = ActivityRetailerWalletPromocodeListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         init()
@@ -55,8 +56,11 @@ class PromocodeListActivity : AppCompatActivity() {
 
 
     fun init(){
-        mStash = MStash.getInstance(this@PromocodeListActivity)
-        getAllApiServiceViewModel = ViewModelProvider(this@PromocodeListActivity, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)))[GetAllApiServiceViewModel::class.java]
+        mStash = MStash.getInstance(this@RetailerWalletPromocodeListActivity)
+        getAllApiServiceViewModel = ViewModelProvider(this@RetailerWalletPromocodeListActivity, GetAllApiServiceViewModelFactory(
+            GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)
+        )
+        )[GetAllApiServiceViewModel::class.java]
     }
 
 
@@ -78,10 +82,10 @@ class PromocodeListActivity : AppCompatActivity() {
                 state = "DELHI",
                 applicableServices = "",
                 status = "",
-                promoionType = "Services"
+                promoionType = "WALLET"
             )
 
-            Log.d("promolistreq", Gson().toJson(request))
+            Log.d("walletpromolistreq", Gson().toJson(request))
 
             getAllApiServiceViewModel.GetPromotionListReq(request).observe(this) { resource ->
                 resource?.let {
@@ -92,30 +96,30 @@ class PromocodeListActivity : AppCompatActivity() {
                                     Constants.dialog.dismiss()
                                     if (response.isSuccess!!) {
                                         promodataList = response!!.data!!
-                                        Log.d("promolistresp", Gson().toJson(promodataList))
+                                        Log.d("walletpromolistresp", Gson().toJson(promodataList))
                                         if(promodataList!!.isNotEmpty()){
-                                            val adapter = PromocodeListAdapter(this,getAllApiServiceViewModel,this,promodataList,
+                                            val adapter = WalletPromocodeListAdapter(this,getAllApiServiceViewModel,this,promodataList,
                                                 onDetailsClick = { item->
-                                                    promoDataItem= item
-                                                    startActivity(Intent(this@PromocodeListActivity,PromocodeDetailsPage::class.java))
+                                                    retailerWalletPromoDataItem = item
+                                                    startActivity(Intent(this@RetailerWalletPromocodeListActivity,RetailerPromocodeDetailsPage::class.java))
                                                 },
                                                 onApplyClick = {
                                                     // Apply promo logic
                                                 }
 
                                             )
-                                            binding.showpromocode.adapter = adapter
+                                            binding.showwalletpromocode.adapter = adapter
                                             binding.notfoundimage.visibility= View.GONE
-                                            binding.showpromocode.visibility= View.VISIBLE
+                                            binding.showwalletpromocode.visibility= View.VISIBLE
                                         }else{
                                             binding.notfoundimage.visibility= View.VISIBLE
-                                            binding.showpromocode.visibility= View.GONE
+                                            binding.showwalletpromocode.visibility= View.GONE
                                         }
 
                                     }
                                     else {
                                         binding.notfoundimage.visibility= View.VISIBLE
-                                        binding.showpromocode.visibility= View.GONE
+                                        binding.showwalletpromocode.visibility= View.GONE
                                         Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
                                     }
                                 }
@@ -125,7 +129,7 @@ class PromocodeListActivity : AppCompatActivity() {
                         ApiStatus.ERROR -> {
                             Constants.dialog.dismiss()
                             binding.notfoundimage.visibility= View.VISIBLE
-                            binding.showpromocode.visibility= View.GONE
+                            binding.showwalletpromocode.visibility= View.GONE
                         }
 
                         ApiStatus.LOADING -> {
@@ -149,4 +153,5 @@ class PromocodeListActivity : AppCompatActivity() {
         super.onResume()
         hitApiForPromotionList()
     }
+
 }

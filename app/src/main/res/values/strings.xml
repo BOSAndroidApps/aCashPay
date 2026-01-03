@@ -689,6 +689,8 @@
     <string name="bus_operator">Bus Operator</string>
     <string name="filter_your_bus">Filter Your Bus</string>
     <string name="boarding_point">Boarding Point</string>
+    <string name="use_promoa">Use Promo Code to </string>
+    <string name="use_promob">get cashback on Wallet Top - Ups</string>
 
 
 </resources>

@@ -591,7 +591,7 @@ object Constants {
         val minutes = (totalSeconds % 3600) / 60
         val seconds = totalSeconds % 60
 
-        return "Expires in ${hours}h ${minutes}m ${seconds}s"
+        return "Exp. in ${hours}h ${minutes}m ${seconds}s"
     }
 
 
@@ -648,12 +648,6 @@ object Constants {
         return "ClientRef$datePart$randomPart"
     }
 
-    fun generateTransactionId(): String {
-        val sdf = SimpleDateFormat("ddHHmmss", Locale.getDefault())
-        val datePart = sdf.format(Date())
-        val randomPart = Random.nextInt(100, 999) // 3-digit random
-        return "TXN$datePart$randomPart"
-    }
 
 
 

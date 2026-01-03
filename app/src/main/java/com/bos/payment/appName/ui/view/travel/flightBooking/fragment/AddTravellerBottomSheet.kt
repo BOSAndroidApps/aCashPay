@@ -100,6 +100,7 @@ class AddTravellerBottomSheet:BottomSheetDialogFragment() {
         return binding.root
     }
 
+
     fun showAndHideView(){
 
         val selectedPaxDetail = paxDetailsList.find {
@@ -292,12 +293,6 @@ class AddTravellerBottomSheet:BottomSheetDialogFragment() {
         }
         return super.onCreateDialog(savedInstanceState)
     }
-
-
-    private  fun selectionHover(){
-
-    }
-
 
 
     override fun onDismiss(dialog: DialogInterface) {

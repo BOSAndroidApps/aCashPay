@@ -33,6 +33,8 @@ import com.bos.payment.appName.data.repository.GetAllAPIServiceRepository
 import com.bos.payment.appName.data.viewModelFactory.GetAllApiServiceViewModelFactory
 import com.bos.payment.appName.databinding.ActivityPromocodeDetailsPageBinding
 import com.bos.payment.appName.databinding.ActivityPromocodeListBinding
+import com.bos.payment.appName.databinding.ActivityRetailerPromocodeDetailsPageBinding
+import com.bos.payment.appName.databinding.ActivityRetailerWalletPromocodeListBinding
 import com.bos.payment.appName.network.RetrofitClient
 import com.bos.payment.appName.ui.adapter.PromocodeListAdapter
 import com.bos.payment.appName.ui.view.Dashboard.tomobile.SendWalletAmountPage.Companion.name
@@ -46,8 +48,8 @@ import com.bos.payment.appName.utils.MStash
 import com.bos.payment.appName.utils.Utils.runIfConnected
 import com.google.gson.Gson
 
-class PromocodeDetailsPage : AppCompatActivity() {
-    lateinit var binding: ActivityPromocodeDetailsPageBinding
+class RetailerPromocodeDetailsPage : AppCompatActivity() {
+    lateinit var binding: ActivityRetailerPromocodeDetailsPageBinding
     var countDownTimer: CountDownTimer? = null
     private lateinit var getAllApiServiceViewModel: GetAllApiServiceViewModel
     private var mStash: MStash? = null
@@ -55,18 +57,18 @@ class PromocodeDetailsPage : AppCompatActivity() {
     var redeemAmount : Double =0.0
 
     companion object{
-       lateinit var promoDataItem: PromoDataItem
+       lateinit var retailerWalletPromoDataItem: PromoDataItem
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityPromocodeDetailsPageBinding.inflate(layoutInflater)
+        binding = ActivityRetailerPromocodeDetailsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mStash = MStash.getInstance(this@PromocodeDetailsPage)
+        mStash = MStash.getInstance(this@RetailerPromocodeDetailsPage)
 
-        getAllApiServiceViewModel = ViewModelProvider(this@PromocodeDetailsPage, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)
+        getAllApiServiceViewModel = ViewModelProvider(this@RetailerPromocodeDetailsPage, GetAllApiServiceViewModelFactory(GetAllAPIServiceRepository(RetrofitClient.apiAllInterface)
         ))[GetAllApiServiceViewModel::class.java]
 
 
@@ -77,26 +79,38 @@ class PromocodeDetailsPage : AppCompatActivity() {
     }
 
     fun setDataOnView(){
-        binding.promocode.text= promoDataItem.promoCode
+        binding.promocode.text= retailerWalletPromoDataItem.promoCode
+
         binding.statuscard.setCardBackgroundColor(
-            if (promoDataItem.status.equals("active", true))
+            if (retailerWalletPromoDataItem.status.equals("active", true))
                 ContextCompat.getColor(binding.root.context, R.color.green)
             else
-                ContextCompat.getColor(binding.root.context, R.color.grey)
-        )
-        binding.status.text= promoDataItem.status
-        binding.promotionTypeApplicationMode.text= "${promoDataItem.applicationMode}${promoDataItem.promotionType}"
-        binding.promoname.text= promoDataItem.promoName
-        binding.fromdate.text= formatDateTime(promoDataItem.startDate)
-        binding.todate.text= formatDateTime(promoDataItem.endDate)
-        binding.targetamount.text = "₹ (${String.format("%.2f",promoDataItem.minTransactionAmount)})"
-        binding.maxamount.text ="₹ ${String.format("%.2f",promoDataItem.minTransactionAmount)}"
-        binding.promocodeforachieved.text = promoDataItem.promoCode
+                ContextCompat.getColor(binding.root.context, R.color.grey))
 
-        var discountValue = promoDataItem.discountValue
-        var maxdicamount = promoDataItem.maxDiscountAmount
-        var mintxnamt= promoDataItem.minTransactionAmount
-         if(promoDataItem.discountType.equals("Percentage")){
+        binding.status.text= retailerWalletPromoDataItem.status
+        binding.promotionTypeApplicationMode.text= "${retailerWalletPromoDataItem.promotionType} Cashback"
+
+
+        // Offer Amount
+        val offerText = when (retailerWalletPromoDataItem.discountType?.lowercase()) {
+            "flat" -> " ${retailerWalletPromoDataItem.discountValue}"
+            "percentage" -> "${retailerWalletPromoDataItem.discountValue}% "
+            else -> "-"
+        }
+        binding.offeramount.text = "$offerText"
+        binding.maxdiscount.text = "Cashback Up to ₹${String.format("%.2f",retailerWalletPromoDataItem.maxDiscountAmount)}"
+        binding.maxlimited.text = "${retailerWalletPromoDataItem.usageLimitPerUser} "
+        binding.fromdate.text= formatDateTime(retailerWalletPromoDataItem.startDate)
+        binding.todate.text= formatDateTime(retailerWalletPromoDataItem.endDate)
+        binding.targetamount.text = "₹ (${String.format("%.2f",retailerWalletPromoDataItem.minTransactionAmount)})"
+        binding.maxamount.text ="₹ ${String.format("%.2f",retailerWalletPromoDataItem.minTransactionAmount)}"
+        binding.promocodeforachieved.text = retailerWalletPromoDataItem.promoCode
+
+
+        var discountValue = retailerWalletPromoDataItem.discountValue
+        var maxdicamount = retailerWalletPromoDataItem.maxDiscountAmount
+        var mintxnamt= retailerWalletPromoDataItem.minTransactionAmount
+         if(retailerWalletPromoDataItem.discountType.equals("Percentage")){
              val finalAmount = calculateDiscount(
                  amount = mintxnamt!!,
                  discountValue = discountValue!!,
@@ -131,7 +145,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
         binding.timealertlayout.visibility=View.GONE
 
         countDownTimer = startExpiryTimer(
-            endDate =promoDataItem.endDate!!,
+            endDate =retailerWalletPromoDataItem.endDate!!,
             onTick = { timeText ->
                 binding.expriedate.text = timeText
                 binding.timealertlayout.visibility=View.VISIBLE
@@ -159,9 +173,9 @@ class PromocodeDetailsPage : AppCompatActivity() {
 
         runIfConnected {
             val request = GetEligibleReq(
-                fromDate = promoDataItem.startDate,
-                toDate = promoDataItem.endDate,
-                serviceCode = promoDataItem.applicableServices?.joinToString(",") ?: "-",
+                fromDate = retailerWalletPromoDataItem.startDate,
+                toDate = retailerWalletPromoDataItem.endDate,
+                serviceCode = "",
                 retailerId = userCode,
                 operatorCode = "",
                 subserviceCode = ""
@@ -169,7 +183,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
 
             Log.d("Eligiblereq", Gson().toJson(request))
 
-            getAllApiServiceViewModel.GetEligibleReq(request).observe(this) { resource ->
+            getAllApiServiceViewModel.GetRetailerWalletEligibleReq(request).observe(this) { resource ->
                 resource?.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
@@ -179,8 +193,8 @@ class PromocodeDetailsPage : AppCompatActivity() {
                                     if (response.isSuccess!!) {
                                         Log.d("eligibleresp", String.format("%.2f",response.totalTransactionAmount))
                                         binding.achievedamount.text = "₹ ${String.format("%.2f",response.totalTransactionAmount)}"
-                                        setDataForProgress(response.totalTransactionAmount!!,promoDataItem.minTransactionAmount!!)
-                                        if(response.totalTransactionAmount >= promoDataItem.minTransactionAmount!!){
+                                        setDataForProgress(response.totalTransactionAmount!!,retailerWalletPromoDataItem.minTransactionAmount!!)
+                                        if(response.totalTransactionAmount >= retailerWalletPromoDataItem.minTransactionAmount!!){
                                             binding.redeemlayout.visibility= View.VISIBLE
                                             binding.completetarget.visibility= View.VISIBLE
                                             binding.expiringlayout.visibility= View.GONE
@@ -252,7 +266,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
             transIpAddress = mStash!!.getStringValue(Constants.deviceIPAddress, ""),
             remark = "Promo cashback redeemed deposit",
             transferTo = mStash!!.getStringValue(Constants.RegistrationId, ""),
-            transferToMsg = "Congratulations! ₹ ${String.format("%.2f",redeemAmount)} has been credited to your wallet for Promo Code ${promoDataItem.promoCode}",
+            transferToMsg = "Congratulations! ₹ ${String.format("%.2f",redeemAmount)} has been credited to your wallet for Promo Code ${retailerWalletPromoDataItem.promoCode}",
             gstAmt = 0,
             parmUserName = mStash!!.getStringValue(Constants.RegistrationId, ""),
             servicesChargeGSTAmt = 0,
@@ -260,7 +274,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
             actualTransactionAmount = redeemAmount ?: 0.0,
             actualCommissionAmt = 0,
             commissionWithoutGST = 0,
-            transferFromMsg = "₹ ${String.format("%.2f",redeemAmount)} debited for promo cashback redemption. Promo Code ${promoDataItem.promoCode} Beneficiary: ${mStash!!.getStringValue(Constants.RegistrationId, "")}",
+            transferFromMsg = "₹ ${String.format("%.2f",redeemAmount)} debited for promo cashback redemption. Promo Code ${retailerWalletPromoDataItem.promoCode} Beneficiary: ${mStash!!.getStringValue(Constants.RegistrationId, "")}",
             netCommissionAmt = 0,
             tdSAmt = 0.0,
             servicesChargeAmt = 0,
@@ -302,12 +316,13 @@ class PromocodeDetailsPage : AppCompatActivity() {
                     }
                 }
             }
+
          }
 
 
     @SuppressLint("SetTextI18n")
     fun openDialogForShowingCashbackData()  {
-        dialog = Dialog(this@PromocodeDetailsPage, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog = Dialog(this@RetailerPromocodeDetailsPage, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.promowalletamounttransferalert)
 
@@ -330,7 +345,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
         cashbackDataCard.visibility=View.VISIBLE
         confirmationPayoutCard.visibility=View.GONE
 
-         promovalue.text = promoDataItem.promoCode
+         promovalue.text = retailerWalletPromoDataItem.promoCode
          cashbackamount.text = "₹ ${String.format("%.2f",redeemAmount)}"
 
         done.setOnClickListener {
@@ -373,7 +388,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
 
 
     fun finalSuccessDialog(){
-        var dialog = Dialog(this@PromocodeDetailsPage, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        var dialog = Dialog(this@RetailerPromocodeDetailsPage, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.successalertpromocode)
 
@@ -408,7 +423,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
             taskType = "INS_USAGE",
             transactionAmount = redeemAmount ?: 0.0,
             toDate = null,
-            promoCode = promoDataItem.promoCode,
+            promoCode = retailerWalletPromoDataItem.promoCode,
             retailerCode = mStash!!.getStringValue(Constants.RegistrationId, ""),
             discountApplied = redeemAmount ?: 0.0,
             transactionID = requestId,

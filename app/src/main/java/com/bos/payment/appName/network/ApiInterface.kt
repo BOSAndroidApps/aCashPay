@@ -764,5 +764,9 @@ interface ApiInterface {
     @POST("api/promo/transaction/ManagePromoUsage")
     suspend fun GetManagePromoUsageReq(@Body req: ManagePromoUsageReq): Response<ManagePromoUsageResp>?
 
+     // for retailer wallet..........
+    @POST("api/promo/transaction/GetWalletEligibleTransactionTotal")
+    suspend fun GetRetailerWalletEligibleReq(@Body req: GetEligibleReq): Response<GetEligibleResp>?
+
 
 }

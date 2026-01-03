@@ -68,7 +68,8 @@ class SplashActivity : AppCompatActivity() {
 //                            startActivity(Intent(this, IdentifyClient::class.java))
                                 startActivity(Intent(this, LoginActivity::class.java))
 
-                            } else {
+                            }
+                            else {
                                 // Regular flow: Check if user credentials are stored
                                 val isLoggedIn = mStash.getBoolanValue(Constants.IS_LOGIN, false)
                                 val useFingerprint = mStash.getBoolanValue(Constants.fingerPrintAction.toString(), false)
@@ -88,29 +89,6 @@ class SplashActivity : AppCompatActivity() {
                                     finish()
                                 }
                             }
-//                        }else if (mStash.getBoolanValue(Constants.IS_LOGIN.toString(), false)){
-//                            startActivity(Intent(this, DashboardActivity::class.java))
-//                        }else if (mStash.getBoolanValue(Constants.fingerPrintAction.toString(), false)){
-//                            startActivity(Intent(this, FingerprintActivity::class.java))
-//                        }else {
-//                            startActivity(Intent(this, LoginActivity::class.java))
-//                        }
-
-//                        val status = mStash.getBoolanValue(Constants.Status, false)
-//                        Log.d(TAG, "initView: $status")
-//                        Log.d(TAG, "fingerPrintAction: ${ mStash.getBoolanValue(Constants.fingerPrintAction.toString(), false)}")
-//
-//                        val targetActivity = when {
-//                            mStash.getBoolanValue(Constants.fingerPrintAction.toString(), false) -> FingerprintActivity::class.java
-//                            status -> DashboardActivity::class.java
-//                            else -> {
-//                                Log.d(TAG, "initView: LoginActivity")
-//                                IdentifyClient::class.java
-//                            }
-//                        }
-//
-//                        startActivity(Intent(this, targetActivity))
-//                        finish()
                         }
 
                         ApiStatus.ERROR -> {

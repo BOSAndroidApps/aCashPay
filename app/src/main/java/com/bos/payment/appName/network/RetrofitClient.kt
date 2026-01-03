@@ -18,10 +18,12 @@ object RetrofitClient {
     private const val BASE_GETURL_RECHARGE : String = "https://api.aopay.in/" // Annu just commented 7/08/2025 for guru demo
 
      /*Demo Api*/
-     private const val BASE_URLAPI: String = "https://api.boscenter.in/"
+   // private const val BASE_URLAPI: String = "https://api.boscenter.in/"
+     private const val BASE_URLAPI: String = "http://192.168.1.107/"
 
     /* UAT Api Fr Login*/
-    private const val BASE_GETURL: String = "https://bosapi.bos.center"
+    //private const val BASE_GETURL: String = "https://bosapi.bos.center"
+    private const val BASE_GETURL: String = "http://192.168.1.107/"
     const val IMAGE_BASE_URL: String = "https://bosapi.bos.center"
 
     /* Live Api Fr Login*/
@@ -29,10 +31,10 @@ object RetrofitClient {
     const val IMAGE_BASE_URL: String = "https://bosapi.businessonlinesolution.in"*/
 
     /*Demo Api*/
-   // private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
+   private const val TRAVEL_URL: String = "https://travel.bospay.co.in/"
 
     /*Live Api*/
-    private const val TRAVEL_URL: String = "https://travel.bospay.in/"
+   // private const val TRAVEL_URL: String = "https://travel.bospay.in/"
 
     private const val PAYOUT_URL: String = "https://payout.aopay.in/"
 

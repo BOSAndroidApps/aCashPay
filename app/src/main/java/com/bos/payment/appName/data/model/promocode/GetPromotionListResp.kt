@@ -2,14 +2,13 @@ package com.bos.payment.appName.data.model.promocode
 
 import com.google.gson.annotations.SerializedName
 
-
 data class GetPromotionListResp(
 
 	@field:SerializedName("returnCode")
 	val returnCode: String? = null,
 
 	@field:SerializedName("data")
-	val data: List<PromoDataItem?>? = null,
+	val data: MutableList<PromoDataItem?>? = null,
 
 	@field:SerializedName("returnMessage")
 	val returnMessage: String? = null,
@@ -37,6 +36,9 @@ data class PromoDataItem(
 
 	@field:SerializedName("updatedDate")
 	val updatedDate: String? = null,
+
+	@field:SerializedName("operatorName")
+	val operatorName: List<String?>? = null,
 
 	@field:SerializedName("usageLimitPerUser")
 	val usageLimitPerUser: Int? = null,
@@ -73,6 +75,9 @@ data class PromoDataItem(
 
 	@field:SerializedName("updatedBy")
 	val updatedBy: String? = null,
+
+	@field:SerializedName("serviceName")
+	val serviceName: List<String?>? = null,
 
 	@field:SerializedName("totalUsageLimit")
 	val totalUsageLimit: Int? = null,

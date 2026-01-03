@@ -8,11 +8,19 @@ data class UploadRechargeMobileRespResp(
 	val returnCode: String? = null,
 
 	@field:SerializedName("data")
-	val data: Any? = null,
+	val data: TransferToAgentDataItem? = null,
 
 	@field:SerializedName("returnMessage")
 	val returnMessage: String? = null,
 
 	@field:SerializedName("isSuccess")
 	val isSuccess: Boolean? = null
+)
+
+data class TransferToAgentDataItem(
+	@field:SerializedName("refTransID")
+	val refTransID: String? = null,
+
+	@field:SerializedName("requestData")
+	val requestData: Any? = null
 )

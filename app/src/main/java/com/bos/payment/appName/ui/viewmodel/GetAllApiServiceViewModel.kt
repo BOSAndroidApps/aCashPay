@@ -1036,7 +1036,32 @@ class GetAllApiServiceViewModel constructor(private val repository: GetAllAPISer
         }
     }
 
+    //
 
+    fun GetRetailerWalletEligibleReq(req: GetEligibleReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            val response = withTimeout(10_0000) { // 10 seconds timeout
+                repository.GetRetailerWalletEligibleReq(req)
+            }
+            emit(ApiResponse.success(response))
+        }
+
+        catch (e: TimeoutCancellationException) {
+            emit(ApiResponse.error(data = null, message = "Request timed out. Please try again."))
+        }
+
+        catch (e: IOException) {
+            emit(
+                ApiResponse.error(data = null, message = "No internet connection. Please check your network."))
+        }
+
+        catch (e: Exception) {
+            emit(
+                ApiResponse.error(data = null, message = "Something went wrong: ${e.localizedMessage}")
+            )
+        }
+    }
 
     fun GetManagePromoUsageReq(req: ManagePromoUsageReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
