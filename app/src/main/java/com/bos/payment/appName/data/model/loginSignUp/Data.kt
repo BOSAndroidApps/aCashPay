@@ -18,6 +18,9 @@ data class Data (
   @SerializedName("superAdminCode"  ) var superAdminCode  : String? = null,
   @SerializedName("refrenceID"      ) var refrenceID      : String? = null,
   @SerializedName("agencyname"      ) var agencyname      : String? = null,
-  @SerializedName("fullName"        ) var fullName        : String? = null
+  @SerializedName("fullName"        ) var fullName        : String? = null,
+  @SerializedName("state"           ) var state           : String? = null,
+  @SerializedName("applicationMode" ) var applicationmode           : String? = null,
+  @SerializedName("kycApproved"     ) var kycapproved           : String? = null,
 
-)
+  )

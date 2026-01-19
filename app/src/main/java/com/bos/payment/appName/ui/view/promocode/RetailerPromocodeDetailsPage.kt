@@ -55,6 +55,8 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
     private var mStash: MStash? = null
     lateinit var dialog: Dialog
     var redeemAmount : Double =0.0
+    var totalTransactionAmount : Double =0.0
+    var minTransactionAmount : Double =0.0
 
     companion object{
        lateinit var retailerWalletPromoDataItem: PromoDataItem
@@ -105,7 +107,7 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
         binding.targetamount.text = "₹ (${String.format("%.2f",retailerWalletPromoDataItem.minTransactionAmount)})"
         binding.maxamount.text ="₹ ${String.format("%.2f",retailerWalletPromoDataItem.minTransactionAmount)}"
         binding.promocodeforachieved.text = retailerWalletPromoDataItem.promoCode
-
+        minTransactionAmount =   retailerWalletPromoDataItem.minTransactionAmount!!
 
         var discountValue = retailerWalletPromoDataItem.discountValue
         var maxdicamount = retailerWalletPromoDataItem.maxDiscountAmount
@@ -149,6 +151,15 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
             onTick = { timeText ->
                 binding.expriedate.text = timeText
                 binding.timealertlayout.visibility=View.VISIBLE
+
+                if(totalTransactionAmount >= minTransactionAmount!!){
+                    binding.redeemlayout.visibility= View.VISIBLE
+                    binding.expiringlayout.visibility= View.GONE
+                }
+                else {
+                    binding.expiringlayout.visibility= View.VISIBLE
+                    binding.redeemlayout.visibility= View.GONE
+                }
             },
             onExpire = {
                 binding.expriedate.text = "Expired"
@@ -194,6 +205,9 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
                                         Log.d("eligibleresp", String.format("%.2f",response.totalTransactionAmount))
                                         binding.achievedamount.text = "₹ ${String.format("%.2f",response.totalTransactionAmount)}"
                                         setDataForProgress(response.totalTransactionAmount!!,retailerWalletPromoDataItem.minTransactionAmount!!)
+                                        totalTransactionAmount = response.totalTransactionAmount
+                                        minTransactionAmount =   retailerWalletPromoDataItem.minTransactionAmount!!
+
                                         if(response.totalTransactionAmount >= retailerWalletPromoDataItem.minTransactionAmount!!){
                                             binding.redeemlayout.visibility= View.VISIBLE
                                             binding.completetarget.visibility= View.VISIBLE
@@ -204,7 +218,7 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
                                         else{
                                             binding.redeemlayout.visibility= View.GONE
                                             binding.completetarget.visibility= View.GONE
-                                            binding.expiringlayout.visibility= View.VISIBLE
+                                            binding.expiringlayout.visibility= View.GONE
                                             binding.showingprogresstarget.visibility= View.VISIBLE
                                         }
 
@@ -212,7 +226,7 @@ class RetailerPromocodeDetailsPage : AppCompatActivity() {
                                     else {
                                         binding.redeemlayout.visibility= View.GONE
                                         binding.completetarget.visibility= View.GONE
-                                        binding.expiringlayout.visibility= View.VISIBLE
+                                        binding.expiringlayout.visibility= View.GONE
                                         binding.showingprogresstarget.visibility= View.VISIBLE
                                         Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
                                     }

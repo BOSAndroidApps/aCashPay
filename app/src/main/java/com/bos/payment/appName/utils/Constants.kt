@@ -599,7 +599,14 @@ object Constants {
     fun startExpiryTimer(endDate: String, onTick: (String) -> Unit, onExpire: () -> Unit): CountDownTimer? {
 
         val expiryMillis = getExpiryMillis(endDate) ?: return null
+
         val remainingMillis = expiryMillis - System.currentTimeMillis()
+
+        if (remainingMillis <= 0) {
+            onTick("Expired")
+            onExpire()
+            return null
+        }
 
         if (!shouldStartTimer(expiryMillis)) return null
 
@@ -610,6 +617,7 @@ object Constants {
             }
 
             override fun onFinish() {
+                onTick("Expired")
                 onExpire()
             }
 

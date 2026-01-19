@@ -56,11 +56,7 @@ class GenerateQRCodeActivity : AppCompatActivity() {
     private fun intiView() {
         pd = PD(this)
         mStash = MStash.getInstance(this)
-
-        viewModel = ViewModelProvider(
-            this,
-            MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllAPIService))
-        )[MoneyTransferViewModel::class.java]
+        viewModel = ViewModelProvider(this, MoneyTransferViewModelFactory(MoneyTransferRepository(RetrofitClient.apiAllAPIService)))[MoneyTransferViewModel::class.java]
     }
 
 
@@ -127,29 +123,7 @@ class GenerateQRCodeActivity : AppCompatActivity() {
             toast("Failed to generate QR code")
         }
 
-//    private fun getGenerateQRCode(response: GenerateQRCodeRes) {
-//        if (response.Status == "true" && response.UPIIntend != null) {
-//            var uriIntent = response.UPIIntend.toString()
-//
-////            val qrCodeWriter = QRCodeWriter()
-//
-//            // Initialize multi format writer
-//            val writer = MultiFormatWriter()
-//
-//            try {
-//                val bitMatrix = writer.encode(uriIntent, BarcodeFormat.QR_CODE, 250, 250)
-//                val barCodeEncoder = BarcodeEncoder()
-//                val bitMap: Bitmap = barCodeEncoder.createBitmap(bitMatrix)
-//                bin.qrCodeImageView.setImageBitmap(bitMap)
-//
-//                toast(response.message.toString())
-//            } catch (e: WriterException) {
-//                e.printStackTrace()
-//            }
-//        } else {
-//            toast(response.message.toString())
-//        }
-//
+
     }
 
 }

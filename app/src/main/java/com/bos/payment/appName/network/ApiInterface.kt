@@ -750,7 +750,6 @@ interface ApiInterface {
     suspend fun GetServiceChargeReq(@Body req: ServiceChargeReq): Response<ServiceChargeResp>?
 
 
-
     // for promocode
 
     @POST("api/PromoCode/PromotionResult")

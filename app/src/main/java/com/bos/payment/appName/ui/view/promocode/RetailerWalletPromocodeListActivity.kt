@@ -67,7 +67,7 @@ class RetailerWalletPromocodeListActivity : AppCompatActivity() {
     fun hitApiForPromotionList() {
         var userCode = mStash!!.getStringValue(Constants.RegistrationId, "").toString()
         var adminCode = mStash!!.getStringValue(Constants.AdminCode, "").toString()
-        var currentDate = getCurrentDateUtc() // 2025-12-29T07:15:24.611Z
+        var state = mStash!!.getStringValue(Constants.State, "").toString()
 
         runIfConnected {
             val request = GetPromotionListReq(
@@ -79,7 +79,7 @@ class RetailerWalletPromocodeListActivity : AppCompatActivity() {
                 applicableOperators = "",
                 promoCode = "",
                 retailerCode = userCode,
-                state = "DELHI",
+                state = state,
                 applicableServices = "",
                 status = "",
                 promoionType = "WALLET"

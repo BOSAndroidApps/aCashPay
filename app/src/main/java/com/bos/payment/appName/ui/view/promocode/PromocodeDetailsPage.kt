@@ -37,6 +37,7 @@ import com.bos.payment.appName.network.RetrofitClient
 import com.bos.payment.appName.ui.adapter.PromocodeListAdapter
 import com.bos.payment.appName.ui.view.Dashboard.tomobile.SendWalletAmountPage.Companion.name
 import com.bos.payment.appName.ui.view.Dashboard.tomobile.SendWalletAmountPage.Companion.userID
+import com.bos.payment.appName.ui.view.promocode.RetailerPromocodeDetailsPage.Companion.retailerWalletPromoDataItem
 import com.bos.payment.appName.ui.viewmodel.GetAllApiServiceViewModel
 import com.bos.payment.appName.utils.ApiStatus
 import com.bos.payment.appName.utils.Constants
@@ -53,6 +54,8 @@ class PromocodeDetailsPage : AppCompatActivity() {
     private var mStash: MStash? = null
     lateinit var dialog: Dialog
     var redeemAmount : Double =0.0
+    var totalTransactionAmount : Double =0.0
+    var minTransactionAmount : Double =0.0
 
     companion object{
        lateinit var promoDataItem: PromoDataItem
@@ -92,6 +95,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
         binding.targetamount.text = "₹ (${String.format("%.2f",promoDataItem.minTransactionAmount)})"
         binding.maxamount.text ="₹ ${String.format("%.2f",promoDataItem.minTransactionAmount)}"
         binding.promocodeforachieved.text = promoDataItem.promoCode
+        minTransactionAmount =   promoDataItem.minTransactionAmount!!
 
         var discountValue = promoDataItem.discountValue
         var maxdicamount = promoDataItem.maxDiscountAmount
@@ -135,6 +139,15 @@ class PromocodeDetailsPage : AppCompatActivity() {
             onTick = { timeText ->
                 binding.expriedate.text = timeText
                 binding.timealertlayout.visibility=View.VISIBLE
+
+                if(totalTransactionAmount >= minTransactionAmount!!){
+                    binding.redeemlayout.visibility= View.VISIBLE
+                    binding.expiringlayout.visibility= View.GONE
+                }
+                else {
+                    binding.expiringlayout.visibility= View.VISIBLE
+                    binding.redeemlayout.visibility= View.GONE
+                }
             },
             onExpire = {
                 binding.expriedate.text = "Expired"
@@ -180,6 +193,10 @@ class PromocodeDetailsPage : AppCompatActivity() {
                                         Log.d("eligibleresp", String.format("%.2f",response.totalTransactionAmount))
                                         binding.achievedamount.text = "₹ ${String.format("%.2f",response.totalTransactionAmount)}"
                                         setDataForProgress(response.totalTransactionAmount!!,promoDataItem.minTransactionAmount!!)
+
+                                        totalTransactionAmount = response.totalTransactionAmount
+                                        minTransactionAmount =   promoDataItem.minTransactionAmount!!
+
                                         if(response.totalTransactionAmount >= promoDataItem.minTransactionAmount!!){
                                             binding.redeemlayout.visibility= View.VISIBLE
                                             binding.completetarget.visibility= View.VISIBLE
@@ -190,7 +207,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
                                         else{
                                             binding.redeemlayout.visibility= View.GONE
                                             binding.completetarget.visibility= View.GONE
-                                            binding.expiringlayout.visibility= View.VISIBLE
+                                            binding.expiringlayout.visibility= View.GONE
                                             binding.showingprogresstarget.visibility= View.VISIBLE
                                         }
 
@@ -198,7 +215,7 @@ class PromocodeDetailsPage : AppCompatActivity() {
                                     else {
                                         binding.redeemlayout.visibility= View.GONE
                                         binding.completetarget.visibility= View.GONE
-                                        binding.expiringlayout.visibility= View.VISIBLE
+                                        binding.expiringlayout.visibility= View.GONE
                                         binding.showingprogresstarget.visibility= View.VISIBLE
                                         Toast.makeText(this, response.returnMessage, Toast.LENGTH_SHORT).show()
                                     }
