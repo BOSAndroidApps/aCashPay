@@ -166,9 +166,7 @@ class TransactionReportsActivity : AppCompatActivity() {
                     Log.d("ToDate", ToDate)
 
                     // If both dates are selected, validate and call API
-                    if (binding.reportmode.selectedItem.toString().trim().isNotEmpty()
-                        && binding.selectreport.selectedItem.toString().trim().isNotEmpty()
-                        && ToDate.isNotEmpty()
+                    if (binding.reportmode.selectedItem.toString().trim().isNotEmpty() && binding.selectreport.selectedItem.toString().trim().isNotEmpty() && ToDate.isNotEmpty()
                         && FromDate.isNotEmpty()
                     ) {
                         val from = sdf.parse(FromDate)
